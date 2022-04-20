@@ -25,14 +25,14 @@ jobs:
         with:
           username: d.arpasi@bocom.at
           server: bocos.gmbh
-          port: 22 # default is 22
+          port: 7822
           ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
  
           
           # will put all file under this path
           local_path: ./* # default is ./*
           # files will copy to under remote_path
-          remote_path: /var/www
+          remote_path: /home/bocosgmb/Alloy
           
           # sftp args
           args: '-o ConnectTimeout=5'
