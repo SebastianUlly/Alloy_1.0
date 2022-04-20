@@ -23,14 +23,14 @@ jobs:
       - name: SFTP Deploy
         uses: wlixcc/SFTP-Deploy-Action@v1.2.1
         with:
-          username: d.arpasi@bocom.at
+          username: bocosgmb
           server: bocos.gmbh
           port: 7822
           ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
  
           
           # will put all file under this path
-          local_path: ./* # default is ./*
+          local_path: ./
           # files will copy to under remote_path
           remote_path: /home/bocosgmb/Alloy
           
