@@ -1,0 +1,130 @@
+@import '../variables';
+
+// test-variables
+$number-of-spaces__1: 2;
+$number-of-spaces__2: 3;
+
+// styling of the div-container that holds everything for the input
+.input {
+	max-width: 100%;
+	margin: 1.5*$standard-value auto;
+	position: relative;
+	padding: 0 1.5*$standard-value;
+
+	// label sits inside the input-field and is moved to the top when the input-field is in focus, or has text in it
+	&__label {
+		position: absolute;
+		max-width: 76%;
+		left: 2*$standard-value;
+		top: 1.3*$standard-value;
+		padding: 0 0.6*$standard-value;
+		color: white;
+		opacity: 0.4;
+		transform-origin: 0 0;
+		transition: transform 120ms ease-in;
+		background-color: #212121;
+		text-overflow: ellipsis;
+		overflow: hidden;
+		// z-index: -1;
+	}
+
+	// error sits at the bottom of the input-field
+	&__error {
+		position: absolute;
+		right: 0.5*$standard-value;
+		bottom: -0.9*$standard-value;
+		color: white;
+		padding: 0 1.1*$standard-value;
+		white-space: nowrap;
+		transform: scale(0.8);
+		transform-origin: 0 0;
+		transition: transform 120ms ease-in;
+		background-color: #212121;
+		color: red;
+	}
+
+	// error-icon is like error and sits at the bottom of the input-filed
+	// holds only icon, no text
+	&__error-icon {
+		position: absolute;
+		right: 1.4*$standard-value;
+		bottom: -1.5*$standard-value;
+		padding: 0 0.3*$standard-value;
+		white-space: nowrap;
+		transform: scale(0.8);
+		transform-origin: 0 0;
+		transition: transform 120ms ease-in;
+		background-color: #212121;
+
+		// image-tag to hold the svg-icon
+		img {
+			filter: invert(26%) sepia(99%) saturate(7474%) hue-rotate(358deg) brightness(115%) contrast(113%);
+		}
+
+		&:hover + .input__error__message {
+			display: block;
+		}
+	}
+
+	// error-message sits inside the input-field, is visible when the user hovers over the error-icon
+	.input__error__message {
+		display: none;
+		position: absolute;
+		top: 0.8*$standard-value;
+		left: 2.5*$standard-value;
+		background-color: darkgrey;
+		color: white;
+		padding: 0.5*$standard-value;
+		z-index: 1;
+		font-size: 1.3*$standard-value;
+	}
+
+	&__field {
+		box-sizing: border-box;
+		display: block;
+		width: 100%;
+		border-radius: 0.4*$standard-value;
+		background-color: #212121;
+		border: 0.2*$standard-value solid white;
+		color: white;
+		padding: $standard-value;
+		font-size: 1.7*$standard-value;
+		background-color: transparent;
+
+		&:focus {
+			outline: none;
+		}
+
+		&:focus,
+		&:not(:placeholder-shown) {
+			& + .input__label {
+				transform: translate(0, -2*$standard-value) scale(0.8);
+				opacity: 1;
+				z-index: 0;
+			}
+		}
+	}
+
+	&__field.textarea__1 {
+		height: 4.333*$standard-value*$number-of-spaces__1+15*($number-of-spaces__1 - 1);
+	}
+
+	&__field.textarea__2 {
+		height: 4.333*$standard-value*$number-of-spaces__2+15*($number-of-spaces__2 - 1);
+		resize: none;
+	}
+}
+
+.input__field .disabled {
+	// box-sizing: border-box;
+	// display: block;
+	// width: 100%;
+	// border-radius: 0.4*$standard-value;
+	// background-color: #212121;
+	// border: 0.2*$standard-value solid white;
+	// color: white;
+	// padding: $standard-value;
+	// font-size: 1.7*$standard-value;
+	// background-color: transparent;
+	opacity: 0.5;
+}
