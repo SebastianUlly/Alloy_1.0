@@ -1,0 +1,75 @@
+@import '../variables';
+
+input[type="file"] {
+    display: none;
+}
+
+.custom-file-upload {
+	margin: 1.5*$standard-value auto;
+	position: relative;
+	box-sizing: border-box;
+	display: block;
+	color: white;
+	background-color: #212121;
+	border: 0.2*$standard-value solid white;
+	border-radius: 0.4*$standard-value;
+	width: 12*$standard-value;
+	height: 12*$standard-value;
+    cursor: pointer;
+
+	.line {
+		background-color: white;
+		position: absolute;
+		border: 0.1*$standard-value solid white;
+		border-radius: 100%;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+	}
+
+	.vertical-line {
+		width: 0px;
+		height: 20px;
+	}
+
+	.horizontal-line {
+		width: 20px;
+		height: 0px;
+	}
+}
+
+.thumbnail-container {
+	position: relative;
+	display: flex;
+	justify-content: space-evenly;
+
+	.thumbnail {
+		margin: 15px auto;
+		max-width: 13*$standard-value;
+		max-height: 13*$standard-value;
+		border: 0.2*$standard-value solid white;
+		border-radius: 0.4*$standard-value;
+		padding: 1*$standard-value 1*$standard-value;
+		position: relative;
+		box-sizing: border-box;
+		display: block;
+	}
+}
+
+
+.button-container {
+	position: relative;
+
+	button {
+		position: absolute;
+		top: 50%;
+		transform: translateY(-50%) translateX(-50%);
+		box-sizing: border-box;
+		display: block;
+		color: white;
+		background-color: transparent;
+		border: 0.2*$standard-value solid white;
+		border-radius: 0.4*$standard-value;
+		padding: 0.5*$standard-value 1*$standard-value;
+	}
+}
