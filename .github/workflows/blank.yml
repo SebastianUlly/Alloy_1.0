@@ -30,9 +30,9 @@ jobs:
  
           
           # will put all file under this path
-          local_path: ./Projekt
+          local_path: ./Alloy
           # files will copy to under remote_path
-          remote_path: /home/bocosgmb/Alloy
+          remote_path: /home/bocosgmb/
           
           # sftp args
           args: '-o ConnectTimeout=5'
