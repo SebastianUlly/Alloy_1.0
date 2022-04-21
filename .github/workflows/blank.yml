@@ -30,7 +30,7 @@ jobs:
  
           
           # will put all file under this path
-          local_path: ./
+          local_path: ./Projekt
           # files will copy to under remote_path
           remote_path: /home/bocosgmb/Alloy
           
