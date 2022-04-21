@@ -1,0 +1,145 @@
+<template>
+	<v-card class="popup">
+		{{ conversionFactor }}
+		<div
+			class="img-cropper"
+		>
+			<vue-cropper
+				ref="cropper"
+				:src="url"
+				preview=".preview"
+			/>
+		</div>
+		<div class="actions">
+			<a
+				href="#"
+				role="button"
+				@click.prevent="cropImage"
+			>
+				Übernehmen
+			</a>
+			<a
+				href="#"
+				role="button"
+				@click.prevent="cancel"
+			>
+				Abbrechen
+			</a>
+			<!-- <a
+				href="#"
+				role="button"
+				@click.prevent="showFileChooser"
+			>
+				Anderes Bild hochladen
+			</a> -->
+		</div>
+	</v-card>
+</template>
+
+<script>
+import VueCropper from 'vue-cropperjs'
+import 'cropperjs/dist/cropper.css'
+
+export default {
+	components: {
+		VueCropper
+	},
+
+	props: {
+		image: {
+			required: true
+		}
+	},
+
+	data () {
+		return {
+			url: '',
+			cropImg: '',
+			data: null,
+			aspectRatio: 2 / 1,
+			conversionFactor: 0,
+			imageSize: {
+				width: 0,
+				height: 0
+			}
+		}
+	},
+
+	created () {
+		// creating the url of the passed image-file
+		this.url = URL.createObjectURL(this.image)
+		this.getImageSize()
+	},
+
+	methods: {
+		async getImageSize () {
+			const imageDimensions = file =>
+				new Promise((resolve, reject) => {
+					const img = new Image()
+
+					// the following handler will fire after the successful loading of the image
+					img.onload = () => {
+						const { naturalWidth: width, naturalHeight: height } = img
+						resolve({ width, height })
+					}
+
+					// and this handler will fire if there was an error with the image (like if it's not really an image or a corrupted one)
+					img.onerror = () => {
+						reject('There was some problem with the image.')
+					}
+
+					img.src = URL.createObjectURL(file)
+				})
+
+			try {
+				const dimensions = await imageDimensions(this.image)
+				this.imageSize.width = dimensions.width
+				this.imageSize.height = dimensions.height
+				this.conversionFactor = 700 / this.imageSize.width
+			} catch (error) {
+				console.error(error)
+			}
+		},
+
+		cropImage () {
+			// get image data for post processing, e.g. upload or setting image src
+			this.cropImg = this.$refs.cropper.getCroppedCanvas().toDataURL()
+			this.data = this.$refs.cropper.getCropBoxData()
+			// console.log(this.data)
+			// console.log('Conversion: left = ' + Math.ceil(this.data.left / this.conversionFactor) + ' top: ' + Math.ceil(this.data.top / this.conversionFactor) + ' width: ' + Math.ceil(this.data.width / this.conversionFactor) + ' height: ' + Math.ceil(this.data.height / this.conversionFactor))
+			const convertedData = {
+				left: Math.ceil(this.data.left / this.conversionFactor),
+				top: Math.ceil(this.data.top / this.conversionFactor),
+				width: Math.ceil(this.data.width / this.conversionFactor),
+				height: Math.ceil(this.data.height / this.conversionFactor)
+			}
+			this.$emit('confirm', convertedData)
+		},
+
+		cancel () {
+			this.$emit('cancel')
+		},
+
+		showFileChooser () {
+			this.$refs.input.click()
+		}
+	}
+}
+</script>
+
+<style scoped>
+.popup {
+	position: fixed;
+    width: auto;
+    top: 100px;
+    left: 100px;
+    height: auto;
+    background-color: darkolivegreen;
+	z-index: 10;
+}
+
+.img-cropper {
+	width: 700px;
+	height: auto;
+}
+</style>

@@ -1,0 +1,109 @@
+@import '../variables';
+
+
+.editor {
+	&__label {
+		position: absolute;
+		max-width: 76%;
+		left: 2*$standard-value;
+		top: 0.5*$standard-value;
+		padding: 0 0.6*$standard-value;
+		color: white;
+		background-color: #212121;
+		z-index: 2;
+		transform: scale(0.8);
+	}
+
+	// error sits at the bottom of the input-field
+	&__error {
+		position: absolute;
+		right: 3*$standard-value;
+		bottom: 0.4*$standard-value;
+		color: white;
+		padding: 0 1.1*$standard-value;
+		white-space: nowrap;
+		transform: scale(0.8);
+		background-color: #212121;
+		color: red;
+	}
+
+	// error-message sits inside the input-field, is visible when the user hovers over the error-icon
+	&__error__message {
+		display: none;
+		position: absolute;
+		top: 0.8*$standard-value;
+		left: 2.5*$standard-value;
+		background-color: darkgrey;
+		color: white;
+		padding: 0.5*$standard-value;
+		z-index: 1;
+		font-size: 1.3*$standard-value;
+	}
+}
+
+.quill-editor {
+	margin: 15px;
+	border: 2px solid white;
+	border-radius: 4px;
+	height: auto;
+	position: relative;
+}
+
+.ql-toolbar {
+	position: absolute;
+	top: 0;
+	left: 0;
+	background-color: #222;
+	z-index: 1;
+}
+
+.ql-container {
+	margin: 12.5% 0 0 0;
+	height: 100px;
+	min-height: 100px;
+	max-height: 800px;
+	border: none;
+	resize: vertical;
+	overflow-y: hidden;
+	border: none;
+}
+
+.ql-editor {
+	overflow-y: scroll;
+	max-height: 100%;
+	border: none;
+	font-size: 1.7*$standard-value;
+	scrollbar-color: white black;
+	scrollbar-width: thin;
+
+	&::-webkit-scrollbar {
+		width: 1*$standard-value;
+	}
+
+	/* Track */
+	&::-webkit-scrollbar-track {
+		background-color: black; 
+	}
+	
+	// /* Handle */
+	&::-webkit-scrollbar-thumb {
+		background: white;
+	}
+	
+	/* Handle on hover */
+	&::-webkit-scrollbar-thumb:hover {
+		background: rgb(153, 153, 153);
+	}
+}
+
+.ql-snow .ql-stroke {
+	stroke: white;
+}
+
+.ql-snow .ql-fill {
+	fill: white;
+}
+
+.ql-picker-label::before {
+	color: white;
+}

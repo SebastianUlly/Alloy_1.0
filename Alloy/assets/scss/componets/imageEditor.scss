@@ -1,0 +1,33 @@
+@import '../variables';
+
+.popup {
+	border: 0.2*$standard-value solid white;
+	border-radius: 0.4*$standard-value;
+	padding: 2*$standard-value;
+	position: fixed;
+    width: auto;
+    top: 13*$standard-value;
+    left: 13*$standard-value;
+    height: auto;
+    background-color: #212121;
+	z-index: 10;
+	
+	.img-cropper {
+		max-width: 70*$standard-value;
+		max-height: 70*$standard-value;
+	}
+
+	.actions {
+		display: flex;
+		justify-content: space-evenly;
+
+		a {
+			border: 0.2*$standard-value solid white;
+			border-radius: 0.4*$standard-value;
+			padding: 0.5*$standard-value 1*$standard-value;
+			margin: 2*$standard-value 0 0 0;
+			color: white;
+			text-decoration: none;
+		}
+	}
+}

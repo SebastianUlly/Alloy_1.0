@@ -24,9 +24,10 @@
       ]
     },
     "types": [
-      "@types/node",
-      "@nuxt/types"
-    ]
+      "@nuxt/types",
+      "@types/node"
+    ],
+    "noImplicitAny": false
   },
   "exclude": [
     "node_modules",
