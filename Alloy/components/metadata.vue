@@ -22,7 +22,7 @@ import { mapGetters } from 'vuex'
 import FileId from '~/components/metadata/fileId'
 import FileName from '~/components/metadata/fileName'
 import FileParents from '~/components/metadata/fileParents'
-
+import ProjectNumber from '~/components/metadata/projectNumber/projectNumber'
 import { validationRules } from '~/assets/ValidationParser'
 
 import { NestedArray } from '~/assets/classes/arrayClasses'
@@ -31,7 +31,8 @@ export default {
 	components: {
 		FileId,
 		FileName,
-		FileParents
+		FileParents,
+		ProjectNumber,
 	},
 
 	props: {
