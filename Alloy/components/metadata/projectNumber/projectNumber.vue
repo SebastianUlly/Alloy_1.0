@@ -1,15 +1,16 @@
 <template>
   <div>
-      <span>
-          {{label}}
-      </span>
-    <input type="text" v-model="ProjectNumber" />
+    <span>
+      {{ label }}
+    </span>
+    <input type="text" v-model="ProjectNumber" id="farbe" />
   </div>
+
 </template>
 
 <script>
 import { mapGetters } from "vuex";
-import fileListVue from "../../elements/lib/fileList.vue";
+import { GetElementData } from '~/assets/classes/alloyClasses';
 export default {
   props: {
     elementId: {
@@ -31,14 +32,27 @@ export default {
     },
   },
   data() {
-    return { ProjectNumber: "", OldProjectNumber: "" };
+    return { ProjectNumber: "" };
   },
   computed: {
     ...mapGetters({ fileData: "file/getFileData" }),
+    validation() {
+      if (this.ProjectNumber.length >= 5) {
+        return true;
+      }
+      return false;
+    },
   },
   watch: {
-    ProjectNumber() {
+    ProjectNumber(value) {
       this.EnteredText();
+      const farbe2 = document.getElementById("farbe");
+      if(value.length >= 5){
+        farbe2.classList.add("active");
+      }
+      else{
+        farbe2.classList.remove("active");
+      }
     },
   },
   mounted() {
@@ -52,34 +66,12 @@ export default {
         data: { text: this.ProjectNumber },
       };
       this.$store.commit("file/setEnteredData", payload);
-      if (this.ProjectNumber === this.OldProjectNumber) {
-        const payload = {
-          elementId: this.elementId,
-
-          hasChanged: false,
-        };
-
-        // commiting the payload to the store
-
-        this.$store.commit("infoBox/setHasChangedPropertyOfElement", payload);
-      } else {
-        const payload = {
-          elementId: this.elementId,
-
-          hasChanged: true,
-        };
-
-        // commiting the payload to the store
-
-        this.$store.commit("infoBox/setHasChangedPropertyOfElement", payload);
-      }
     },
     findData() {
       const data = this.fileData.find(
         (item) => item.elementId === this.elementId
       );
       this.ProjectNumber = data.data.text;
-      this.OldProjectNumber = data.data.text;
     },
   },
 };
@@ -91,13 +83,19 @@ input {
   border-radius: 4px;
   margin: 0 auto;
   width: 100%;
+  color: white;
 }
-div{
-    margin: auto;
-    width: 100%;
-    padding: 0 15px;
+.active{
+    border: solid green 2px;
 }
-label{
-    
+div {
+  margin: auto;
+  width: 100%;
+  padding: 0 15px;
+}
+label {
+}
+input:focus {
+  outline: none;
 }
 </style>
