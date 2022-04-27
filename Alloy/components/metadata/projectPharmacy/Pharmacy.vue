@@ -3,9 +3,14 @@
     <span> {{ label }}</span>
     <select v-model="selectedPharmacy" name="" id="selector">
       <option value="" disabled selected>Bitte wählen sie im Menü</option>
-      <option value="Apo1">Apo1</option>
-      <option value="Apo2">Apo2</option>
-      <option value="Apo3">Apo3</option>
+
+      <option
+        :key="index"
+        v-for="(item, index) of parameters.pharmacies"
+        :value="item"
+      >
+        {{ item }}
+      </option>
     </select>
   </div>
 </template>
@@ -22,6 +27,11 @@ export default {
       type: String,
       requred: true,
     },
+    parameters: {
+      type: Object,
+      required: false,
+      default: null,
+    },
   },
   data() {
     return { selectedPharmacy: "" };
@@ -29,6 +39,12 @@ export default {
   watch: {
     selectedPharmacy(value) {
       this.sendSelectedPharmacy();
+    },
+    fileData: {
+      deep: true,
+      handler() {
+        this.startFunction();
+      },
     },
   },
   computed: {
@@ -51,6 +67,14 @@ export default {
       if (data) {
         this.selectedPharmacy = data.data.text;
       }
+    },
+    startFunction() {
+      this.findData();
+      const payload = {
+        elementId: this.elementId,
+        hasChanged: false,
+      };
+      this.$store.commit("infoBox/addToHasChangedArray", payload);
     },
   },
   mounted() {

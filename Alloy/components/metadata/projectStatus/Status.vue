@@ -3,12 +3,14 @@
     <span> {{ label }}</span>
     <select v-model="projectState" name="" id="selector">
       <option value="" disabled selected>
-        Bitte wählen sie die Zustand aus
+        Bitte wählen sie den Zustand aus
+        
       </option>
-      <option value="Zustand1">Zustand 1</option>
-      <option value="Zuzstand2">Zustand 2</option>
-      <option value="Zustand3">Zustand 3</option>
+      <option  :key="index" v-for="(item,index) of parameters.states" :value="item">
+        {{item}}
+      </option>
     </select>
+    <!--  <vue-json-pretty :data="parameters"/> -->
   </div>
 </template>
 
