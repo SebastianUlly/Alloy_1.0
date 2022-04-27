@@ -42,7 +42,7 @@ export default {
         },
         elementId: this.elementId,
       };
-      console.log(payload), this.$store.commit("file/setEnteredData", payload);
+      this.$store.commit("file/setEnteredData", payload);
     },
     findData() {
       const data = this.fileData.find(

@@ -1,16 +1,21 @@
 <template>
   <div>
-    <span>
-      {{ label }}
-    </span>
-    <input type="text" v-model="ProjectNumber" id="farbe" />
+    <div v-for="item of childrenWithData" :key="item.elementId">
+      <component
+        :is="item.componentId"
+        :label="item.label"
+        :data-original="item.textOriginal"
+        :parameters="item.parameters"
+        @update="enterText($event, item)"
+      />
+    </div>
   </div>
-
 </template>
 
 <script>
 import { mapGetters } from "vuex";
-import { GetElementData } from '~/assets/classes/alloyClasses';
+import { GetElementData } from "~/assets/classes/alloyClasses";
+import { deepCopy } from "~/assets/classes/objectClasses";
 export default {
   props: {
     elementId: {
@@ -32,70 +37,73 @@ export default {
     },
   },
   data() {
-    return { ProjectNumber: "" };
+    return { childrenWithData: null };
   },
   computed: {
     ...mapGetters({ fileData: "file/getFileData" }),
-    validation() {
-      if (this.ProjectNumber.length >= 5) {
-        return true;
-      }
-      return false;
-    },
   },
   watch: {
-    ProjectNumber(value) {
-      this.EnteredText();
-      const farbe2 = document.getElementById("farbe");
-      if(value.length >= 5){
-        farbe2.classList.add("active");
-      }
-      else{
-        farbe2.classList.remove("active");
-      }
+    fileData: {
+      deep: true,
+      handler() {
+        this.startFunction();
+      },
     },
   },
   mounted() {
-    this.findData();
+    this.startFunction();
   },
 
   methods: {
-    EnteredText() {
+    startFunction() {
+      this.findData();
+      for (const item of this.children) {
+        const payload = {
+          elementId: item.elementId,
+          hasChanged: false,
+        };
+        this.$store.commit("infoBox/addToHasChangedArray", payload);
+      }
+    },
+    enterText(event, item) {
+      item.textToEdit = event;
       const payload = {
-        elementId: this.elementId,
-        data: { text: this.ProjectNumber },
+        elementId: item.elementId,
+        data: { text: event },
       };
+
       this.$store.commit("file/setEnteredData", payload);
+      if (item.textToEdit === item.textOriginal) {
+        const payload = {
+          elementId: item.elementId,
+          hasChanged: false,
+        };
+        // commiting the payload to the store
+        this.$store.commit("infoBox/setHasChangedPropertyOfElement", payload);
+      } else {
+        const payload = {
+          elementId: item.elementId,
+          hasChanged: true,
+        };
+        // commiting the payload to the store
+        this.$store.commit("infoBox/setHasChangedPropertyOfElement", payload);
+      }
     },
     findData() {
-      const data = this.fileData.find(
-        (item) => item.elementId === this.elementId
-      );
-      this.ProjectNumber = data.data.text;
+      this.childrenWithData = deepCopy(this.children);
+      for (const item of this.childrenWithData) {
+        const data = new GetElementData(this.fileData, item.elementId);
+        if (data.dataFromDatabase) {
+          item.textOriginal = data.dataFromDatabase.text;
+          item.textToEdit = data.dataFromDatabase.text;
+        } else {
+          item.textOriginal = "";
+          item.textToEdit = "";
+        }
+      }
     },
   },
 };
 </script>
 
-<style scoped>
-input {
-  border: solid white 2px;
-  border-radius: 4px;
-  margin: 0 auto;
-  width: 100%;
-  color: white;
-}
-.active{
-    border: solid green 2px;
-}
-div {
-  margin: auto;
-  width: 100%;
-  padding: 0 15px;
-}
-label {
-}
-input:focus {
-  outline: none;
-}
-</style>
+<style scoped></style>
