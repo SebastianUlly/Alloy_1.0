@@ -1,7 +1,13 @@
 <template>
-  <div>
+  <div  :style="color" class="div">
     <span> {{ label }}</span>
-    <select v-model="selectedPharmacy" name="" id="selector">
+    <select
+      
+      @change="setColor()"
+      v-model="selectedPharmacy"
+      name=""
+      id="selector"
+    >
       <option value="" disabled selected>Bitte wählen sie im Menü</option>
 
       <option
@@ -34,7 +40,7 @@ export default {
     },
   },
   data() {
-    return { selectedPharmacy: "" };
+    return { selectedPharmacy: "", spanColor:"white", originalValue:""};
   },
   watch: {
     selectedPharmacy(value) {
@@ -49,6 +55,9 @@ export default {
   },
   computed: {
     ...mapGetters({ fileData: "file/getFileData" }),
+    color() {
+      return "color: " + this.spanColor
+    }
   },
   methods: {
     sendSelectedPharmacy() {
@@ -67,6 +76,9 @@ export default {
       if (data) {
         this.selectedPharmacy = data.data.text;
       }
+      this.originalValue = this.selectedPharmacy;
+      
+
     },
     startFunction() {
       this.findData();
@@ -76,7 +88,30 @@ export default {
       };
       this.$store.commit("infoBox/addToHasChangedArray", payload);
     },
+    setColor() {
+      if(this.selectedPharmacy !== this.originalValue){
+        this.spanColor="red";
+        const hasChangedPayload = {
+        elementId: this.elementId,
+        hasChanged: true,
+      };
+      // commiting the payload to the store
+      this.$store.commit("infoBox/setHasChangedPropertyOfElement", hasChangedPayload);
+      }
+      else
+      {
+        this.spanColor="white";
+        const hasChangedPayload = {
+        elementId: this.elementId,
+        hasChanged: false,
+      };
+      // commiting the payload to the store
+      this.$store.commit("infoBox/setHasChangedPropertyOfElement", hasChangedPayload);
+      }
+
+    },
   },
+
   mounted() {
     this.findData();
   },
@@ -96,4 +131,5 @@ div {
   width: 100%;
   padding: 0 15px;
 }
+
 </style>

@@ -25,7 +25,7 @@ import FileParents from '~/components/metadata/fileParents'
 import ProjectNumber from '~/components/metadata/projectNumber/projectNumber'
 import { validationRules } from '~/assets/ValidationParser'
 import Status from '~/components/metadata/projectStatus/Status'
-
+import ZipCode from '~/components/metadata/projectZipCode/ZipCode'
 import { NestedArray } from '~/assets/classes/arrayClasses'
 
 export default {
@@ -36,6 +36,7 @@ export default {
 		ProjectNumber,
 		Pharmacy,
 		Status,
+		ZipCode,
 	},
 
 	props: {
