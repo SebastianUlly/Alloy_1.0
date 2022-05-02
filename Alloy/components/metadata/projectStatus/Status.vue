@@ -1,16 +1,13 @@
 <template>
   <div>
-    <span> {{ label }}</span>
-    <select v-model="projectState" name="" id="selector">
-      <option value="" disabled selected>
-        Bitte wählen sie den Zustand aus
-        
-      </option>
-      <option  :key="index" v-for="(item,index) of parameters.states" :value="item">
-        {{item}}
-      </option>
-    </select>
-    <!--  <vue-json-pretty :data="parameters"/> -->
+   <selectInput
+   :elementId="elementId"
+   :children="children"
+   :label="label"
+   :options="parameters.options"
+   
+   
+   />
   </div>
 </template>
 
@@ -98,16 +95,5 @@ export default {
 </script>
 
 <style scoped>
-select {
-  border: solid white 2px;
-  border-radius: 4px;
-  margin: 0 auto;
-  width: 100%;
-  color: white;
-}
-div {
-  margin: auto;
-  width: 100%;
-  padding: 0 15px;
-}
+
 </style>
