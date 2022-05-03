@@ -4,7 +4,7 @@
    :label="label" 
    :elementId="elementId"
    :options="parameters.options"
-   :required="parameters.requred"
+   :required="parameters.required"
    
 
    />
@@ -27,10 +27,7 @@ export default{
       required: false,
       default: null,
     },
-    
-
-   }
-
+  }
 }
 </script>
 

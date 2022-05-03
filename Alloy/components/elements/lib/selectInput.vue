@@ -1,24 +1,14 @@
 <template>
   <div>
     <span> {{ label }}</span>
-    <select
-      v-model="selectedValue"
-      name=""
-      id="selector"
-    >
-    <option value="">Bitte wahlen Sie</option>
-      <option
-        :key="index"
-        v-for="(item, index) of options"
-        :value="item"
-      >
+    <select v-model="selectedValue" name="" id="selector">
+      <option value="">Bitte wahlen Sie</option>
+      <option :key="index" v-for="(item, index) of options" :value="item">
         {{ item }}
       </option>
     </select>
-    <vue-json-pretty :data="required"/>
   </div>
 </template>
-
 
 <script>
 export default {
@@ -34,21 +24,18 @@ export default {
     options: {
       type: Array,
       required: false,
-      default: null
-      },
-    required:{  
-        type: Boolean,  
-    }
+      default: null,
+    },
+    required: {
+      type: Boolean,
+    },
   },
   data() {
-    return { selectedValue: ""};
+    return { selectedValue: "" };
   },
-  methods: {
-    
-  },
+  methods: {},
 
-  mounted() {
-  },
+  mounted() {},
 };
 </script>
 
@@ -65,5 +52,4 @@ div {
   width: 100%;
   padding: 0 15px;
 }
-
 </style>

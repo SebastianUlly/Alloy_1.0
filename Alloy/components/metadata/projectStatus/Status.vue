@@ -5,6 +5,7 @@
    :children="children"
    :label="label"
    :options="parameters.options"
+   :required="parameters.required"
    
    
    />
@@ -17,7 +18,7 @@ export default {
   props: {
     elementId: {
       type: String,
-      required: true,
+      required: false,
     },
     children: {
       type: Array,

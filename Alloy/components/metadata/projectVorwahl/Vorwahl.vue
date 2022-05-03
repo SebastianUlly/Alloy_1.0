@@ -1,19 +1,20 @@
+
 <template>
   <div>
     <selectInput
       :label="label"
       :elementId="elementId"
       :options="parameters.options"
-
     />
   </div>
 </template>
+
 <script>
 export default {
   props: {
     label: {
       type: String,
-      reuired: true,
+      required: true,
     },
     elementId: {
       type: String,
@@ -25,6 +26,14 @@ export default {
       default: null,
     },
   },
+  data() {
+    return { vorwahl: "" };
+  },
+  watch: {
+    vorwahl: {
+      handler() {},
+    },
+  },
 };
-
 </script>
+

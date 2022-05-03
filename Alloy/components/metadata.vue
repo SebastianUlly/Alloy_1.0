@@ -10,6 +10,7 @@
 					:label="element.label"
 					:parameters="element.parameters"
 				/>
+
 			</div>
 		</div>
 		<!-- <vue-json-pretty :data="nestedArray" /> -->
@@ -25,8 +26,9 @@ import FileParents from '~/components/metadata/fileParents'
 import ProjectNumber from '~/components/metadata/projectNumber/projectNumber'
 import { validationRules } from '~/assets/ValidationParser'
 import Status from '~/components/metadata/projectStatus/Status'
-import ZipCode from '~/components/metadata/projectZipCode/ZipCode'
+import Vorwahl from '~/components/metadata/projectVorwahl/Vorwahl'
 import { NestedArray } from '~/assets/classes/arrayClasses'
+import zipCode from '~/components/metadata/projectZipCode/zipCode'
 
 export default {
 	components: {
@@ -36,7 +38,8 @@ export default {
 		ProjectNumber,
 		Pharmacy,
 		Status,
-		ZipCode,
+		Vorwahl,
+		zipCode,
 	},
 
 	props: {
