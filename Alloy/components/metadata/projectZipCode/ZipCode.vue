@@ -4,6 +4,7 @@
       :label="label"
       :elementId="elementId"
       :options="parameters.options"
+      :required="parameters.required"
 
     />
   </div>
