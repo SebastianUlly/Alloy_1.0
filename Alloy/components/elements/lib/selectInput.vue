@@ -13,6 +13,7 @@
 
 <script>
 import { mapGetters } from "vuex";
+
 export default {
   props: {
     label: {
@@ -37,23 +38,68 @@ export default {
   },
   methods: {
     onChange() {
-      console.table(this.fileData);
       if (this.selectedValue !== this.originalValue) {
         this.labelColor = "yellow";
+        const payload = {
+          elementId: this.elementId,
+          hasChanged: true,
+        };
+        this.$store.commit("infoBox/setHasChangedPropertyOfElement", payload);
       } else {
         this.labelColor = "white";
+        const payload = {
+          elementId: this.elementId,
+          hasChanged: false,
+        };
+        this.$store.commit("infoBox/setHasChangedPropertyOfElement", payload);
+      }
+      this.sendData();
+    },
+    findData() {
+      if (this.fileData) {
+        for (const item of this.fileData) {
+          if (this.elementId === item.elementId) {
+            if (item.data) {
+              this.originalValue = item.data.text;
+              this.selectedValue = item.data.text;
+            }
+          } else {
+            this.originalValue = "";
+            this.selectedValue = "";
+          }
+        }
       }
     },
-    // sendData(){
-    //   const payload = {
-    //   elementId: this.elementId,
-    //  data: this.selectedValue,
-    //   }
-    //  }
+    sendData() {
+      const payload = {
+        elementId: this.elementId,
+        data: {
+          text: this.selectedValue,
+        },
+      };
+      this.$store.commit("file/setEnteredData", payload);
+    },
+  },
+  mounted() {
+    const payload = {
+      elementId: this.elementId,
+      hasChanged: false,
+    };
+    this.findData();
+    this.$store.commit("infoBox/addToHasChangedArray", payload);
   },
   computed: {
-    ...mapGetters({fileData: "file/getFileData" })
+    ...mapGetters({ fileData: "file/getFileData" }),
+  },
+  watch: {
+    fileData: {
+      deep: true,
+      handler() {
+        this.findData();
+        this.onChange();
+      },
     },
+  },
 };
 </script>
 
