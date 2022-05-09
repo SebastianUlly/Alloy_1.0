@@ -57,15 +57,10 @@ export default {
     },
     findData() {
       if (this.fileData) {
-        for (const item of this.fileData) {
-          if (this.elementId === item.elementId) {
-            if (item.data) {
-              this.originalValue = item.data.text;
-              this.selectedValue = item.data.text;
-            }
-          } else {
-            this.originalValue = "";
-            this.selectedValue = "";
+        for (let item of this.fileData) {
+          if (this.elementId === item.elementId && item.data != null) {
+            this.originalValue = item.data.text;
+            this.selectedValue = item.data.text;
           }
         }
       }
@@ -78,6 +73,8 @@ export default {
         },
       };
       this.$store.commit("file/setEnteredData", payload);
+      console.log(payload);
+      console.log(this.selectedValue);
     },
   },
   mounted() {
