@@ -1,19 +1,17 @@
 <template>
   <div>
-   <selectInput
-   :label="label" 
-   :elementId="elementId"
-   :options="parameters.options"
-   :required="parameters.required"
-   
-
-   />
+    <selectInput
+      :label="label"
+      :elementId="elementId"
+      :options="parameters.options"
+      :required="parameters.required"
+    />
   </div>
 </template>
 
 <script>
-export default{
-   props:{
+export default {
+  props: {
     label: {
       type: String,
       required: true,
@@ -27,10 +25,8 @@ export default{
       required: false,
       default: null,
     },
-  }
-}
+  },
+};
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

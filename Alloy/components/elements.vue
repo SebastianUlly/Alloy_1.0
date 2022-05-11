@@ -26,6 +26,13 @@ import SingleLineList from './elements/SingleLineList'
 import SingleDirectionRelationship from './elements/relationships/SingleDirectionRelationship'
 import Drawer from './elements/drawer'
 import Headline from './elements/headline/Headline.vue'
+import Pharmacy from '~/components/metadata/projectPharmacy/Pharmacy'
+import ProjectNumber from '~/components/metadata/projectNumber/projectNumber'
+import Status from '~/components/metadata/projectStatus/Status'
+import Vorwahl from '~/components/metadata/projectVorwahl/Vorwahl'
+import zipCode from '~/components/metadata/projectZipCode/zipCode'
+import pharmacyGroup from '~/components/metadata/pharmacyGroup/pharmacyGroup'
+
 
 import { validationRules } from '~/assets/ValidationParser'
 
@@ -38,7 +45,13 @@ export default {
 		SingleLineList,
 		SingleDirectionRelationship,
 		Drawer,
-		Headline
+		Headline,
+		ProjectNumber,
+		Pharmacy,
+		Status,
+		Vorwahl,
+		zipCode,
+		pharmacyGroup,
 	},
 
 	props: {

@@ -19,27 +19,17 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import Pharmacy from '~/components/metadata/projectPharmacy/Pharmacy'
 import FileId from '~/components/metadata/fileId'
 import FileName from '~/components/metadata/fileName'
 import FileParents from '~/components/metadata/fileParents'
-import ProjectNumber from '~/components/metadata/projectNumber/projectNumber'
 import { validationRules } from '~/assets/ValidationParser'
-import Status from '~/components/metadata/projectStatus/Status'
-import Vorwahl from '~/components/metadata/projectVorwahl/Vorwahl'
 import { NestedArray } from '~/assets/classes/arrayClasses'
-import zipCode from '~/components/metadata/projectZipCode/zipCode'
 
 export default {
 	components: {
 		FileId,
 		FileName,
 		FileParents,
-		ProjectNumber,
-		Pharmacy,
-		Status,
-		Vorwahl,
-		zipCode,
 	},
 
 	props: {
