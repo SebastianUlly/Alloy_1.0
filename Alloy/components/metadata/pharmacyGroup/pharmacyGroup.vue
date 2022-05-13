@@ -1,27 +1,41 @@
 <template>
   <div>
-    <!-- <div :key="index" v-for="index of parameters.selectLimit">
-      <select class="select" name="" v-model="selectedPharmacy[index-1]">
-        <option id="option" :value="items.label" v-for="items of files" :key="items.id">
-          
-          {{ items.label }}
-        </option>
-      </select>
-    </div> -->
     <inputForPharmacy
       :elementId="elementId"
       :options="files"
       :selectLimit="parameters.selectLimit"
-    />
-      <vue-json-pretty :data="selectedPharmacy" />
+      @myevent="callback"
+      :labelColor="this.labelColor"
+    /><!-- if the input changed gives the value back to parent -->
+    <!--   <vue-json-pretty :data="selectedPharmacy" /> -->
   </div>
 </template>
 <script>
 import gql from "graphql-tag";
-
+import { mapGetters } from "vuex";
 export default {
-  mounted() {
-    this.getfile();
+  props: {
+    label: {
+      type: String,
+      required: true,
+    },
+    elementId: {
+      type: String,
+      required: true,
+    },
+    parameters: {
+      type: Object,
+      required: false,
+      default: null,
+    },
+  },
+  data() {
+    return {
+      files: [],
+      selectedPharmacy: ["", "", "", "", "", "", ""],
+      originalSelectedPharmacy: ["", "", "", "", "", "", ""],
+      labelColor: "white",
+    };
   },
   methods: {
     getfile() {
@@ -47,47 +61,39 @@ export default {
           console.log({ error });
         });
     },
+    callback(data) {
+      this.selectedPharmacy = data;
+      let payload;
+      if (
+        JSON.stringify(this.selectedPharmacy) !==
+        JSON.stringify(this.originalSelectedPharmacy)
+      ) {
+        this.labelColor = "red";
+        payload = {
+          elementId: this.elementId,
+          hasChanged: true,
+        };
+      } else {
+        this.labelColor = "white";
+        payload = {
+          elementId: this.elementId,
+          hasChanged: false,
+        };
+      }
+      this.$store.commit("infoBox/setHasChangedPropertyOfElement", payload);
+      console.log(payload.hasChanged);
+    },
   },
-  props: {
-    label: {
-      type: String,
-      required: true,
-    },
-    elementId: {
-      type: String,
-      required: true,
-    },
-    parameters: {
-      type: Object,
-      required: false,
-      default: null,
-    },
+  mounted() {
+    this.getfile();
+    const payload = {
+      elementId: this.elementId,
+      hasChanged: false,
+    };
+    this.$store.commit("infoBox/addToHasChangedArray", payload);
   },
-  data() {
-    return { files: [], selectedPharmacy:["","","","","","",""]};
-  },
-  watch: {
-    asd: {
-
-    },
+  computed: {
+    ...mapGetters({ fileData: "file/getFileData" }),
   },
 };
 </script>
-
-<style scoped>
-select {
-  border: solid white 2px;
-  border-radius: 4px;
-  margin: 0 auto;
-  width: 100%;
-  color: white;
-}
-div {
-  margin: auto;
-  width: 100%;
-  padding: 0 15px;
-}
-.required {
-  color: red;
-}
-</style>

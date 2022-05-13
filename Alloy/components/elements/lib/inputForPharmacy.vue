@@ -1,12 +1,12 @@
 <template>
   <div>
-    <div :key="index" v-for="index of selectLimit">
+    <div  class="divclass" :key="index" v-for="index of selectLimit">
       <select
         class="select"
         @change="onChange()"
-        onchange = "$emit('myevent')"
         name=""
         v-model="selectedPharmacy[index - 1]"
+        :style="'color:' + labelColor"
       >
         <option :value="item.label" v-for="item of options" :key="item.id">
           {{ item.label }}
@@ -31,12 +31,10 @@ export default {
       type: Array,
       required: true,
     },
-    value: {
-      type: Array,
-    },
-    modelValue: {
-      type: Array,
-    },
+    labelColor:{
+      type: String,
+      required: true,
+    }
   },
 
   data() {
@@ -47,23 +45,33 @@ export default {
   },
   methods: {
     onChange() {
-      if (
-        JSON.stringify(this.selectedPharmacy) !==
-        JSON.stringify(this.originalValue)
-      ) {
-        const payload = {};
-      }
+      console.log(this.labelColor)
+      this.$emit('myevent', this.selectedPharmacy)
+
     },
   },
   computed: {
-      inputVal:{
-          get(){
-              return this.modelValue
-          },
-          set(val){
-            this.$emit('update:modelValue', val)
-          }
-      }
+    
   },
 };
 </script>
+
+<style scoped>
+.required {
+  color: red;
+}
+option{
+  color:aliceblue;
+  width: 100%;
+  margin:0 auto;
+}
+.select{
+  border: solid white 2px;
+  border-radius: 4px;
+  margin: 0 auto;
+  width: 80%;
+  color: white;
+}
+
+
+</style>
