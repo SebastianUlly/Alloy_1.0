@@ -1,13 +1,18 @@
 <template>
   <div>
+    <span  :style="'color:' + labelColor" >{{label}}</span>
+    
     <inputForPharmacy
       :elementId="elementId"
       :options="files"
       :selectLimit="parameters.selectLimit"
       @myevent="callback"
-      :labelColor="this.labelColor"
+    
+      :originalValue="originalSelectedPharmacy"
     /><!-- if the input changed gives the value back to parent -->
-    <!--   <vue-json-pretty :data="selectedPharmacy" /> -->
+    <vue-json-pretty :data="selectedPharmacy" />
+    <vue-json-pretty :data="originalSelectedPharmacy" />
+
   </div>
 </template>
 <script>
@@ -28,6 +33,7 @@ export default {
       required: false,
       default: null,
     },
+
   },
   data() {
     return {
@@ -62,34 +68,58 @@ export default {
         });
     },
     callback(data) {
-      this.selectedPharmacy = data;
+      console.log(data)
+      this.selectedPharmacy  = data;
       let payload;
       if (
         JSON.stringify(this.selectedPharmacy) !==
         JSON.stringify(this.originalSelectedPharmacy)
       ) {
-        this.labelColor = "red";
+        this.labelColor = "red"
         payload = {
           elementId: this.elementId,
           hasChanged: true,
         };
       } else {
-        this.labelColor = "white";
+        this.labelColor = "green"
         payload = {
           elementId: this.elementId,
           hasChanged: false,
         };
       }
+      this.sendData();
       this.$store.commit("infoBox/setHasChangedPropertyOfElement", payload);
-      console.log(payload.hasChanged);
+    },
+    sendData() {
+      const valuesToSend = JSON.parse(JSON.stringify(this.selectedPharmacy))
+      const payload = {
+        elementId: this.elementId,
+        data: {
+          values: valuesToSend,
+        },
+      };
+      this.$store.commit("file/setEnteredData", payload);
+    },
+    findData() {
+      if (this.fileData) {
+        for (let item of this.fileData) {
+          if (this.elementId === item.elementId && item.data != null) {
+            const valuesFromDatabase = JSON.parse(JSON.stringify(item.data.values))
+            this.originalSelectedPharmacy = valuesFromDatabase;
+            this.selectedPharmacy = valuesFromDatabase;
+          }
+        }
+      }
     },
   },
+
   mounted() {
     this.getfile();
     const payload = {
       elementId: this.elementId,
       hasChanged: false,
     };
+    this.findData();
     this.$store.commit("infoBox/addToHasChangedArray", payload);
   },
   computed: {

@@ -1,13 +1,17 @@
 <template>
   <div>
-    <div  class="divclass" :key="index" v-for="index of selectLimit">
+    <div class="divclass" :key="index" v-for="index of selectLimit">
       <select
         class="select"
         @change="onChange()"
-        name=""
         v-model="selectedPharmacy[index - 1]"
-        :style="'color:' + labelColor"
+        :style="
+          selectedPharmacy[index - 1] === originalValue[index - 1]
+            ? 'color:white'
+            : 'color:red'
+        "
       >
+        <option default value="">Wählen Sie</option>
         <option :value="item.label" v-for="item of options" :key="item.id">
           {{ item.label }}
         </option>
@@ -31,27 +35,37 @@ export default {
       type: Array,
       required: true,
     },
-    labelColor:{
-      type: String,
+    originalValue: {
+      type: Array,
       required: true,
-    }
+    },
   },
 
   data() {
     return {
-      originalValue: ["", "", "", "", "", "", ""],
       selectedPharmacy: ["", "", "", "", "", "", ""],
     };
   },
   methods: {
     onChange() {
-      console.log(this.labelColor)
-      this.$emit('myevent', this.selectedPharmacy)
-
+      console.log(this.labelColor);
+      this.$emit("myevent", this.selectedPharmacy);
+    },
+    start() {
+      this.selectedPharmacy = JSON.parse(JSON.stringify(this.originalValue));
     },
   },
-  computed: {
-    
+  computed: {},
+  mounted() {
+    this.start();
+  },
+  watch: {
+    originalValue: {
+      deep: true,
+      handler() {
+        this.start();
+      },
+    },
   },
 };
 </script>
@@ -60,18 +74,16 @@ export default {
 .required {
   color: red;
 }
-option{
-  color:aliceblue;
+option {
+  color: aliceblue;
   width: 100%;
-  margin:0 auto;
+  margin: 0 auto;
 }
-.select{
+.select {
   border: solid white 2px;
   border-radius: 4px;
   margin: 0 auto;
   width: 80%;
   color: white;
 }
-
-
 </style>
