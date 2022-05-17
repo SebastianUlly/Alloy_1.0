@@ -1,22 +1,31 @@
 <template>
   <div>
-    <div class="divclass" :key="index" v-for="index of selectLimit">
+    <div class="divclass" :key="index" v-for="index of this.inputNumber">
       <select
-        class="select"
+        :class="[
+          'select',
+          selectedPharmacy[index - 1] === originalValue[index - 1]
+            ? ''
+            : 'changed',
+        ]"
         @change="onChange()"
         v-model="selectedPharmacy[index - 1]"
-        :style="
-          selectedPharmacy[index - 1] === originalValue[index - 1]
-            ? 'color:white'
-            : 'color:red'
-        "
       >
         <option default value="">Wählen Sie</option>
         <option :value="item.label" v-for="item of options" :key="item.id">
           {{ item.label }}
         </option>
       </select>
+      <button class="deleteBtn">-</button>
     </div>
+    <button
+      :class="this.available ? '' : 'hidden'"
+      @click="addPharmacy()"
+      class="addPharmacy"
+      :disabled="!this.available"
+    >
+      + Apotheke
+    </button>
   </div>
 </template>
 
@@ -44,13 +53,31 @@ export default {
   data() {
     return {
       selectedPharmacy: ["", "", "", "", "", "", ""],
+      inputNumber: 0,
+      available: true,
     };
   },
   methods: {
+    addPharmacy() {
+      console.log(this.originalValue.length)
+      this.inputNumber = this.inputNumber + 1;
+      if (
+        this.inputNumber <= this.selectLimit - 1
+      ) {
+        this.available = true;
+      } else{
+        this.available = false;
+
+      }
+    },
+    deletePharmacy(){
+
+    },
     onChange() {
-      console.log(this.labelColor);
+      
       this.$emit("myevent", this.selectedPharmacy);
     },
+    // setting original value to string and then to a variable
     start() {
       this.selectedPharmacy = JSON.parse(JSON.stringify(this.originalValue));
     },
@@ -58,6 +85,7 @@ export default {
   computed: {},
   mounted() {
     this.start();
+    
   },
   watch: {
     originalValue: {
@@ -71,19 +99,5 @@ export default {
 </script>
 
 <style scoped>
-.required {
-  color: red;
-}
-option {
-  color: aliceblue;
-  width: 100%;
-  margin: 0 auto;
-}
-.select {
-  border: solid white 2px;
-  border-radius: 4px;
-  margin: 0 auto;
-  width: 80%;
-  color: white;
-}
+@import url("~/assets/scss/componets/inputForPharmacy.css");
 </style>

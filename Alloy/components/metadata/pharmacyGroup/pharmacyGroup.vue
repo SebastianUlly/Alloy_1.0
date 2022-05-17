@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <span  :style="'color:' + labelColor" >{{label}}</span>
+  <div class="labeldiv">
+  <span class="label" :style="'color:' + labelColor" >{{label}}</span>
     
     <inputForPharmacy
       :elementId="elementId"
@@ -10,8 +10,8 @@
     
       :originalValue="originalSelectedPharmacy"
     /><!-- if the input changed gives the value back to parent -->
-    <vue-json-pretty :data="selectedPharmacy" />
-    <vue-json-pretty :data="originalSelectedPharmacy" />
+ <!--    <vue-json-pretty :data="selectedPharmacy" />
+    <vue-json-pretty :data="originalSelectedPharmacy" /> -->
 
   </div>
 </template>
@@ -68,7 +68,7 @@ export default {
         });
     },
     callback(data) {
-      console.log(data)
+      
       this.selectedPharmacy  = data;
       let payload;
       if (
@@ -127,3 +127,6 @@ export default {
   },
 };
 </script>
+<style scoped>
+@import url("~/assets/scss/componets/inputForPharmacy.css");
+</style>
