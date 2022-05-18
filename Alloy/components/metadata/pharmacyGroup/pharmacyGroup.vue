@@ -1,6 +1,6 @@
 <template>
   <div class="labeldiv">
-  <span class="label" :style="'color:' + labelColor" >{{label}}</span>
+  <div class="label" :style="'color:' + labelColor" >{{label}}</div>
     
     <inputForPharmacy
       :elementId="elementId"
@@ -38,8 +38,8 @@ export default {
   data() {
     return {
       files: [],
-      selectedPharmacy: ["", "", "", "", "", "", ""],
-      originalSelectedPharmacy: ["", "", "", "", "", "", ""],
+      selectedPharmacy: [],
+      originalSelectedPharmacy: [],
       labelColor: "white",
     };
   },

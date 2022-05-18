@@ -1,62 +1,69 @@
 .required {
-    color: red;
-  }
-  option {
-    width: 100%;
-    margin: 0 auto;
-  }
-  .select{
-    border-radius: 4px;
-    width: 90%;
-    height: 40px;
-    color: white;
-    display: block;
-    border: 2px solid white;
-    padding: 5px;
-    
-  }
-  .select.changed:focus-visible,.select.changed{
-    border: 2px solid red !important;
-    outline:none;
-
-  }
-option{
-    margin-left: 10px;
-
+  color: red;
 }
-.divclass{
-    margin: 10px auto;
-    width: 90%;
-    height: 40px;
-    display: flex;
-    justify-content: space-between;
+option {
+  width: 100%;
+  margin: 0 auto;
 }
-.addPharmacy{
-    border-radius: 4px;
-    border: 2px solid white;
-    width: 90%;
-    display: block;
-    margin: 0 auto 30px;
-    height: 40px;
-}
-.addPharmacy.hidden{
+.select {
   border-radius: 4px;
-  border: 2px solid grey;
   width: 90%;
-  display: block;
-  margin: 0 auto 30px;
   height: 40px;
-  color: grey;
+  color: white;
+  display: block;
+  border: 2px solid white;
+}
+.select.changed:focus-visible,
+.select.changed {
+  border: 2px solid red !important;
+  outline: none;
+}
+option {
+  margin-left: 10px;
+  text-align: center;
+}
+.divclass {
+  margin: 10px auto;
+  width: 90%;
+  height: 40px;
+  display: flex;
+  justify-content: space-between;
 }
 
-.deleteBtn{
-    border-radius: 4px;
-    border: 2px solid white;
-    width: 8%;
-    height: 40px;
-    font-size: x-large;
+.addButton {
+  border-radius: 4px;
+  border: 2px solid white;
+  width: 8%;
+  height: 40px;
+  font-size: x-large;
 }
-
-
-
+.label {
+  text-align: center;
+}
+.list{
+  border: 2px solid white;
+  border-radius: 4px;
+  width:90%;
+  margin:0 auto;
+}
+.listedPharmacies {
+  width:90%;
+  margin: 10px 0px;
   
+  padding: 5px;
+}
+.listedPharmaciesDiv {
+  display: flex;
+  justify-content: space-between;
+  align-content: center;
+  align-items: center;
+  width: 90%;
+  margin:0 auto;
+}
+.deleteButton {
+  display:flex;
+  justify-content: center;
+  align-content: center;
+  align-items: center;
+  padding: 5px;
+}
