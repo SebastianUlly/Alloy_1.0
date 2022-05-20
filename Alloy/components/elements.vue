@@ -17,20 +17,21 @@
 </template>
 
 <script>
-
 import { mapGetters } from 'vuex'
-
 import Relationships from './elements/relationships/Relationships'
 import Selection from './elements/Selection'
 import SingleLineList from './elements/SingleLineList'
 import SingleDirectionRelationship from './elements/relationships/SingleDirectionRelationship'
 import Drawer from './elements/drawer'
 import Headline from './elements/headline/Headline.vue'
-
+import Pharmacy from '~/components/metadata/projectPharmacy/Pharmacy'
+import ProjectNumber from '~/components/metadata/projectNumber/projectNumber'
+import Status from '~/components/metadata/projectStatus/Status'
+import Vorwahl from '~/components/metadata/projectVorwahl/Vorwahl'
+import zipCode from '~/components/metadata/projectZipCode/zipCode'
+import pharmacyGroup from '~/components/metadata/pharmacyGroup/pharmacyGroup'
 import { validationRules } from '~/assets/ValidationParser'
-
 import { NestedArray } from '~/assets/classes/arrayClasses'
-
 export default {
 	components: {
 		Relationships,
@@ -38,36 +39,36 @@ export default {
 		SingleLineList,
 		SingleDirectionRelationship,
 		Drawer,
-		Headline
+		Headline,
+		ProjectNumber,
+		Pharmacy,
+		Status,
+		Vorwahl,
+		zipCode,
+		pharmacyGroup,
 	},
-
 	props: {
 		value: { type: Object, required: true }
 	},
-
 	data () {
 		return {
 			form: {},
 			nestedArray: null
 		}
 	},
-
 	// function to return the validation-object for every component
 	validations () {
 		return { form: validationRules(this.schemaElements) }
 	},
-
 	computed: {
 		...mapGetters({
 			schemaElements: 'schema/getSchemaElements',
 			allowedElements: 'authentication/getAllowedElements'
 		}),
-
 		watchSchemaElements () {
 			return this.schemaElements
 		}
 	},
-
 	watch: {
 		schemaElements: {
 			deep: true,
@@ -77,7 +78,6 @@ export default {
 				// console.log(this.nestedArray)
 			}
 		},
-
 		watchSchemaElements: {
 			deep: true,
 			handler () {
@@ -87,25 +87,20 @@ export default {
 			}
 		}
 	},
-
 	methods: {
 		update (key, value) {
 			this.form[key] = value
 			this.$v.form[key].$touch()
-
 			this.$emit('input', {
 				...this.value,
 				[key]: value
 			})
-
 			this.announceStatus()
 		},
-
 		validate () {
 			this.$v.$touch()
 			this.announceStatus()
 		},
-
 		announceStatus () {
 			this.$emit('status', {
 				invalid: this.$v.$invalid
@@ -116,5 +111,4 @@ export default {
 </script>
 
 <style>
-
 </style>

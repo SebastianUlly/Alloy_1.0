@@ -1,0 +1,60 @@
+.required {
+    color: red;
+  }
+  option {
+    width: 100%;
+    margin: 0 auto;
+  }
+  .select{
+    border-radius: 4px;
+    width: 90%;
+    height: 40px;
+    color: white;
+    display: block;
+    border: 2px solid white;
+    padding: 5px;
+    
+  }
+  .select.changed:focus-visible,.select.changed{
+    border: 2px solid red !important;
+    outline:none;
+
+  }
+option{
+    margin-left: 10px;
+
+}
+.divclass{
+    margin: 10px auto;
+    width: 90%;
+    height: 40px;
+    display: flex;
+    justify-content: space-between;
+}
+.addPharmacy{
+    border-radius: 4px;
+    border: 2px solid white;
+    width: 90%;
+    display: block;
+    margin: 0 auto 30px;
+    height: 40px;
+}
+.addPharmacy.hidden{
+  border-radius: 4px;
+  border: 2px solid grey;
+  width: 90%;
+  display: block;
+  margin: 0 auto 30px;
+  height: 40px;
+  color: grey;
+}
+
+.deleteBtn{
+    border-radius: 4px;
+    border: 2px solid white;
+    width: 8%;
+    height: 40px;
+    font-size: x-large;
+}
+
+
