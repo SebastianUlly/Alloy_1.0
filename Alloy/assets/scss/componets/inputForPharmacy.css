@@ -3,15 +3,17 @@
 }
 option {
   width: 100%;
-  margin: 0 auto;
+  background-color: black;
+  padding: 5px;
 }
 .select {
   border-radius: 4px;
   width: 90%;
   height: 40px;
-  color: white;
+  color:white;
   display: block;
   border: 2px solid white;
+  text-indent: 5px;
 }
 .select.changed:focus-visible,
 .select.changed {
@@ -48,9 +50,7 @@ option {
 }
 .listedPharmacies {
   width:90%;
-  margin: 10px 0px;
-  
-  padding: 5px;
+  margin: 5px 0px;
 }
 .listedPharmaciesDiv {
   display: flex;
