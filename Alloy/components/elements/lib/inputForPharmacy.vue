@@ -1,31 +1,25 @@
 <template>
   <div>
-    <div class="divclass" :key="index" v-for="index of this.inputNumber">
-      <select
-        :class="[
-          'select',
-          selectedPharmacy[index - 1] === originalValue[index - 1]
-            ? ''
-            : 'changed',
-        ]"
-        @change="onChange()"
-        v-model="selectedPharmacy[index - 1]"
-      >
-        <option default value="">Wählen Sie</option>
-        <option :value="item.label" v-for="item of options" :key="item.id">
-          {{ item.label }}
+    <div class="list">
+      <div class="listedPharmaciesDiv" v-for="item of allPharmacy" :key="item">
+        <div class="listedPharmacies">{{ item }}</div>
+        <div class="deleteButton">
+          <v-icon> mdi-delete </v-icon>
+        </div>
+      </div>
+    </div>
+
+    <!-- <vue-json-pretty :data="originalValue"/>
+    <vue-json-pretty :data="selectedPharmacy"/> -->
+    <div class="divclass">
+      <select class="select" id="options">
+        <option selected disabled value="">Wählen Sie die gewünschte Apotheke aus</option>
+        <option :value="item.label" v-for="item of availablePharmacies" :key="item.id">
+          <div>{{ item.label }}</div>
         </option>
       </select>
-      <button class="deleteBtn">-</button>
+      <button @click="addPharmacy()" :disabled="availablePharmacies.length === 0" class="addButton">+</button>
     </div>
-    <button
-      :class="this.available ? '' : 'hidden'"
-      @click="addPharmacy()"
-      class="addPharmacy"
-      :disabled="!this.available"
-    >
-      + Apotheke
-    </button>
   </div>
 </template>
 
@@ -49,41 +43,38 @@ export default {
       required: true,
     },
   },
+
   data() {
     return {
-      selectedPharmacy: ["", "", "", "", "", "", ""],
+      selectedPharmacy: [],
       inputNumber: 0,
       available: true,
+      pharmacyIsActive: [],
     };
   },
   methods: {
+    deletePharmacy() {},
     addPharmacy() {
-      console.log(this.originalValue.length)
-      this.inputNumber = this.inputNumber + 1;
-      if (
-        this.inputNumber <= this.selectLimit - 1
-      ) {
-        this.available = true;
-      } else{
-        this.available = false;
-      }
+      const optionValue = document.getElementById("options").value;
+      this.selectedPharmacy.push(optionValue);
+      this.$emit("myevent", this.allPharmacy);
+      document.getElementById('options').value = "";
+      this.pharmacyIsActive.push(optionValue);
     },
-    deletePharmacy(){
-    },
-    onChange() {
-      
-      this.$emit("myevent", this.selectedPharmacy);
-    },
-    // setting original value to string and then to a variable
     start() {
-      this.selectedPharmacy = JSON.parse(JSON.stringify(this.originalValue));
+      //this.selectedPharmacy = JSON.parse(JSON.stringify(this.originalValue));
     },
   },
-  computed: {},
-  mounted() {
-    this.start();
-    
+  computed: {
+    allPharmacy() {
+      return [...this.originalValue, ...this.selectedPharmacy];
+    },
+    availablePharmacies(){
+      return this.options.filter(p => !this.allPharmacy.includes(p.label));
+    },
   },
+  mounted() {},
+  created() {},
   watch: {
     originalValue: {
       deep: true,
