@@ -1,12 +1,13 @@
 <template>
   <div class="labeldiv">
-  <span class="label" :style="'color:' + labelColor" >{{label}}</span>
+  
     
     <inputForPharmacy
       :elementId="elementId"
       :options="files"
       :selectLimit="parameters.selectLimit"
       @myevent="callback"
+      :label="label"
     
       :originalValue="originalSelectedPharmacy"
     /><!-- if the input changed gives the value back to parent -->

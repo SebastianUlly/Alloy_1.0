@@ -12,7 +12,7 @@
 				/>
 			</div>
 		</div>
-		<!-- <vue-json-pretty :data="nestedArray" /> -->
+		
 	</div>
 </template>
 

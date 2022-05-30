@@ -1,10 +1,11 @@
 <template>
   <div>
-    <span :style="'color:' + labelColor"> {{ label }}</span> <!-- writes out the lebel name of the input element and gives sytle to it -->
-    <span class="required" v-if="required">required</span>   <!-- checks if "reguired" porp is true or false and write it out -->
-    <select v-model="selectedValue" name="" id="selector" @change="onChange()"> <!--triggers the onChange function -->
+    
+    <span :style="'color:' + labelColor"> {{ label }}</span>
+    <span class="required" v-if="required">required</span>  
+    <select v-model="selectedValue" name="" id="selector" @change="onChange()"> 
       <option value="">Bitte wahlen Sie</option>
-      <option :key="index" v-for="(item, index) of options" :value="item">  <!-- option with for cycle that lists the options-->
+      <option :key="index" v-for="(item, index) of options" :value="item">  
         {{ item }}
       </option>
     </select>
@@ -111,6 +112,15 @@ div {
   padding: 0 15px;
 }
 .required {
+  color: red;
+}
+.div>label{
+  position:absolute;
+  top:-1px;
+  left:20px;
+  background-color:rgb(255, 0, 0);
+}
+.label{
   color: red;
 }
 </style>

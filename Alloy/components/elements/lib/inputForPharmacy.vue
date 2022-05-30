@@ -1,6 +1,9 @@
 <template>
   <div>
+    
+
     <div class="list">
+      <span class="label" :style="'color:' + labelColor">{{ label }}</span>
       <div class="listedPharmaciesDiv" v-for="item of allPharmacy" :key="item">
         <div class="listedPharmacies">{{ item }}</div>
         <div class="deleteButton">
@@ -8,17 +11,26 @@
         </div>
       </div>
     </div>
-
-    <!-- <vue-json-pretty :data="originalValue"/>
-    <vue-json-pretty :data="selectedPharmacy"/> -->
     <div class="divclass">
-      <select class="select" id="options">
-        <option selected disabled value="">Wählen Sie die gewünschte Apotheke aus</option>
-        <option :value="item.label" v-for="item of availablePharmacies" :key="item.id">
+      <select v-model="optionValue" class="select" id="options">
+        <option selected disabled value=""
+          >Wählen Sie die gewünschte Apotheke aus</option
+        >
+        <option
+          :value="item.label"
+          v-for="item of availablePharmacies"
+          :key="item.id"
+        >
           <div>{{ item.label }}</div>
         </option>
       </select>
-      <button @click="addPharmacy()" :disabled="availablePharmacies.length === 0" class="addButton">+</button>
+      <button
+        @click="addPharmacy()"
+        :disabled="availablePharmacies.length === 0"
+        class="addButton"
+      >
+        +
+      </button>
     </div>
   </div>
 </template>
@@ -28,20 +40,24 @@ export default {
   props: {
     elementId: {
       type: String,
-      required: true,
+      required: true
     },
     selectLimit: {
       type: Number,
-      required: true,
+      required: true
     },
     options: {
       type: Array,
-      required: true,
+      required: true
     },
     originalValue: {
       type: Array,
-      required: true,
+      required: true
     },
+    label: {
+      type: String,
+      required: true,
+    }
   },
 
   data() {
@@ -50,28 +66,28 @@ export default {
       inputNumber: 0,
       available: true,
       pharmacyIsActive: [],
+      optionValue: ""
     };
   },
   methods: {
     deletePharmacy() {},
     addPharmacy() {
-      const optionValue = document.getElementById("options").value;
-      this.selectedPharmacy.push(optionValue);
+      this.selectedPharmacy.push(this.optionValue);
       this.$emit("myevent", this.allPharmacy);
-      document.getElementById('options').value = "";
-      this.pharmacyIsActive.push(optionValue);
+      this.optionValue = "";
+      this.pharmacyIsActive.push(this.optionValue);
     },
     start() {
       //this.selectedPharmacy = JSON.parse(JSON.stringify(this.originalValue));
-    },
+    }
   },
   computed: {
     allPharmacy() {
       return [...this.originalValue, ...this.selectedPharmacy];
     },
-    availablePharmacies(){
+    availablePharmacies() {
       return this.options.filter(p => !this.allPharmacy.includes(p.label));
-    },
+    }
   },
   mounted() {},
   created() {},
@@ -80,9 +96,9 @@ export default {
       deep: true,
       handler() {
         this.start();
-      },
-    },
-  },
+      }
+    }
+  }
 };
 </script>
 
