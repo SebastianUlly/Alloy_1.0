@@ -8,6 +8,7 @@
       :selectLimit="parameters.selectLimit"
       @myevent="callback"
       :label="label"
+      :labelColor = "labelColor"
     
       :originalValue="originalSelectedPharmacy"
     /><!-- if the input changed gives the value back to parent -->
@@ -69,7 +70,7 @@ export default {
     },
     callback(data) {
       
-      this.selectedPharmacy  = data;
+      this.selectedPharmacy = data;
       let payload;
       if (
         JSON.stringify(this.selectedPharmacy) !==
