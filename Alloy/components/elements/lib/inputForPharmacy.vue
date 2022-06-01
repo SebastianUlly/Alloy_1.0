@@ -10,19 +10,25 @@
       <div
         id="div"
         class="listedPharmaciesDiv"
-        v-for="item of allPharmacy"
+        v-for="(item, index) of allPharmacy"
         :key="item"
       >
         <div class="listedPharmacies">{{ item }}</div>
 
         <div class="deleteButton">
           <v-icon @click="deletePharmacy(item)"> mdi-delete </v-icon>
-          <v-icon @click="move(+1 ,item)">mdi-arrow-down-bold</v-icon>
-          <v-icon @click="move(-1, item)">mdi-arrow-up-bold</v-icon>
+          <v-icon :disabled="index === 0" @click="move(index, -1)"
+            >mdi-arrow-up-bold</v-icon
+          >
+          <v-icon
+            :disabled="index === allPharmacy.length - 1"
+            @click="move(index, 1)"
+            >mdi-arrow-down-bold</v-icon
+          >
         </div>
       </div>
     </div>
-   <!--  select and add button to add the selected pharmacy to the array -->
+    <!--  select and add button to add the selected pharmacy to the array -->
     <div class="divclass">
       <select v-model="optionValue" class="select" id="options">
         <option selected disabled value=""
@@ -88,14 +94,13 @@ export default {
     };
   },
   methods: {
-    move(direction, item){
-      let temporary = this.allPharmacy;
-      for(let i; i < temporary.length; i++){
-        if(item === temporary[i]){
-          let itemToMove = temporary[i];
-          console.log(itemToMove)
-        }
-      }
+    //called when the up or down arrow is clicked it takes the index of the item that is clicked and the direction (1 or -1) and then it moves the item in the array.
+    move(index, direction) {
+      this.allPharmacy.splice(
+        index + direction,
+        0,
+        this.allPharmacy.splice(index, 1)[0]
+      );
     },
     //deleting pharmacies from allPharmacy
     deletePharmacy(itemForDelete) {
@@ -104,18 +109,16 @@ export default {
           this.allPharmacy.splice(i, 1);
         }
       }
-      this.$emit("myevent", this.allPharmacy);
     },
 
     // adding the selected pharmacy to the allPharmacy array
     addPharmacy() {
       this.allPharmacy.push(this.optionValue);
-      this.$emit("myevent", this.allPharmacy);
       this.optionValue = "";
       this.pharmacyIsActive.push(this.optionValue);
     },
 
-    //called when the originalValue is changed and converts it to an array
+    //called when the originalValue or the allPharmacy is changed and converts it to an array
     start() {
       this.allPharmacy = JSON.parse(JSON.stringify(this.originalValue));
     }
@@ -128,8 +131,15 @@ export default {
   },
   mounted() {},
   created() {},
-  // watching the originalValue and if it changes it will call the start() method.
+  // watching the allPharmacy and if it changes it will call the start() method
   watch: {
+    allPharmacy: {
+      deep: true,
+      handler() {
+        this.$emit("myevent", this.allPharmacy);
+      }
+    },
+    // watching the originalValue and if it changes it will call the start() method
     originalValue: {
       deep: true,
       handler() {

@@ -82,7 +82,7 @@ export default {
           hasChanged: true,
         };
       } else {
-        this.labelColor = "green"
+        this.labelColor = "white"
         payload = {
           elementId: this.elementId,
           hasChanged: false,
