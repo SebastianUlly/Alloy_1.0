@@ -107,17 +107,17 @@ export default {
     findData() {
       if (this.fileData) {
         for (let item of this.fileData) {
-          if (this.elementId === item.elementIdó) {
+          if (this.elementId === item.elementId && item.data !== null) {
             if (item.data) {
               const valuesFromDatabase = JSON.parse(
                 JSON.stringify(item.data.values)
               );
               this.originalSelectedPharmacy = valuesFromDatabase;
               this.selectedPharmacy = valuesFromDatabase;
-              } else {
-                this.originalSelectedPharmacy = [];
-                this.selectedPharmacy = [];
-              }
+            } else {
+              this.originalSelectedPharmacy = [];
+              this.selectedPharmacy = [];
+            }
           }
         }
       }

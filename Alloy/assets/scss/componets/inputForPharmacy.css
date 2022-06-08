@@ -29,6 +29,9 @@ option {
   display: flex;
   justify-content: space-between;
 }
+.padding{
+  padding-top:20px;
+}
 
 .addButton {
   border-radius: 4px;
@@ -44,7 +47,7 @@ option {
 .list{
   border: 2px solid white;
   border-radius: 4px;
-  width:95%;
+  width:93%;
   margin:0 auto;
   position: relative;
 }

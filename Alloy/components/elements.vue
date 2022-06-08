@@ -27,13 +27,16 @@ import Headline from './elements/headline/Headline.vue'
 import Pharmacy from '~/components/metadata/projectPharmacy/Pharmacy'
 import ProjectNumber from '~/components/metadata/projectNumber/projectNumber'
 import Status from '~/components/metadata/projectStatus/Status'
-import Vorwahl from '~/components/metadata/projectVorwahl/Vorwahl'
-import zipCode from '~/components/metadata/projectZipCode/zipCode'
+//import Vorwahl from '~/components/metadata/projectVorwahl/Vorwahl'
+//import zipCode from '~/components/metadata/projectZipCode/zipCode'
 import pharmacyGroup from '~/components/metadata/pharmacyGroup/pharmacyGroup'
 import { validationRules } from '~/assets/ValidationParser'
 import { NestedArray } from '~/assets/classes/arrayClasses'
+import projectList from './elements/projectList/projectList'
+import projectDate from '~/components/metadata/projectDate/projectDate'
 export default {
 	components: {
+		projectList,
 		Relationships,
 		Selection,
 		SingleLineList,
@@ -43,9 +46,10 @@ export default {
 		ProjectNumber,
 		Pharmacy,
 		Status,
-		Vorwahl,
-		zipCode,
+		//Vorwahl,
+		//zipCode,
 		pharmacyGroup,
+		projectDate,
 	},
 	props: {
 		value: { type: Object, required: true }
