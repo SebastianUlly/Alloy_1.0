@@ -16,6 +16,7 @@ option {
   display: block;
   border: 2px solid white;
   text-indent: 5px;
+  
 }
 .select.changed:focus-visible,
 .select.changed {
@@ -28,9 +29,10 @@ option {
   height: 40px;
   display: flex;
   justify-content: space-between;
+  margin-bottom: 10px;
 }
 .padding{
-  padding-top:20px;
+  padding:20px 0;
 }
 
 .addButton {
@@ -47,7 +49,7 @@ option {
 .list{
   border: 2px solid white;
   border-radius: 4px;
-  width:93%;
+  width:95%;
   margin:0 auto;
   position: relative;
 }

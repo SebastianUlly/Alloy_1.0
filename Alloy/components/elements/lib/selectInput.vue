@@ -100,7 +100,7 @@ export default {
 
 <style scoped>
 select {
-  border: solid white 2px;
+ border: solid white 2px;
   border-radius: 4px;
   margin: 0 auto;
   width: 100%;

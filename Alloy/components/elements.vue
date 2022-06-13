@@ -47,7 +47,7 @@ export default {
 		Pharmacy,
 		Status,
 		//Vorwahl,
-		//zipCode,
+	//zipCode,
 		pharmacyGroup,
 		projectDate,
 	},

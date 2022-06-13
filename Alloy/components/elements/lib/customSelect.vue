@@ -29,7 +29,7 @@
       </div>
     </div>
     <!--  select and add button to add the selected pharmacy to the array -->
-    <div class="divclass">
+    <div class="divclass" v-if="availableItems.length > 0 && allSelectedItems.length < selectLimit">
       <select v-model="optionValue" class="select" id="options">
         <option selected disabled value=""
           >Wählen Sie die gewünschte {{this.label}} aus</option
@@ -46,7 +46,7 @@
       <!-- button that calls the addItem() when clicked it is disabled if the availableItems array is empty or the optionValue is empty -->
       <button
         @click="addItem()"
-        :disabled="availableItems.length === 0 || optionValue === '' || allSelectedItems.length === selectLimit"
+        :disabled=" optionValue === ''"
         class="addButton"
       >
         +
@@ -111,7 +111,6 @@ export default {
       this.allSelectedItems.push(this.optionValue);
       this.optionValue = "";
       this.itemIsActive.push(this.optionValue);
-      console.log(this.selectLimit)
     },
 
     //called when the originalValue or the allSelectedItems is changed and converts it to an array
