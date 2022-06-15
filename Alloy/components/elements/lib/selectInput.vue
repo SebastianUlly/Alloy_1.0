@@ -123,4 +123,9 @@ div {
 .label{
   color: red;
 }
+option{
+  color: white;
+  background-color: #1E1E1E;
+  text-align:center;
+}
 </style>

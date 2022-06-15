@@ -25,7 +25,7 @@ import SingleDirectionRelationship from './elements/relationships/SingleDirectio
 import Drawer from './elements/drawer'
 import Headline from './elements/headline/Headline.vue'
 import Pharmacy from '~/components/metadata/projectPharmacy/Pharmacy'
-import ProjectNumber from '~/components/metadata/projectNumber/projectNumber'
+import projectName from '~/components/metadata/projectName/projectName'
 import Status from '~/components/metadata/projectStatus/Status'
 //import Vorwahl from '~/components/metadata/projectVorwahl/Vorwahl'
 //import zipCode from '~/components/metadata/projectZipCode/zipCode'
@@ -34,6 +34,7 @@ import { validationRules } from '~/assets/ValidationParser'
 import { NestedArray } from '~/assets/classes/arrayClasses'
 import projectList from './elements/projectList/projectList'
 import projectDate from '~/components/metadata/projectDate/projectDate'
+import projectNumber from '~/components/metadata/projectNumber/projectNumber'
 export default {
 	components: {
 		projectList,
@@ -43,13 +44,14 @@ export default {
 		SingleDirectionRelationship,
 		Drawer,
 		Headline,
-		ProjectNumber,
+		projectName,
 		Pharmacy,
 		Status,
 		//Vorwahl,
 	//zipCode,
 		pharmacyGroup,
 		projectDate,
+		projectNumber,
 	},
 	props: {
 		value: { type: Object, required: true }
