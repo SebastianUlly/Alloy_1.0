@@ -24,11 +24,13 @@ import FileName from '~/components/metadata/fileName'
 import FileParents from '~/components/metadata/fileParents'
 import { validationRules } from '~/assets/ValidationParser'
 import { NestedArray } from '~/assets/classes/arrayClasses'
+import projectPreview from '~/components/metadata/projectPreview/projectPreview'
 export default {
 	components: {
 		FileId,
 		FileName,
 		FileParents,
+		projectPreview,
 	},
 	props: {
 		value: { type: Object, required: true }
