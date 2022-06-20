@@ -13,8 +13,8 @@
       />
     </div>
     <!-- if the input changed gives the value back to parent -->
-    <!--    <vue-json-pretty :data="selectedPharmacy" />
-    <vue-json-pretty :data="originalSelectedPharmacy" /> -->
+     <vue-json-pretty :data="files" />
+    <!-- <vue-json-pretty :data="originalSelectedPharmacy" /> -->
   </div>
 </template>
 <script>
@@ -60,12 +60,22 @@ export default {
               fileBySchemaId(schemaId: $schemaId) {
                 id
                 label
+                data
               }
             }
           `
         })
         .then(data => {
-          this.files = data.data.fileBySchemaId;
+          let temp = data.data.fileBySchemaId;
+          this.files = temp.map(item => {
+            return {
+              id:item.id,
+              label:item.data.data.text,
+              data:item.data,
+              longLabel:item.label,
+              __typename:item.__typename
+            }
+          })
           /* console.log(data); */
         })
         .catch(error => {
@@ -107,7 +117,7 @@ export default {
     findData() {
       if (this.fileData) {
         for (let item of this.fileData) {
-          if (this.elementId === item.elementIdó) {
+          if (this.elementId === item.elementId) {
             if (item.data) {
               const valuesFromDatabase = JSON.parse(
                 JSON.stringify(item.data.values)
@@ -131,6 +141,7 @@ export default {
     };
     this.findData();
     this.$store.commit("infoBox/addToHasChangedArray", payload);
+    console.log(this.SelectedPharmacy)
   },
   computed: {
     ...mapGetters({ fileData: "file/getFileData" })

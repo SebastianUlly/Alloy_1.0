@@ -39,6 +39,7 @@ export default {
     ...mapGetters({
       fileData: "file/getFileData",
       fileValues: "file/getFileValues"
+
     }),
 
     findData() {

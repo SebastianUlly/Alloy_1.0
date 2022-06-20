@@ -35,6 +35,7 @@ import { NestedArray } from '~/assets/classes/arrayClasses'
 import projectList from './elements/projectList/projectList'
 import projectDate from '~/components/metadata/projectDate/projectDate'
 import projectNumber from '~/components/metadata/projectNumber/projectNumber'
+import pharmacyAbb from '~/components/metadata/pharmacyAbb/pharmacyAbb'
 export default {
 	components: {
 		projectList,
@@ -52,6 +53,7 @@ export default {
 		pharmacyGroup,
 		projectDate,
 		projectNumber,
+		pharmacyAbb,
 	},
 	props: {
 		value: { type: Object, required: true }

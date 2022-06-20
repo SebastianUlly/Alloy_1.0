@@ -26,7 +26,7 @@ export default {
       required: true,
     }
   },
-  daata(){
+  data(){
     return{
         Year: null,
         Month: null, 
