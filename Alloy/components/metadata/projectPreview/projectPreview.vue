@@ -7,8 +7,6 @@
       :dataOriginal="findData"
       :parameters="parameters"
     />
-    <vue-json-pretty :data="fileData" />
-    <vue-json-pretty :data="fileValues" />
   </div>
 </template>
 
@@ -38,24 +36,25 @@ export default {
   computed: {
     ...mapGetters({
       fileData: "file/getFileData",
-      fileValues: "file/getFileValues"
+      fileValues: "file/getFileValues",
+      directory: "directory/getDirectory"
     }),
 
     findData() {
       let data = "";
       if (this.fileData && this.fileValues) {
+        data += this.directory.find(item => item.id === this.fileValues.parentIds[0])?.label
+        data += "-";
+        data += this.fileValues.label
+        data += "-";
         for (let i = 0; i < this.parameters.previewList.length; i++) {
           let fieldData =
             this.fileData.find(
               item => item.elementId == this.parameters.previewList[i]
-            ) ??
-            (this.fileValues.parentIds.includes(this.parameters.previewList[i])
-              ? this.fileValues
-              : null);
+            )
           data +=
             fieldData?.data?.text ??
-            fieldData?.data?.values ??
-            fieldData?.label ??
+            fieldData?.data?.values
             "n/a";
           if (i < this.parameters.previewList.length - 1) {
             data += "-";
@@ -64,7 +63,6 @@ export default {
       }
       return data;
     }
-  },
-  methods: {}
+  }
 };
 </script>

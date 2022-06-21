@@ -31,7 +31,7 @@
     <!--  select and add button to add the selected pharmacy to the array -->
     <div class="divclass" v-if="availableItems.length > 0 && allSelectedItems.length < selectLimit">
       <select v-model="optionValue" class="select" id="options">
-        <option selected disabled value=""
+        <option default disabled value=""
           >Wählen Sie die gewünschte {{this.label}} aus</option
         >
         <!-- loop for writing the options out -->
@@ -116,7 +116,7 @@ export default {
     //called when the originalValue or the allSelectedItems is changed and converts it to an array
     start() {
       this.allSelectedItems = JSON.parse(JSON.stringify(this.originalValue));
-    }
+    },
   },
   // Filtering the options array and returning the items that are not in the allSelectedItems array.
   computed: {

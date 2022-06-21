@@ -12,9 +12,6 @@
         :originalValue="originalSelectedPharmacy"
       />
     </div>
-    <!-- if the input changed gives the value back to parent -->
-    <!--    <vue-json-pretty :data="selectedPharmacy" />
-    <vue-json-pretty :data="originalSelectedPharmacy" /> -->
   </div>
 </template>
 <script>
@@ -60,13 +57,22 @@ export default {
               fileBySchemaId(schemaId: $schemaId) {
                 id
                 label
+                data
               }
             }
           `
         })
         .then(data => {
-          this.files = data.data.fileBySchemaId;
-          /* console.log(data); */
+          const temp = data.data.fileBySchemaId
+          this.files =
+          temp.map(
+            function (item, index, array) {
+              return {
+                label: item.data.find(elementData => elementData.elementId === '91f42e63-98b4-462b-bf65-58b416718cb0')?.data?.text,
+                id: item.id
+              }
+            }
+          )
         })
         .catch(error => {
           console.log({ error });
@@ -107,7 +113,7 @@ export default {
     findData() {
       if (this.fileData) {
         for (let item of this.fileData) {
-          if (this.elementId === item.elementIdó) {
+          if (this.elementId === item.elementId) {
             if (item.data) {
               const valuesFromDatabase = JSON.parse(
                 JSON.stringify(item.data.values)
