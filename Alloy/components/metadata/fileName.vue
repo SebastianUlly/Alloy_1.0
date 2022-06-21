@@ -60,6 +60,13 @@ export default {
 			handler () {
 				this.startFunction()
 			}
+		},
+
+		children: {
+			deep: true,
+			handler () {
+				this.startFunction()
+			}
 		}
 	},
 
