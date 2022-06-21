@@ -1,8 +1,25 @@
 <template>
 	<div>
 		<div>
+			<div
+				class="input"
+			>
+				<!-- input-field -->
+				<input
+					v-model="search"
+					type="text"
+					placeholder=" "
+					class="input__field"
+				>
+				<!-- label to the input-field -->
+				<span class="input__label">
+					Suche
+				</span>
+			</div>
 			<v-treeview
 				:items="nestedDirectory"
+				:search="search"
+				:filter="filter"
 				:active.sync="active"
 				activatable
 				return-object
@@ -107,7 +124,9 @@ export default {
 	data () {
 		return {
 			rawDirectory: [],
-			active: []
+			active: [],
+			search: '',
+			caseSensitive: false
 		}
 	},
 
@@ -143,7 +162,13 @@ export default {
 		// computed property to watch the changes in the directory
 		watchDirectoryForChanges () {
 			return this.storeDirectory
-		}
+		},
+
+		filter () {
+			return this.caseSensitive
+				? (item, search, textKey) => item[textKey].indexOf(search) > -1
+				: undefined
+		},
 	},
 
 	watch: {
@@ -345,8 +370,10 @@ export default {
 }
 </script>
 
-<style>
-	.entity_label {
-		padding-left: 15px
-	}
+<style scoped lang="scss">
+@import '../assets/scss/componets/inputField.scss';
+
+.entity_label {
+	padding-left: 15px
+}
 </style>
