@@ -3,20 +3,23 @@
 }
 option {
   width: 100%;
-  background-color: black;
-  padding: 5px;
-  margin-left: 10px;
+  background-color: #1E1E1E ;
   text-align: center;
 }
 .select {
   border-radius: 4px;
   width: 90%;
-  height: 40px;
+  height: 50px;
   color:white;
   display: block;
   border: 2px solid white;
   text-indent: 5px;
-  
+  background: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='white' viewBox='0 0 16 16'><path fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/></svg>") no-repeat;
+  background-position: calc(100% - 0.75rem) center !important;
+  -moz-appearance:none !important;
+  -webkit-appearance: none !important; 
+  appearance: none !important;
+  padding-right: 2rem !important;
 }
 .select.changed:focus-visible,
 .select.changed {
@@ -25,21 +28,24 @@ option {
 }
 .divclass {
   margin: 10px auto;
-  width: 95%;
   height: 40px;
   display: flex;
   justify-content: space-between;
   margin-bottom: 10px;
 }
 .padding{
-  padding:20px 0;
+  padding:20px 15px;
+}
+.text{
+  margin-top: 12px;
+  text-align: center;
 }
 
 .addButton {
   border-radius: 4px;
   border: 2px solid white;
   width: 8%;
-  height: 40px;
+  height: 50px;
   font-size: x-large;
 }
 .addButton:disabled {
@@ -49,19 +55,20 @@ option {
 .list{
   border: 2px solid white;
   border-radius: 4px;
-  width:95%;
   margin:0 auto;
   position: relative;
+  height: 50px;
+  text-align: center;
 }
 .list>.label{
   position:absolute;
   top:-13px;
-  left:10px;
+  left:5px;
   background-color: #1E1E1E;
-  font-size: 13px;
+  font-size: 15px;
+  padding: 0 5px;
 }
 .listedPharmacies {
-  width:90%;
   margin: 5px 0px;
 }
 .listedPharmaciesDiv {
@@ -69,7 +76,8 @@ option {
   justify-content: space-between;
   align-content: center;
   align-items: center;
-  width: 90%;
+  width: 95%;
+  padding-top:5px;
   margin:0 auto;
 }
 .deleteButton {

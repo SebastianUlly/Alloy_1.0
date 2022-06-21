@@ -3,7 +3,7 @@
     <div class="list">
       <span class="label" :style="'color:' + labelColor">{{ label }}</span>
       <!-- showing a message when the allSelectedItems array is empty -->
-      <div v-if="!allSelectedItems.length" style="text-align:center; color: grey">
+      <div class="text" v-if="!allSelectedItems.length" style="text-align:center; color: grey">
         Noch keine {{label}} ausgewählt
       </div>
       <!-- loop that creates a div for each item in the allSelectedItems array -->
@@ -17,10 +17,11 @@
 
         <div class="deleteButton">
           <v-icon @click="deleteItem(item)"> mdi-delete </v-icon>
-          <v-icon :disabled="index === 0" @click="move(index, -1)"
-            >mdi-arrow-up-bold</v-icon
-          >
+          <v-icon v-if="selectLimit > 1" :disabled="index === 0" @click="move(index, -1)">
+            mdi-arrow-up-bold
+          </v-icon>
           <v-icon
+          v-if="selectLimit > 1"
             :disabled="index === allSelectedItems.length - 1"
             @click="move(index, 1)"
             >mdi-arrow-down-bold</v-icon
