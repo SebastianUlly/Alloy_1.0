@@ -12,9 +12,6 @@
         :originalValue="originalSelectedPharmacy"
       />
     </div>
-    <!-- if the input changed gives the value back to parent -->
-     <vue-json-pretty :data="files" />
-    <!-- <vue-json-pretty :data="originalSelectedPharmacy" /> -->
   </div>
 </template>
 <script>
@@ -66,17 +63,16 @@ export default {
           `
         })
         .then(data => {
-          let temp = data.data.fileBySchemaId;
-          this.files = temp.map(item => {
-            return {
-              id:item.id,
-              label:item.data.data.text,
-              data:item.data,
-              longLabel:item.label,
-              __typename:item.__typename
+          const temp = data.data.fileBySchemaId
+          this.files =
+          temp.map(
+            function (item, index, array) {
+              return {
+                label: item.data.find(elementData => elementData.elementId === '91f42e63-98b4-462b-bf65-58b416718cb0')?.data?.text,
+                id: item.id
+              }
             }
-          })
-          /* console.log(data); */
+          )
         })
         .catch(error => {
           console.log({ error });
@@ -141,7 +137,6 @@ export default {
     };
     this.findData();
     this.$store.commit("infoBox/addToHasChangedArray", payload);
-    console.log(this.SelectedPharmacy)
   },
   computed: {
     ...mapGetters({ fileData: "file/getFileData" })
