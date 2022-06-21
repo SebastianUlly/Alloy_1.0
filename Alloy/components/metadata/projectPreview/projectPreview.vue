@@ -43,11 +43,11 @@ export default {
     findData() {
       let data = "";
       if (this.fileData && this.fileValues) {
-        data += this.directory.find(item => item.id === this.fileValues.parentIds[0])?.label
-        data += "-";
-        data += this.fileValues.label
-        data += "-";
         for (let i = 0; i < this.parameters.previewList.length; i++) {
+          if (i === 1) {
+            data += this.fileValues.label
+            data += "-";
+          }
           let fieldData =
             this.fileData.find(
               item => item.elementId == this.parameters.previewList[i]

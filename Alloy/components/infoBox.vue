@@ -9,6 +9,7 @@
 			class="select-container"
 			:style="disableSelect ? 'opacity: 0.4' : 'opacity: 1'"
 		>
+			<div class="select-label">Schema</div>
 			<span class="selectedSchemaLabel">
 				{{ selectedSchema.label }}
 			</span>
@@ -422,23 +423,30 @@ export default {
 	width: 100%;
 	padding: 1.5*$standard-value;
 	position: relative;
-	span {
+
+	.selectedSchemaLabel {
 		position: absolute;
 		z-index: 1;
-		top: 7.5*$standard-value;
+		top: 2.8*$standard-value;
 		left: 3.1*$standard-value;
 		font-size: 1.75*$standard-value;
 	}
 }
 
 .schema-select {
+	position: relative;
 	border: 0.2*$standard-value solid white;
 	border-radius: 0.4*$standard-value;
 	padding: $standard-value;
 	color: white;
 	width: 100%;
-	
 	font-size: 1.8*$standard-value;
+	background: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='white' viewBox='0 0 16 16'><path fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/></svg>") no-repeat;
+	background-position: calc(100% - 0.75rem) center !important;
+	-moz-appearance:none !important;
+	-webkit-appearance: none !important; 
+	appearance: none !important;
+	padding-right: 2rem !important;
 
 	option {
 		color: black;
@@ -450,21 +458,25 @@ export default {
 	width: 100%;
 	display: flex;
 	justify-content: center;
-	
-
-	
 }
+
 button {
-		padding: 1*$standard-value;
-		color: #a9a9a9;
-		background-color: #28a745;
-		 border: 0.1*$standard-value solid #114a1f; 
-		border-radius: 0.4*$standard-value;
-	}
-.selectedSchemaLabel{
-position: absolute;
-background-color: #1E1E1E;
-top: -10%;
- /* ich habe keine idee mehr, warum es nicht bewegen möchte*/
+	padding: 1*$standard-value;
+	color: #a9a9a9;
+	background-color: #28a745;
+	border: 0.1*$standard-value solid #114a1f; 
+	border-radius: 0.4*$standard-value;
+}
+
+.select-label {
+	position: absolute;
+	max-width: 76%;
+	left: 2*$standard-value;
+	top: 0.6*$standard-value;
+	padding: 0 0.6*$standard-value;
+	color: white;
+	background-color: #212121;
+	z-index: 10;
+	font-size: 13px;
 }
 </style>
