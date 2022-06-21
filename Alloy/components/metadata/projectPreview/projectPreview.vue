@@ -40,8 +40,11 @@ export default {
       directory: "directory/getDirectory"
     }),
 
+    // function to find the data creating the full project-designation
     findData() {
+      // defining data as an empty string
       let data = "";
+      // checking if the fileData and fileValues are not undefined
       if (this.fileData && this.fileValues) {
         for (let i = 0; i < this.parameters.previewList.length; i++) {
           if (i === 1) {

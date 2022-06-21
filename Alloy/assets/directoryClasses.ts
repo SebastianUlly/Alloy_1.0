@@ -22,11 +22,17 @@ class MainDirectory {
 			}
 		}[]
 	) {
+		// looping through the raw (flat) directory
 		for (const entry of rawDirectory) {
+			// looping through all the files
 			for (const file of files) {
+				// checking if the fileId of the file and the fileId in the directory-entry match
 				if (entry.fileId === file.fileId) {
+					// adding the necessary data-fileds to the directory-entry
 					entry.label = file.label
+					entry.name = file.label
 					entry.schemaId = file.schemaId
+					// looping through the schemas to get the correct schemaId to the directory-entry
 					for (const schema of schemes) {
 						if (file.schemaId === schema.id) {
 							entry.isLeaf = schema.metadata.isLeaf
