@@ -1,10 +1,13 @@
 <template>
   <div>
-    
-    <span :style="'color:' + labelColor"> {{ label }}</span>
+    <v-icon @click="refs.selector.click()" class="chevron">mdi-chevron-down</v-icon>
+    <span class="label" :style="'color:' + labelColor"> {{ label }}</span>
     <span class="required" v-if="required">required</span>  
-    <select v-model="selectedValue" name="" id="selector" @change="onChange()"> 
-      <option value="">Bitte wahlen Sie</option>
+    <select ref="selector" v-model="selectedValue" name="" id="selector" @change="onChange()">
+      <option value="">Noch kein {{label}} ausgewählt 
+      
+      </option>
+      
       <option :key="index" v-for="(item, index) of options" :value="item">  
         {{ item }}
       </option>
@@ -39,7 +42,7 @@ export default {
   methods: {
     onChange() {                                                          // if the selected value is not the original value then add the yellow property to label
       if (this.selectedValue !== this.originalValue) {
-        this.labelColor = "yellow";
+        this.labelColor = "red";
         const payload = {
           elementId: this.elementId,
           hasChanged: true,
@@ -105,11 +108,14 @@ select {
   margin: 0 auto;
   width: 100%;
   color: white;
+  height: 50px;
+  background-color: transparent;
 }
 div {
   margin: auto;
   width: 100%;
   padding: 0 15px;
+  position: relative;
 }
 .required {
   color: red;
@@ -117,15 +123,28 @@ div {
 .div>label{
   position:absolute;
   top:-1px;
-  left:20px;
+  left:10px;
   background-color:rgb(255, 0, 0);
 }
-.label{
-  color: red;
-}
+
 option{
   color: white;
   background-color: #1E1E1E;
   text-align:center;
+}
+.label{
+    color: white;
+    position: absolute;
+    top: -10px;
+    left: 20px;
+    background-color: #1E1E1E;
+    font-size: 15px;
+    padding: 0 5px    
+}
+.chevron{
+  position:absolute;
+  top: 50%;
+  right:5%;
+  transform:translateY(-50%);
 }
 </style>
