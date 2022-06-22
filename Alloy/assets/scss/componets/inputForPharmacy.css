@@ -3,10 +3,10 @@
 }
 option {
   width: 100%;
-  background-color: #1E1E1E ;
-  text-align: center;
+  background-color: #1E1E1E;
 }
 .select {
+  padding:5px;
   border-radius: 4px;
   width: 90%;
   height: 50px;
@@ -38,7 +38,7 @@ option {
 }
 .text{
   margin-top: 12px;
-  text-align: center;
+  padding-left: 10px;
 }
 
 .addButton {
@@ -58,7 +58,6 @@ option {
   margin:0 auto;
   position: relative;
   height: 50px;
-  text-align: center;
 }
 .list>.label{
   position:absolute;
@@ -76,7 +75,7 @@ option {
   justify-content: space-between;
   align-content: center;
   align-items: center;
-  width: 95%;
+  width: 97%;
   padding-top:5px;
   margin:0 auto;
 }
