@@ -462,10 +462,15 @@ export default {
 
 button {
 	padding: 1*$standard-value;
-	color: #a9a9a9;
+	color: #ffffff;
 	background-color: #28a745;
-	border: 0.1*$standard-value solid #114a1f; 
+	border: 0.1*$standard-value solid #28A144; 
 	border-radius: 0.4*$standard-value;
+	transition-duration: 0.4s;
+}
+button:hover {
+  background-color:#30c553;
+  color: white;
 }
 
 .select-label {

@@ -154,6 +154,7 @@ export default {
 select {
   border: solid white 2px;
   border-radius: 4px;
+  padding: 10px;
   margin: 0 auto;
   width: 100%;
   color: white;
@@ -187,7 +188,7 @@ div {
 option {
   color: white;
   background-color: #1e1e1e;
-  text-align: center;
+  padding: 10px;
 }
 .label {
   color: white;

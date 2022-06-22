@@ -7,6 +7,9 @@
       :dataOriginal="findData"
       :parameters="parameters"
     />
+    <button @click="copy()" class="copy">
+      <v-icon>mdi-content-copy</v-icon>
+    </button>
   </div>
 </template>
 
@@ -33,6 +36,17 @@ export default {
       default: null
     }
   },
+  data() {
+    return {
+      dataToCopy: ""
+    };
+  },
+  methods: {
+    //sends the dataToCopy to clipboard
+    copy() {
+      navigator.clipboard.writeText(this.dataToCopy);
+    }
+  },
   computed: {
     ...mapGetters({
       fileData: "file/getFileData",
@@ -47,25 +61,41 @@ export default {
       // checking if the fileData and fileValues are not undefined
       if (this.fileData && this.fileValues) {
         for (let i = 0; i < this.parameters.previewList.length; i++) {
-          if (i === 1) {
-            data += this.fileValues.label
+          if (i === 1 && this.fileValues.label) {
+            data += this.fileValues.label;
             data += "-";
           }
-          let fieldData =
-            this.fileData.find(
-              item => item.elementId == this.parameters.previewList[i]
-            )
-          data +=
-            fieldData?.data?.text ??
+          let fieldData = this.fileData.find(
+            item => item.elementId == this.parameters.previewList[i]
+          );
+          data += fieldData?.data?.text ?? fieldData?.data?.values ?? "";
+          if (
+            (i < this.parameters.previewList.length - 1 &&
+              fieldData?.data?.text) ||
             fieldData?.data?.values
-            "n/a";
-          if (i < this.parameters.previewList.length - 1) {
+          ) {
             data += "-";
           }
         }
+        this.dataToCopy = data;
+      } else {
+        data = "";
       }
+
       return data;
     }
   }
 };
 </script>
+<style>
+.centeredDiv {
+  position: relative;
+}
+
+.copy {
+  position: absolute;
+  right: 5%;
+  top: 50%;
+  transform: translateY(-50%);
+}
+</style>
