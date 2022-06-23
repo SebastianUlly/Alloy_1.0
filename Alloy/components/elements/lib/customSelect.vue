@@ -137,6 +137,7 @@ export default {
     originalValue: {
       deep: true,
       handler() {
+        console.log('kalsd', this.originalValue)
         this.start();
       }
     }
