@@ -41,17 +41,10 @@
 			v-model="form"
 			@status="saveElementsStatus"
 		/>
-		<!-- <div class="button-container">
-			<button
-				:disabled="disableSaveBtn"
-				:style="disableSaveBtn ? 'opacity: 0.4' : 'opacity: 1'"
-				@click="saveFile"
-			>
-				Datei Speichern
-			</button>
-		</div> -->
+		<!-- save button -->
 		<div class="button-container">
 			<button
+				:disabled="disableSaveBtn"
 				:style="disableSaveBtn ? 'opacity: 0.4' : 'opacity: 1'"
 				@click="saveFile"
 				:class="{disabled: disableSaveBtn}"
@@ -59,44 +52,6 @@
 				Datei Speichern
 			</button>
 		</div>
-		<!-- <h3>
-			Schema-Values
-		</h3> -->
-		<!-- <vue-json-pretty
-			v-if="schemaValues"
-			:data="schemaValues"
-		/>
-		<h3>
-			Schema-Metadata
-		</h3>
-		<vue-json-pretty
-			v-if="schemaMetadata"
-			:data="schemaMetadata"
-		/> -->
-		<!-- <h3>
-			Schema-Elements
-		</h3>
-		<vue-json-pretty
-			v-if="schemaElements"
-			:data="schemaElements"
-		/> -->
-		<!-- <h3>
-			File-Values
-		</h3>
-		<vue-json-pretty
-			v-if="fileValues"
-			:data="fileValues"
-		/>  -->
-		<!-- <h3>
-			File-Data
-		</h3>
-		<vue-json-pretty
-			v-if="fileData"
-			:data="fileData"
-		/> -->
-		<!-- <h3>
-			Data in Store from Components
-		</h3> -->
 	</v-card>
 </template>
 
@@ -106,6 +61,8 @@ import { v4 as uuidv4 } from 'uuid'
 
 import { mapGetters } from 'vuex'
 import { ParentOfEntity, EditEntity, AddEntityToDirectory } from '../assets/directoryClasses'
+import { hasAnythingChanged } from '~/assets/functions/hasChanged'
+
 import 'vue-json-pretty/lib/styles.css'
 
 import Metadata from '~/components/metadata'
@@ -159,11 +116,10 @@ export default {
 			return this.selectedSchema.id
 		},
 
+		// computed property to determine if the copy button has to be disabled
 		disableSaveBtn () {
-			if (this.hasChangedArray.every(item => !item.hasChanged)) {
-				return true
-			}
-			return false
+			// returning the result of the function that checks the hasChangedArray for any changes
+			return !hasAnythingChanged(this.hasChangedArray)
 		}
 	},
 
