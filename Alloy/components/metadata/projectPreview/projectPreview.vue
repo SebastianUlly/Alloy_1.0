@@ -1,25 +1,28 @@
 <template>
-	<div class="centeredDiv">
-		<inputField
-			:label="label"
-			:elementId="elementId"
-			:required="parameters.required"
-			:dataOriginal="findData"
-			:parameters="parameters"
-		/>
-		<button
-			v-if="dataToCopy"
-			:disabled="disableCopyButton"
-			@click="copy()"
-			class="copy"
-		>
-			<v-icon
+  <div class="centeredDiv">
+    <inputField
+      :label="label"
+      :elementId="elementId"
+      :required="parameters.required"
+      :dataOriginal="findData"
+      :parameters="parameters"
+    />
+
+    <button
+      v-if="dataToCopy"
+      :disabled="disableCopyButton"
+      title="In die Zwischenablage kopieren!"
+      @click="copy()"
+      ref="copyButton"
+      class="copy"
+    >
+      <v-icon
 				:style="disableCopyButton ? 'filter: invert(50%)' : ''"
 			>
 				mdi-content-copy
 			</v-icon>
-		</button>
-	</div>
+    </button>
+  </div>
 </template>
 
 <script>
@@ -27,37 +30,50 @@ import { mapGetters } from "vuex";
 import { hasAnythingChanged } from '~/assets/functions/hasChanged'
 
 export default {
-	props: {
-		elementId: {
-			type: String,
-			required: true
-		},
-		children: {
-			type: Array,
-			required: true
-		},
-		label: {
-			type: String,
-			required: true
-		},
-		parameters: {
-			type: Object,
-			required: false,
-			default: null
-		}
-	},
-	data() {
-		return {
-			dataToCopy: ""
-		};
-	},
-	computed: {
-		...mapGetters({
-			fileData: "file/getFileData",
-			fileValues: "file/getFileValues",
-			directory: "directory/getDirectory",
-			hasChangedArray: 'infoBox/getHasChangedArray'
-		}),
+  props: {
+    elementId: {
+      type: String,
+      required: true
+    },
+    children: {
+      type: Array,
+      required: true
+    },
+    label: {
+      type: String,
+      required: true
+    },
+    parameters: {
+      type: Object,
+      required: false,
+      default: null
+    }
+  },
+  data() {
+    return {
+      dataToCopy: "",
+      timeout: null,
+    };
+  },
+  methods: {
+    //sends the dataToCopy to clipboard
+    copy() {
+      clearTimeout(this.timeout);
+      this.$refs.copyButton.classList.remove("animated");
+      this.$refs.copyButton.classList.add("animated");
+      this.timeout = setTimeout(() => {
+        this.$refs.copyButton.classList.remove("animated");
+      },500);
+      navigator.clipboard.writeText(this.dataToCopy);
+    }
+  },
+  computed: {
+    ...mapGetters({
+      fileData: "file/getFileData",
+      fileValues: "file/getFileValues",
+      directory: "directory/getDirectory",
+      hasChangedArray: 'infoBox/getHasChangedArray'
+    }),
 
 		// function to find the data creating the full project-designation
 		findData() {
@@ -110,9 +126,21 @@ export default {
 }
 
 .copy {
-	position: absolute;
-	right: 5%;
-	top: 50%;
-	transform: translateY(-50%);
+  position: absolute;
+  right: 5%;
+  top: 50%;
+  transform: translateY(-50%);
+  color: white;
+}
+.copy.animated i{
+  animation: fadeOut 0.5s;
+}
+@keyframes fadeOut {
+  0% {
+    color: #5bc356;
+  }
+  100% {
+    color: white;
+  }
 }
 </style>

@@ -47,6 +47,7 @@
 				:disabled="disableSaveBtn"
 				:style="disableSaveBtn ? 'opacity: 0.4' : 'opacity: 1'"
 				@click="saveFile"
+				:class="{disabled: disableSaveBtn}"
 			>
 				Datei Speichern
 			</button>
@@ -427,7 +428,7 @@ button {
 	border-radius: 0.4*$standard-value;
 	transition-duration: 0.4s;
 }
-button:hover {
+button:hover:not(.disabled) {
   background-color:#30c553;
   color: white;
 }
