@@ -1,5 +1,6 @@
 <template>
   <div class="centeredDiv">
+    <div class="popup">Kopiert!</div>
     <inputField
       :label="label"
       :elementId="elementId"
@@ -7,7 +8,8 @@
       :dataOriginal="findData"
       :parameters="parameters"
     />
-    <button @click="copy()" class="copy">
+    
+    <button title="Click here to copy to the clipboard!" @click="copy()" class="copy">
       <v-icon>mdi-content-copy</v-icon>
     </button>
   </div>
@@ -45,6 +47,7 @@ export default {
     //sends the dataToCopy to clipboard
     copy() {
       navigator.clipboard.writeText(this.dataToCopy);
+      
     }
   },
   computed: {
@@ -97,5 +100,32 @@ export default {
   right: 5%;
   top: 50%;
   transform: translateY(-50%);
+}
+.popup{
+  width: 60px;
+  height: 30px;
+  position:absolute;
+  right: 3%;
+  top:-25%;
+  transform: translateY(-50%);
+  font-size:small;
+  background-color: #5BC356;
+  text-align: center;
+  border-radius: 6px;
+  padding-top:5px;
+  z-index: 1;
+  border: 1px solid white;
+  -webkit-animation: fadeinout 4s linear forwards;
+  animation: fadeinout 4s linear forwards;
+}
+
+@-webkit-keyframes fadeinout {
+  0%,100% { opacity: 0; }
+  50% { opacity: 1; }
+}
+
+@keyframes fadeinout {
+  0%,100% { opacity: 0; }
+  50% { opacity: 1; }
 }
 </style>
