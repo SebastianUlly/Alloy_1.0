@@ -7,7 +7,7 @@
       :dataOriginal="findData"
       :parameters="parameters"
     />
-    <button @click="copy()" class="copy">
+    <button v-if="dataToCopy" @click="copy()" class="copy">
       <v-icon>mdi-content-copy</v-icon>
     </button>
   </div>

@@ -15,7 +15,7 @@
 			</span>
 			<select
 				v-model="selectedSchema"
-				class="schema-select"
+				:class="disableSelect ? 'schema-select' : 'schema-select active'"
 				name=""
 				:disabled="disableSelect"
 			>
@@ -441,16 +441,19 @@ export default {
 	color: white;
 	width: 100%;
 	font-size: 1.8*$standard-value;
+
+	option {
+		color: black;
+	}
+}
+
+.active {
 	background: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='white' viewBox='0 0 16 16'><path fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/></svg>") no-repeat;
 	background-position: calc(100% - 0.75rem) center !important;
 	-moz-appearance:none !important;
 	-webkit-appearance: none !important; 
 	appearance: none !important;
 	padding-right: 2rem !important;
-
-	option {
-		color: black;
-	}
 }
 
 .button-container {
