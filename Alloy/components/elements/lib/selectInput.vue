@@ -169,7 +169,7 @@ select {
 }
 
 div {
-  margin: auto;
+  margin: 15px auto;
   width: 100%;
   padding: 0 15px;
   position: relative;
