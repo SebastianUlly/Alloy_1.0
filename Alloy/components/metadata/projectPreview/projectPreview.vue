@@ -1,6 +1,5 @@
 <template>
   <div class="centeredDiv">
-    <div class="popup">Kopiert!</div>
     <inputField
       :label="label"
       :elementId="elementId"
@@ -8,8 +7,13 @@
       :dataOriginal="findData"
       :parameters="parameters"
     />
-    
-    <button title="Click here to copy to the clipboard!" @click="copy()" class="copy">
+
+    <button
+      title="In die Zwischenablage kopieren!"
+      @click="copy()"
+      ref="copyButton"
+      class="copy"
+    >
       <v-icon>mdi-content-copy</v-icon>
     </button>
   </div>
@@ -40,14 +44,20 @@ export default {
   },
   data() {
     return {
-      dataToCopy: ""
+      dataToCopy: "",
+      timeout: null,
     };
   },
   methods: {
     //sends the dataToCopy to clipboard
     copy() {
+      clearTimeout(this.timeout);
+      this.$refs.copyButton.classList.remove("animated");
+      this.$refs.copyButton.classList.add("animated");
+      this.timeout = setTimeout(() => {
+        this.$refs.copyButton.classList.remove("animated");
+      },500);
       navigator.clipboard.writeText(this.dataToCopy);
-      
     }
   },
   computed: {
@@ -100,32 +110,18 @@ export default {
   right: 5%;
   top: 50%;
   transform: translateY(-50%);
+  /* filter: invert(100%); */
+  color: white;
 }
-.popup{
-  width: 60px;
-  height: 30px;
-  position:absolute;
-  right: 3%;
-  top:-25%;
-  transform: translateY(-50%);
-  font-size:small;
-  background-color: #5BC356;
-  text-align: center;
-  border-radius: 6px;
-  padding-top:5px;
-  z-index: 1;
-  border: 1px solid white;
-  -webkit-animation: fadeinout 4s linear forwards;
-  animation: fadeinout 4s linear forwards;
+.copy.animated i{
+  animation: fadeOut 0.5s;
 }
-
-@-webkit-keyframes fadeinout {
-  0%,100% { opacity: 0; }
-  50% { opacity: 1; }
-}
-
-@keyframes fadeinout {
-  0%,100% { opacity: 0; }
-  50% { opacity: 1; }
+@keyframes fadeOut {
+  0% {
+    color: #5bc356;
+  }
+  100% {
+    color: white;
+  }
 }
 </style>
