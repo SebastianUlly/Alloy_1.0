@@ -29,6 +29,12 @@
 			{{ item }}
 		</option>
     </select>
+	<div class="input__error">
+		<has-changed-indicator
+			:old-data="originalValue"
+			:new-data="selectedValue"
+		/>
+	</div>
   </div>
 </template>
 
@@ -117,15 +123,19 @@ export default {
 
 		// if the data in database exist then sets the original value and the selected value to the data.text
 		findData() {
+			// checking if fileData exists
 			if (this.fileData) {
-				for (let item of this.fileData) {
-					if (this.elementId === item.elementId && item.data != null) {
-						this.originalValue = item.data.text;
-						this.selectedValue = item.data.text;
-					} else {
-						this.originalValue = '';
-						this.selectedValue = '';
-					}
+				// finding the data-item in fileData
+				const item = this.fileData.find(item => item.elementId === this.elementId)
+				// checking if the item is found and if it contains data
+				if (item?.data?.text) {
+					// assigning the values
+					this.originalValue = item.data.text;
+					this.selectedValue = item.data.text;
+				} else {
+					// if nothing is found the values are empty
+					this.originalValue = ''
+					this.selectedValue = ''
 				}
 			}
 		},
