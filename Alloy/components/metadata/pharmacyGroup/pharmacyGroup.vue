@@ -8,7 +8,6 @@
         :selectLimit="parameters.selectLimit"
         @myevent="callback"
         :label="label"
-        :labelColor="labelColor"
         :originalValue="originalSelectedPharmacy"
       />
     </div>
@@ -37,14 +36,46 @@ export default {
 			default: null,
 		},
 	},
+
 	data() {
 		return {
 			files: [],
 			selectedPharmacy: ["", "", "", "", "", "", ""],
-			originalSelectedPharmacy: ["", "", "", "", "", "", ""],
-			labelColor: "white",
-		};
+			originalSelectedPharmacy: ["", "", "", "", "", "", ""]
+		}
 	},
+
+	
+	mounted() {
+		this.getfile();
+		const payload = {
+			elementId: this.elementId,
+			hasChanged: false,
+		};
+		this.findData();
+		this.$store.commit("infoBox/addToHasChangedArray", payload);
+	},
+
+	computed: {
+		...mapGetters({
+			fileData: "file/getFileData"
+		}),
+	},
+	
+	watch: {
+		fileData: {
+			deep: true,
+			handler() {
+				this.findData();
+				const payload = {
+					elementId: this.elementId,
+					hasChanged: false,
+				};
+				this.$store.commit("infoBox/addToHasChangedArray", payload);
+			},
+		},
+	},
+
 	methods: {
 		getfile() {
 		this.$apollo
@@ -77,6 +108,7 @@ export default {
 				console.log({ error });
 			});
 		},
+
 		callback(data) {
 			this.selectedPharmacy = data;
 			let payload;
@@ -84,13 +116,11 @@ export default {
 				JSON.stringify(this.selectedPharmacy) !==
 				JSON.stringify(this.originalSelectedPharmacy)
 			) {
-				this.labelColor = "red";
 				payload = {
 					elementId: this.elementId,
 					hasChanged: true,
 				};
 			} else {
-				this.labelColor = "white";
 				payload = {
 					elementId: this.elementId,
 					hasChanged: false,
@@ -99,6 +129,7 @@ export default {
 			this.sendData();
 			this.$store.commit("infoBox/setHasChangedPropertyOfElement", payload);
 		},
+
 		sendData() {
 			const valuesToSend = JSON.parse(JSON.stringify(this.selectedPharmacy));
 			const payload = {
@@ -109,6 +140,7 @@ export default {
 			};
 			this.$store.commit("file/setEnteredData", payload);
 		},
+
 		findData() {
 			// checking if fileData is found
 			if (this.fileData) {
@@ -128,30 +160,8 @@ export default {
 					this.selectedPharmacy = [];
 				}
 			}
-		},
-	},
-	mounted() {
-			this.getfile();
-			const payload = {
-				elementId: this.elementId,
-				hasChanged: false,
-			};
-			this.findData();
-			this.$store.commit("infoBox/addToHasChangedArray", payload);
-	},
-	computed: {
-		...mapGetters({
-			fileData: "file/getFileData"
-		}),
-	},
-	watch: {
-		fileData: {
-			deep: true,
-			handler() {
-				this.findData();
-			},
-		},
-	},
+		}
+	}
 };
 </script>
 <style scoped>

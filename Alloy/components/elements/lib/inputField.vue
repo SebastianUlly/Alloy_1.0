@@ -10,14 +10,13 @@
 	<!-- container to hold all thats neccessary for the input-element -->
 	<div
 		class="input"
-		:style="parameters.editable === false ? 'opacity: 0.4' : 'opacity: 1'"
 	>
 		<!-- input-field -->
 		<input
 			v-model="dataToEdit"
 			type="text"
 			placeholder=" "
-			class="input__field"
+			:class="parameters.editable === false ? 'input__field-disabled' : 'input__field'"
 			:disabled="parameters.editable === false ? true : false"
 		>
 		<!-- label to the input-field -->

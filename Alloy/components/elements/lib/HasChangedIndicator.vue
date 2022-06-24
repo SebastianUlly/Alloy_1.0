@@ -16,6 +16,11 @@ export default {
 
 		newData: {
 			required: true
+		},
+
+		elementId: {
+			type: String,
+			required: false
 		}
 	},
 
@@ -25,6 +30,29 @@ export default {
 				return true
 			}
 			return false
+		}
+	},
+
+	watch: {
+		newData: {
+			deep: true,
+			handler () {
+				if (JSON.stringify(this.newData) !== JSON.stringify(this.oldData)) {
+					const payload = {
+						elementId: this.elementId,
+						hasChanged: true,
+					};
+					// sends the value (elementId and has changed true or false) of payload to setHasChangedPropertyOfElement function
+					this.$store.commit("infoBox/setHasChangedPropertyOfElement", payload);
+				} else {
+					const payload = {
+						elementId: this.elementId,
+						hasChanged: false,
+					};
+					//makes the same just with the case "false"
+					this.$store.commit("infoBox/setHasChangedPropertyOfElement", payload);
+				}
+			}
 		}
 	}
 }
