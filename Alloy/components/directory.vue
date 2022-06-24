@@ -193,7 +193,9 @@ export default {
 			deep: true,
 			handler () {
 				if (this.active.length > 0) {
+					console.log(this.active)
 					this.$store.commit('directory/assignClickedEntityFileId', this.active[0].fileId)
+					this.$store.commit('directory/assignClickedEntityId', this.active[0].id)
 					this.$emit('clicked')
 				}
 			}
