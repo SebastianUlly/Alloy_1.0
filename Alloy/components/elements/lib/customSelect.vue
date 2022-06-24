@@ -4,7 +4,7 @@
       <span class="label" :style="'color:' + labelColor">{{ label }}</span>
       <!-- showing a message when the allSelectedItems array is empty -->
       <div class="text" v-if="!allSelectedItems.length" style="color: grey">
-        Noch keine {{label}} ausgewählt
+        ...
       </div>
       <!-- loop that creates a div for each item in the allSelectedItems array -->
       <div

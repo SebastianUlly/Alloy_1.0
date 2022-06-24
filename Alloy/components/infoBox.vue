@@ -440,7 +440,7 @@ button:hover:not(.disabled) {
 	top: 0.6*$standard-value;
 	padding: 0 0.6*$standard-value;
 	color: white;
-	background-color: #212121;
+	background-color: #1E1E1E;
 	z-index: 10;
 	font-size: 13px;
 }
