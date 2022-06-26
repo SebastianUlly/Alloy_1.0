@@ -6,10 +6,11 @@ $number-of-spaces__2: 3;
 
 // styling of the div-container that holds everything for the input
 .input {
-	max-width: 100%;
 	margin: 1.5*$standard-value auto;
 	position: relative;
 	padding: 0 1.5*$standard-value;
+	max-width: 100%;
+  	
 
 	// label sits inside the input-field and is moved to the top when the input-field is in focus, or has text in it
 	&__label {

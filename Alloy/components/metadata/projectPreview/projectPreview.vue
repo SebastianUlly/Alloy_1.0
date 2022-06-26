@@ -6,6 +6,7 @@
 			:required="parameters.required"
 			:dataOriginal="dataToCopy"
 			:parameters="parameters"
+			class="preview"
 		/>
 
 		<button
@@ -182,6 +183,12 @@ export default {
 	100% {
 		color: white;
 	}
+}
+.preview input{
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  padding-right: 10% !important;
 }
 
 </style>
