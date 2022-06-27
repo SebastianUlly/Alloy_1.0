@@ -6,6 +6,7 @@
 			:required="parameters.required"
 			:dataOriginal="dataToCopy"
 			:parameters="parameters"
+			class="preview"
 		/>
 
 		<button
@@ -150,15 +151,18 @@ export default {
 }
 .centeredDiv.slideIn {
   	position: relative;
-	animation: slideIn 0.3s cubic-bezier(.26,-0.01,.66,.99);
+	animation: slideIn 0.5s cubic-bezier(.31,.29,0,1)
 
 }
 @keyframes slideIn {
 	0% {
-		height: 1px;	
+		opacity: 0;
+		height: 1px;
+		
 	}
 	100% {
 		height: 45px;
+		opacity: 1;
 	}
 }
 
@@ -170,7 +174,7 @@ export default {
 	color: white;
 }
 .copy.animated i {
-  	animation: fadeOut 0.5s;
+  	animation: fadeOut 1s;
 }
 @keyframes fadeOut {
 	0% {
@@ -179,6 +183,12 @@ export default {
 	100% {
 		color: white;
 	}
+}
+.preview input{
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  padding-right: 10% !important;
 }
 
 </style>
