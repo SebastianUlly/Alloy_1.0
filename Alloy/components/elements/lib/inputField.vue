@@ -15,12 +15,12 @@
 		<input
 			v-model="dataToEdit"
 			type="text"
-			placeholder=" "
+			placeholder="..."
 			:class="parameters.editable === false ? 'input__field-disabled' : 'input__field'"
 			:disabled="parameters.editable === false ? true : false"
 		>
 		<!-- label to the input-field -->
-		<span class="input__label">
+		 <span class="input__label">
 			{{ label }}
 		</span>
 		<!-- error-message to the input -->

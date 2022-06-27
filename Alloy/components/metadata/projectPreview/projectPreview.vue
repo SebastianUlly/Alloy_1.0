@@ -1,10 +1,10 @@
 <template>
-	<div class="centeredDiv">
+	<div ref="slideIn" class="centeredDiv" v-if="isvisible">
 		<inputField
 			:label="label"
 			:elementId="elementId"
 			:required="parameters.required"
-			:dataOriginal="findData"
+			:dataOriginal="dataToCopy"
 			:parameters="parameters"
 		/>
 
@@ -53,29 +53,25 @@ export default {
 		return {
 			dataToCopy: "",
 			timeout: null,
+			isvisible: true
 		};
 	},
-	methods: {
-		//sends the dataToCopy to clipboard
-		copy() {
-			clearTimeout(this.timeout);
-			this.$refs.copyButton.classList.remove("animated");
-			this.$refs.copyButton.classList.add("animated");
-			this.timeout = setTimeout(() => {
-				this.$refs.copyButton.classList.remove("animated");
-			}, 500);
-			navigator.clipboard.writeText(this.dataToCopy);
+	watch: {
+		dataToCopy: {
+			handler() {
+				this.visible();
+				console.log(this.dataToCopy)
+			}
+	
 		},
+		fileData:{
+			deep: true,
+			handler(){
+				this.findData()
+			}
+		}
 	},
-	computed: {
-		...mapGetters({
-			fileData: "file/getFileData",
-			fileValues: "file/getFileValues",
-			directory: "directory/getDirectory",
-			hasChangedArray: "infoBox/getHasChangedArray"
-		}),
-
-		// function to find the data creating the full project-designation
+	methods: {
 		findData() {
 			// defining data as an empty string
 			let data = "";
@@ -97,13 +93,45 @@ export default {
 					) {
 						data += "-";
 					}
+					
 				}
 				this.dataToCopy = data;
-			} else {
-				data = "";
 			}
-			return data;
+			
 		},
+		//sends the dataToCopy to clipboard
+		copy() {
+			clearTimeout(this.timeout);
+			this.$refs.copyButton?.classList.remove("animated");
+			this.$refs.copyButton?.classList.add("animated");
+			this.timeout = setTimeout(() => {
+				this.$refs.copyButton?.classList.remove("animated");
+			}, 500);
+			navigator.clipboard.writeText(this.dataToCopy);
+		},
+		visible(){
+			if(this.dataToCopy.length > 0){
+				this.isvisible = true;
+				this.$refs.slideIn?.classList.add("slideIn");
+			}
+			else{
+				this.isvisible = false;
+				this.$refs.slideIn?.classList.remove("slideIn")
+			}
+			
+		}
+	},
+	computed: {
+		...mapGetters({
+			fileData: "file/getFileData",
+			fileValues: "file/getFileValues",
+			directory: "directory/getDirectory",
+			hasChangedArray: "infoBox/getHasChangedArray",
+		}),
+		
+		
+		// function to find the data creating the full project-designation
+		
 
 		// computed property to determine if the copy button has to be disabled
 		disableCopyButton() {
@@ -111,11 +139,27 @@ export default {
 			return hasAnythingChanged(this.hasChangedArray);
 		},
 	},
+	mounted(){
+		this.findData();
+	}
 };
 </script>
 <style>
 .centeredDiv {
   	position: relative;
+}
+.centeredDiv.slideIn {
+  	position: relative;
+	animation: slideIn 0.3s cubic-bezier(.26,-0.01,.66,.99);
+
+}
+@keyframes slideIn {
+	0% {
+		height: 1px;	
+	}
+	100% {
+		height: 45px;
+	}
 }
 
 .copy {
@@ -136,4 +180,5 @@ export default {
 		color: white;
 	}
 }
+
 </style>

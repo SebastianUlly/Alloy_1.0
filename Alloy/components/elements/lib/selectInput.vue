@@ -18,7 +18,7 @@
 		@change="onChange()"
 	>
 		<option value="">
-			Noch kein {{ label }} ausgewählt
+			...
 		</option>
 		<option
 			v-for="(item, index) of options"
@@ -164,7 +164,7 @@ select {
 	margin: 0 auto;
 	width: 100%;
 	color: white;
-	height: 50px;
+	height: 48px;
 	background: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='white' viewBox='0 0 16 16'><path fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/></svg>")
 		no-repeat;
 	background-position: calc(100% - 0.75rem) center !important;
@@ -189,15 +189,17 @@ option {
 	color: white;
 	background-color: #1e1e1e;
 	padding: 10px;
+	font-size:17px;
 }
 .label {
 	color: white;
 	position: absolute;
-	top: -10px;
+	top: -6px;
 	left: 20px;
 	background-color: #1e1e1e;
-	font-size: 15px;
-	padding: 0 5px;
+	font-size: 12.6px;
+	padding: 0 6px;
+	max-width: 76%;
 }
 .chevron {
 	position: absolute;
