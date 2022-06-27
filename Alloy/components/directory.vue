@@ -193,7 +193,6 @@ export default {
 			deep: true,
 			handler () {
 				if (this.active.length > 0) {
-					console.log(this.active)
 					this.$store.commit('directory/assignClickedEntityFileId', this.active[0].fileId)
 					this.$store.commit('directory/assignClickedEntityId', this.active[0].id)
 					this.$emit('clicked')
@@ -234,7 +233,7 @@ export default {
 		completeDirectory () {
 			// function that takes in the raw data which are fetched when this component is created and processing so that a useable directory is formed
 			// creating new instance by calling the MainDirectory class and passing it the raw data in the arguments
-			const directory = new MainDirectory(this.databaseDirectory, this.files, this.schema)
+			const directory = new MainDirectory(JSON.parse(JSON.stringify(this.databaseDirectory)), this.files, this.schema)
 			// storing the newly created directory in the store
 			this.$store.commit('directory/setToStoreDirectory', directory)
 		},

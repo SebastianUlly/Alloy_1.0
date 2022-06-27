@@ -36,10 +36,16 @@
 				:new-data="dataToEdit"
 			/>
 		</div>
+		<!-- <button @click="defaultValue">
+			consecutive number
+		</button> -->
 	</div>
 </template>
 
 <script>
+import { getConsecutiveNumber } from '~/assets/functions/consecutiveNumber'
+import { mapGetters } from 'vuex'
+
 export default {
 	inheritAttrs: false,
 	props: {
@@ -65,9 +71,17 @@ export default {
 		}
 	},
 
+	computed: {
+		...mapGetters({
+			directory: 'directory/getDirectory',
+			clickedEntityId: 'directory/getClickedEntityId'
+		})
+	},
+
 	watch: {
 		dataOriginal (value) {
 			this.dataToEdit = value
+			this.defaultValue()
 		},
 		// watcher to watch the entered data
 		dataToEdit (value) {
@@ -77,6 +91,16 @@ export default {
 
 	mounted () {
 		this.dataToEdit = this.dataOriginal
+		this.defaultValue()
+	},
+
+	methods: {
+		defaultValue () {
+			// console.log(this.directory)
+			if (this.parameters.default === 'consecutiveNumber' && !this.dataOriginal) {
+				this.dataToEdit = getConsecutiveNumber(this.directory, this.clickedEntityId)	
+			}
+		}
 	}
 }
 </script>
