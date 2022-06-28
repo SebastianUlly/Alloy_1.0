@@ -15,7 +15,7 @@
 		<input
 			v-model="dataToEdit"
 			type="text"
-			placeholder="..."
+			:placeholder="placeholder"
 			:class="parameters.editable === false ? 'input__field-disabled' : 'input__field'"
 			:disabled="parameters.editable === false ? true : false"
 		>
@@ -46,6 +46,8 @@
 import { getConsecutiveNumber } from '~/assets/functions/consecutiveNumber'
 import { mapGetters } from 'vuex'
 
+import ZipCodeList    from '~/zipCodeList.json'
+
 export default {
 	inheritAttrs: false,
 	props: {
@@ -67,7 +69,8 @@ export default {
 
 	data () {
 		return {
-			dataToEdit: ''
+			dataToEdit: '',
+			placeholder: "..."
 		}
 	},
 
