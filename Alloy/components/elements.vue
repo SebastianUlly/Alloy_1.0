@@ -34,6 +34,7 @@ import projectList from './elements/projectList/projectList'
 import projectDate from '~/components/metadata/projectDate/projectDate'
 import projectNumber from '~/components/metadata/projectNumber/projectNumber'
 import pharmacyAbb from '~/components/metadata/pharmacyAbb/pharmacyAbb'
+import selectFromDatabase from '~/components/metadata/selectFromDatabase/selectFromDatabase'
 export default {
 	components: {
 		projectList,
@@ -49,7 +50,9 @@ export default {
 		pharmacyGroup,
 		projectDate,
 		projectNumber,
-		pharmacyAbb
+		pharmacyAbb,
+		selectFromDatabase,
+	},
 	},
 	data () {
 		return {
