@@ -8,7 +8,6 @@
 			:parameters="parameters"
 			class="preview"
 		/>
-
 		<button
 			v-if="dataToCopy"
 			:disabled="disableCopyButton"
