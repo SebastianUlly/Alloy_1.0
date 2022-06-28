@@ -1,11 +1,48 @@
 <template>
 	<div>
 		<!-- treeview to display the directory of the "deleted" files -->
-		<v-treeview
+		<!-- <v-treeview
 			:items="orphanDirectory"
 			:active.sync="active"
 			activatable
 			return-object
+		> -->
+			<!-- template to prepend the file-icons for each item -->
+			<!-- <template v-slot:prepend="{ item, open }"> -->
+				<!-- icon for he bin (open and closed) -->
+				<!-- <v-icon v-if="item.root">
+					{{ open ? 'mdi-delete-empty' : 'mdi-delete' }}
+				</v-icon> -->
+				<!-- icon for the files -->
+				<!-- <v-icon v-else-if="item.isLeaf">
+					mdi-file
+				</v-icon> -->
+				<!-- icon for the folders -->
+				<!-- <v-icon v-else>
+					mdi-folder
+				</v-icon> -->
+			<!-- </template> -->
+			<!-- template to display the label of each item -->
+			<!-- <template v-slot:label="{ item }">
+				<div class="entity_name">
+					{{ item.label }}
+				</div>
+			</template> -->
+			<!-- template to append the icon to delete an entity for each item -->
+			<!-- <template v-slot:append="{ item }">
+				<v-icon
+					v-if="item.fileId"
+					:disabled="!editable"
+					@click="deleteFile(item)"
+				>
+					mdi-cancel
+				</v-icon>
+			</template>
+		</v-treeview> -->
+		<!-- treeview to display the directory of the "deleted" files -->
+		<v-treeview
+			:items="orphanDirectory"
+			:active.sync="active"
 		>
 			<!-- template to prepend the file-icons for each item -->
 			<template v-slot:prepend="{ item, open }">
@@ -80,11 +117,6 @@ export default {
 			storeDirectory: 'directory/getDirectory'
 		}),
 
-		// computed property to return the files
-		watchFiles () {
-			return this.files
-		},
-
 		// computed property to retun this.active (if in this component a file has been clicked)
 		watchClickedFile () {
 			return this.active
@@ -93,11 +125,6 @@ export default {
 		// computed property to return this.fileClicked (if in directory a file has been clicked)
 		watchFileClicked () {
 			return this.fileClicked
-		},
-
-		// computed property to return the directory in the store
-		watchDirectory () {
-			return this.storeDirectory
 		}
 	},
 
@@ -126,7 +153,7 @@ export default {
 		},
 
 		// watcher to watch the files
-		watchFiles: {
+		files: {
 			deep: true,
 			handler (value) {
 				// calling the function to generate the directory of the "deleted" files
@@ -135,7 +162,7 @@ export default {
 		},
 
 		// watcher to watch the directory in the store
-		watchDirectory: {
+		storeDirectory: {
 			deep: true,
 			handler () {
 				// calling the function to generate the directory of the "deleted" files
@@ -182,6 +209,7 @@ export default {
 					}
 				`
 			}).then((data) => {
+				console.log(data.data.deleteFile)
 				// if the deletion of the file has been successfull
 				if (data.data.deleteFile) {
 					// calling the function to fetch the files from the directory again
@@ -194,6 +222,7 @@ export default {
 
 		// function to fetch the files from the database
 		fetchFiles () {
+			console.log('lskjdfh')
 			this.$apollo.query({
 				query: gql`
 					query {
@@ -207,6 +236,24 @@ export default {
 			}).then((data) => {
 				// calling the function to generate the directory of the "deleted" files, with the newly fetched files
 				this.getOrphanDirectory(data.data.files)
+			}).catch((error) => {
+				console.log({ error })
+			})
+		},
+
+		fetchNewDirectory () {
+			this.$apollo.query({
+				query: gql`
+					query {
+						directory {
+							id
+							hierarchy
+						}
+					}
+				`
+			}).then((data) => {
+				this.$store.commit('directory/setDirectoryId', data.data.directory[0].id)
+				this.$store.commit('directory/setDirectoryFromDatabase', data.data.directory[0].hierarchy)
 			}).catch((error) => {
 				console.log({ error })
 			})
