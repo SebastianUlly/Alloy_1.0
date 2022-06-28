@@ -26,6 +26,5 @@ export function getConsecutiveNumber (
 			consecutiveNumber = parseInt(siblings[siblings.length - 1].label) + 1
 		}
 	}
-	console.log('calculated Number', consecutiveNumber)
 	return consecutiveNumber
 }

@@ -100,28 +100,25 @@ export default {
 		...mapGetters({
 			storeDirectory: 'directory/getDirectory',
 			fileValues: 'file/getFileValues',
-			schemaValues: 'schema/getSchemaValues'
-		}),
-
-		watchFileValues () {
-			return this.fileValues
-		},
-
-		watchArrayOfParentIds () {
-			return this.arrayOfParentIds
-		}
+			schemaValues: 'schema/getSchemaValues',
+			clickedEntityId: 'directory/getClickedEntityId'
+		})
 	},
 
 	watch: {
-		watchFileValues: {
+		fileValues: {
 			deep: true,
 			handler () {
 				this.arrayOfParentIds = JSON.parse(JSON.stringify(this.fileValues.parentIds))
+				if (!this.arrayOfParentIds.length) {
+					const parentOfClickedEntity = this.getParentToClickedEntity()
+					this.arrayOfParentIds.push(parentOfClickedEntity)
+				}
 				this.directoryForSelection()
 			}
 		},
 
-		watchArrayOfParentIds: {
+		arrayOfParentIds: {
 			deep: true,
 			handler () {
 				this.directoryForSelection()
@@ -132,10 +129,25 @@ export default {
 	},
 
 	mounted () {
+		this.arrayOfParentIds = JSON.parse(JSON.stringify(this.fileValues.parentIds))
+		if (!this.arrayOfParentIds.length) {
+			const parentOfClickedEntity = this.getParentToClickedEntity()
+			this.arrayOfParentIds.push(parentOfClickedEntity)
+		}
 		this.directoryForSelection()
 	},
 
 	methods: {
+		getParentToClickedEntity () {
+			const entity = this.storeDirectory.find(item => item.id === this.clickedEntityId)
+			if (entity) {
+				const parent = this.storeDirectory.find(item => item.id === entity.parentId)
+				if (parent) {
+					return parent.id
+				}
+			}
+		},
+
 		findParentsToParentIds () {
 			this.arrayOfParents = []
 			for (const parentId of this.arrayOfParentIds) {

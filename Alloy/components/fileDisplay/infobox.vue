@@ -52,8 +52,8 @@ import gql from 'graphql-tag'
 import { v4 as uuidv4 } from 'uuid'
 
 import { mapGetters } from 'vuex'
-import { ParentOfEntity, EditEntity, AddEntityToDirectory } from '../assets/directoryClasses'
-import { hasAnythingChanged } from '~/assets/functions/hasChanged'
+import { ParentOfEntity, EditEntity, AddEntityToDirectory } from '../../assets/directoryClasses'
+import { hasAnythingChanged } from '../../assets/functions/hasChanged'
 
 import 'vue-json-pretty/lib/styles.css'
 
@@ -85,8 +85,6 @@ export default {
 			storeDirectory: 'directory/getDirectory',
 			clickedEntityFileId: 'directory/getClickedEntityFileId',
 			schemaValues: 'schema/getSchemaValues',
-			schemaMetadata: 'schema/getSchemaMetadata',
-			schemaElements: 'schema/getSchemaElements',
 			fileData: 'file/getFileData',
 			fileValues: 'file/getFileValues',
 			dataToSave: 'file/getDataToSave',
@@ -95,29 +93,24 @@ export default {
 			hasChangedArray: 'infoBox/getHasChangedArray'
 		}),
 
-		// computed property to return the fileId of the clicked entity
-		watchClickedFileId () {
-			return this.clickedEntityFileId
+		// computed property to determine if the copy button has to be disabled
+		disableSaveBtn () {
+			// returning the result of the function that checks the hasChangedArray for any changes
+			return !hasAnythingChanged(this.hasChangedArray)
 		},
 
 		// computed property to return the id of the selected schema in the select-element
 		watchSelectedSchema () {
 			return this.selectedSchema.id
 		},
-
-		// computed property to determine if the copy button has to be disabled
-		disableSaveBtn () {
-			// returning the result of the function that checks the hasChangedArray for any changes
-			return !hasAnythingChanged(this.hasChangedArray)
-		}
 	},
 
 	watch: {
 		// watcher to watch the fileId of the clicked entity
-		watchClickedFileId (id) {
+		clickedEntityFileId () {
 			this.getLatestDirectory()
 			// calling the function to get the data of file from the database
-			this.getFileDataToId(id)
+			this.getFileDataToId(this.clickedEntityFileId)
 		},
 
 		// watcher to watch the selected schema
@@ -252,8 +245,6 @@ export default {
 		},
 
 		saveFile () {
-			this.$refs.metadataForm.validate()
-			this.$refs.elementsForm.validate()
 			if (this.disableSelect) {
 				this.updateFile()
 			} else {
@@ -354,7 +345,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import '../assets/scss/_variables.scss';
+@import '../../assets/scss/_variables.scss';
 
 .select-container {
 	width: 100%;

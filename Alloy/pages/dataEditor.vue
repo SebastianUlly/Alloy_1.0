@@ -15,7 +15,7 @@
 import gql from 'graphql-tag'
 
 import Container from '~/components/container'
-import InfoBox from '~/components/infoBox'
+import InfoBox from '~/components/fileDisplay/infoBox'
 
 export default {
 	// graphql-queries that are called when the component is called
