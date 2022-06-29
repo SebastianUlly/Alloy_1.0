@@ -37,17 +37,21 @@
 				:new-data="dataToEdit"
 			/>
 		</div>
-		<!-- <button @click="defaultValue">
-			consecutive number
-		</button> -->
+		<div class="results" v-if="result.length">
+			<div v-for="item of result">
+				{{item}}
+
+			</div>
+
+		</div>
+		<vue-json-pretty :data="parameters.elementToWatch" />
 	</div>
 </template>
 
 <script>
 import { getConsecutiveNumber } from '~/assets/functions/consecutiveNumber'
 import { mapGetters } from 'vuex'
-
-import ZipCodeList    from '~/zipCodeList.json'
+import ZipCodeList from '~/zipCodeList.json'
 
 export default {
 	inheritAttrs: false,
@@ -70,14 +74,18 @@ export default {
 	data () {
 		return {
 			dataToEdit: '',
-			placeholder: "..."
+			placeholder: "...",
+			dataToWatch: '',
+			result: [],
+			isResult: false
 		}
 	},
 
 	computed: {
 		...mapGetters({
 			directory: 'directory/getDirectory',
-			clickedEntityId: 'directory/getClickedEntityId'
+			clickedEntityId: 'directory/getClickedEntityId',
+			fileData: 'file/getDataToSave'
 		})
 	},
 
@@ -89,6 +97,13 @@ export default {
 		// watcher to watch the entered data
 		dataToEdit (value) {
 			this.$emit('update', value)
+		},
+
+		fileData: {
+			deep: true,
+			handler () {
+				this.getDataToWatch()
+			}
 		}
 	},
 
@@ -110,6 +125,18 @@ export default {
 			} else if (this.parameters.default === 'variable_currentYear' && !this.dataOriginal) {
 				this.dataToEdit = new Date().getFullYear()
 			}
+		},
+
+		getDataToWatch () {
+			this.dataToWatch= this.fileData.find(item => item.elementId === this.parameters.elementToWatch)?.data?.text;
+			const res = ZipCodeList.data.filter((item) => item?.plz?.toString().startsWith(this.dataToWatch));
+			for (const obj of res) {
+				this.result.push(obj.plz)
+			}
+			console.log(ZipCodeList.data.filter((item) => item?.plz?.toString().startsWith(this.dataToWatch)));
+			if(this.result){
+				this.isResult = true
+			}
 		}
 	}
 }
@@ -117,4 +144,18 @@ export default {
 
 <style scoped lang="scss">
 @import '../../../assets/scss/componets/inputField.scss';
+.results{
+	position: absolute;
+	display:none;
+	width: 93%;
+	height: 100px;
+	background-color: #1E1E1E;
+	z-index: 1;
+	border: 1px solid white;
+	border-radius: 4px;
+}
+.input input:focus ~ .results{
+	display: block;
+
+}
 </style>
