@@ -53,7 +53,6 @@ export default {
 		pharmacyAbb,
 		selectFromDatabase,
 	},
-	},
 	data () {
 		return {
 			nestedArray: null

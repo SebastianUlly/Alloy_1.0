@@ -1,48 +1,11 @@
 <template>
 	<div>
 		<!-- treeview to display the directory of the "deleted" files -->
-		<!-- <v-treeview
+		<v-treeview
 			:items="orphanDirectory"
 			:active.sync="active"
 			activatable
 			return-object
-		> -->
-			<!-- template to prepend the file-icons for each item -->
-			<!-- <template v-slot:prepend="{ item, open }"> -->
-				<!-- icon for he bin (open and closed) -->
-				<!-- <v-icon v-if="item.root">
-					{{ open ? 'mdi-delete-empty' : 'mdi-delete' }}
-				</v-icon> -->
-				<!-- icon for the files -->
-				<!-- <v-icon v-else-if="item.isLeaf">
-					mdi-file
-				</v-icon> -->
-				<!-- icon for the folders -->
-				<!-- <v-icon v-else>
-					mdi-folder
-				</v-icon> -->
-			<!-- </template> -->
-			<!-- template to display the label of each item -->
-			<!-- <template v-slot:label="{ item }">
-				<div class="entity_name">
-					{{ item.label }}
-				</div>
-			</template> -->
-			<!-- template to append the icon to delete an entity for each item -->
-			<!-- <template v-slot:append="{ item }">
-				<v-icon
-					v-if="item.fileId"
-					:disabled="!editable"
-					@click="deleteFile(item)"
-				>
-					mdi-cancel
-				</v-icon>
-			</template>
-		</v-treeview> -->
-		<!-- treeview to display the directory of the "deleted" files -->
-		<v-treeview
-			:items="orphanDirectory"
-			:active.sync="active"
 		>
 			<!-- template to prepend the file-icons for each item -->
 			<template v-slot:prepend="{ item, open }">
@@ -76,6 +39,7 @@
 				</v-icon>
 			</template>
 		</v-treeview>
+		
 	</div>
 </template>
 
@@ -87,10 +51,6 @@ import { OrphanedFiles } from '~/assets/directoryClasses'
 
 export default {
 	props: {
-		files: {
-			type: Array,
-			required: true
-		},
 		schema: {
 			type: Array,
 			required: true
@@ -108,7 +68,8 @@ export default {
 	data () {
 		return {
 			active: [],
-			orphanDirectory: []
+			orphanDirectory: [],
+			files: []
 		}
 	},
 
@@ -155,9 +116,9 @@ export default {
 		// watcher to watch the files
 		files: {
 			deep: true,
-			handler (value) {
+			handler () {
 				// calling the function to generate the directory of the "deleted" files
-				this.getOrphanDirectory(value)
+				this.getOrphanDirectory()
 			}
 		},
 
@@ -166,21 +127,20 @@ export default {
 			deep: true,
 			handler () {
 				// calling the function to generate the directory of the "deleted" files
-				this.getOrphanDirectory(this.files)
+				this.getOrphanDirectory()
 			}
 		}
 	},
 
 	mounted () {
-		// calling the function to generate the directory of the "deleted" files
-		this.getOrphanDirectory(this.files)
+		this.fetchFiles()
 	},
 
 	methods: {
 		// function to generate the directory of the "deleted" files
-		getOrphanDirectory (files) {
+		getOrphanDirectory () {
 			// creating a new instance of OrphanFiles by passing the directory from the store, the files and the schemes as arguments
-			const orphanedFiles = new OrphanedFiles(this.storeDirectory, files, this.schema)
+			const orphanedFiles = new OrphanedFiles(this.storeDirectory, this.files, this.schema)
 			// assinging the newly created directory to this.orphanDirectory
 			this.orphanDirectory = [
 				{
@@ -194,6 +154,7 @@ export default {
 
 		// function to finally delete a file from the database
 		deleteFile (item) {
+			this.active = []
 			this.$apollo.mutate({
 				variables: {
 					fileId: item.fileId
@@ -222,7 +183,6 @@ export default {
 
 		// function to fetch the files from the database
 		fetchFiles () {
-			console.log('lskjdfh')
 			this.$apollo.query({
 				query: gql`
 					query {
@@ -234,8 +194,8 @@ export default {
 					}
 				`
 			}).then((data) => {
-				// calling the function to generate the directory of the "deleted" files, with the newly fetched files
-				this.getOrphanDirectory(data.data.files)
+				// overwriting the files with the fresh files from the database
+				this.files = data.data.files
 			}).catch((error) => {
 				console.log({ error })
 			})
