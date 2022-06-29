@@ -39,6 +39,7 @@
 				</v-icon>
 			</template>
 		</v-treeview>
+		
 	</div>
 </template>
 
@@ -50,10 +51,6 @@ import { OrphanedFiles } from '~/assets/directoryClasses'
 
 export default {
 	props: {
-		files: {
-			type: Array,
-			required: true
-		},
 		schema: {
 			type: Array,
 			required: true
@@ -71,7 +68,8 @@ export default {
 	data () {
 		return {
 			active: [],
-			orphanDirectory: []
+			orphanDirectory: [],
+			files: []
 		}
 	},
 
@@ -79,11 +77,6 @@ export default {
 		...mapGetters({
 			storeDirectory: 'directory/getDirectory'
 		}),
-
-		// computed property to return the files
-		watchFiles () {
-			return this.files
-		},
 
 		// computed property to retun this.active (if in this component a file has been clicked)
 		watchClickedFile () {
@@ -93,11 +86,6 @@ export default {
 		// computed property to return this.fileClicked (if in directory a file has been clicked)
 		watchFileClicked () {
 			return this.fileClicked
-		},
-
-		// computed property to return the directory in the store
-		watchDirectory () {
-			return this.storeDirectory
 		}
 	},
 
@@ -126,34 +114,33 @@ export default {
 		},
 
 		// watcher to watch the files
-		watchFiles: {
+		files: {
 			deep: true,
-			handler (value) {
+			handler () {
 				// calling the function to generate the directory of the "deleted" files
-				this.getOrphanDirectory(value)
+				this.getOrphanDirectory()
 			}
 		},
 
 		// watcher to watch the directory in the store
-		watchDirectory: {
+		storeDirectory: {
 			deep: true,
 			handler () {
 				// calling the function to generate the directory of the "deleted" files
-				this.getOrphanDirectory(this.files)
+				this.getOrphanDirectory()
 			}
 		}
 	},
 
 	mounted () {
-		// calling the function to generate the directory of the "deleted" files
-		this.getOrphanDirectory(this.files)
+		this.fetchFiles()
 	},
 
 	methods: {
 		// function to generate the directory of the "deleted" files
-		getOrphanDirectory (files) {
+		getOrphanDirectory () {
 			// creating a new instance of OrphanFiles by passing the directory from the store, the files and the schemes as arguments
-			const orphanedFiles = new OrphanedFiles(this.storeDirectory, files, this.schema)
+			const orphanedFiles = new OrphanedFiles(this.storeDirectory, this.files, this.schema)
 			// assinging the newly created directory to this.orphanDirectory
 			this.orphanDirectory = [
 				{
@@ -167,6 +154,7 @@ export default {
 
 		// function to finally delete a file from the database
 		deleteFile (item) {
+			this.active = []
 			this.$apollo.mutate({
 				variables: {
 					fileId: item.fileId
@@ -182,6 +170,7 @@ export default {
 					}
 				`
 			}).then((data) => {
+				console.log(data.data.deleteFile)
 				// if the deletion of the file has been successfull
 				if (data.data.deleteFile) {
 					// calling the function to fetch the files from the directory again
@@ -205,8 +194,26 @@ export default {
 					}
 				`
 			}).then((data) => {
-				// calling the function to generate the directory of the "deleted" files, with the newly fetched files
-				this.getOrphanDirectory(data.data.files)
+				// overwriting the files with the fresh files from the database
+				this.files = data.data.files
+			}).catch((error) => {
+				console.log({ error })
+			})
+		},
+
+		fetchNewDirectory () {
+			this.$apollo.query({
+				query: gql`
+					query {
+						directory {
+							id
+							hierarchy
+						}
+					}
+				`
+			}).then((data) => {
+				this.$store.commit('directory/setDirectoryId', data.data.directory[0].id)
+				this.$store.commit('directory/setDirectoryFromDatabase', data.data.directory[0].hierarchy)
 			}).catch((error) => {
 				console.log({ error })
 			})

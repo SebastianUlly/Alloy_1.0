@@ -59,8 +59,7 @@ export default {
 	watch: {
 		dataToCopy: {
 			handler() {
-				this.visible();
-				console.log(this.dataToCopy)
+				this.visible()
 			}
 	
 		},

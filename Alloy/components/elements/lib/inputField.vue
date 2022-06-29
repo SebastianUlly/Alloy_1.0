@@ -14,6 +14,7 @@
 		<!-- input-field -->
 		<input
 			v-model="dataToEdit"
+			:title="dataToEdit"
 			type="text"
 			:placeholder="placeholder"
 			:class="parameters.editable === false ? 'input__field-disabled' : 'input__field'"
@@ -56,7 +57,6 @@ export default {
 			required: true
 		},
 		dataOriginal: {
-			type: String,
 			required: false,
 			default: ''
 		},
@@ -100,8 +100,15 @@ export default {
 	methods: {
 		defaultValue () {
 			// console.log(this.directory)
-			if (this.parameters.default === 'consecutiveNumber' && !this.dataOriginal) {
-				this.dataToEdit = getConsecutiveNumber(this.directory, this.clickedEntityId)	
+			if (this.parameters.default === 'function_consecutiveNumber' && !this.dataOriginal) {
+				this.dataToEdit = getConsecutiveNumber(this.directory, this.clickedEntityId)?.toString()
+				if (this.dataToEdit?.length === 1) {
+					this.dataToEdit = '00' + this.dataToEdit
+				} else if (this.dataToEdit?.length === 2) {
+					this.dataToEdit = '0' + this.dataToEdit
+				}
+			} else if (this.parameters.default === 'variable_currentYear' && !this.dataOriginal) {
+				this.dataToEdit = new Date().getFullYear()
 			}
 		}
 	}
