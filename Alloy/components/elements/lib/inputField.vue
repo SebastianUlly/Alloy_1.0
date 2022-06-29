@@ -14,6 +14,7 @@
 		<!-- input-field -->
 		<input
 			v-model="dataToEdit"
+			:title="dataToEdit"
 			type="text"
 			:placeholder="placeholder"
 			:class="parameters.editable === false ? 'input__field-disabled' : 'input__field'"

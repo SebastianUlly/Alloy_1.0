@@ -163,7 +163,6 @@ class OrphanedFiles extends DirectoryImage {
 		super(storeDirectory)
 		const directoryString = JSON.stringify(this.directoryCopy)
 		this.orphanedFiles = []
-
 		for (const file of files) {
 			if (!directoryString.includes(file.fileId)) {
 				file.id = file.fileId
