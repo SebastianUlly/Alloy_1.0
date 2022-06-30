@@ -8,7 +8,13 @@
         :parameters="item.parameters"
         @update="enterText($event, item)"
       />
+      <!-- <vue-json-pretty :data="item.parameters.elementToWatch"/> -->
     </div>
+    <div>
+
+
+    </div>
+     <vue-json-pretty :data="fileData"/>
   </div>
 </template>
 
@@ -16,6 +22,7 @@
 import { mapGetters } from "vuex";
 import { GetElementData } from "~/assets/classes/alloyClasses";
 import { deepCopy } from "~/assets/classes/objectClasses";
+import ZipCodeList from '~/zipCodeList.json';
 export default {
   props: {
     elementId: {
