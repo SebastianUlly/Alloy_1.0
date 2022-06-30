@@ -103,10 +103,6 @@ import {
 
 export default {
 	props: {
-		files: {
-			type: Array,
-			required: true
-		},
 		schema: {
 			type: Array,
 			required: true
@@ -126,7 +122,8 @@ export default {
 			rawDirectory: [],
 			active: [],
 			search: '',
-			caseSensitive: false
+			caseSensitive: false,
+			files: []
 		}
 	},
 
@@ -175,7 +172,7 @@ export default {
 		watchDatabaseDirectory: {
 			deep: true,
 			handler () {
-				this.completeDirectory()
+				this.fetchFiles()
 			}
 		},
 
@@ -204,6 +201,13 @@ export default {
 			if (!this.fileClicked) {
 				this.active = []
 			}
+		},
+
+		files: {
+			deep: true,
+			handler () {
+				this.completeDirectory()
+			}
 		}
 	},
 
@@ -225,11 +229,31 @@ export default {
 		})
 	},
 
-	// mounted () {
-	// 	this.completeDirectory()
-	// },
+	mounted () {
+		this.fetchFiles()
+	},
 
 	methods: {
+		// function to fetch the files from the database
+		fetchFiles () {
+			this.$apollo.query({
+				query: gql`
+					query {
+						files {
+							fileId: id
+							label
+							schemaId
+						}
+					}
+				`
+			}).then((data) => {
+				// overwriting the files with the fresh files from the database
+				this.files = data.data.files
+			}).catch((error) => {
+				console.log({ error })
+			})
+		},
+
 		completeDirectory () {
 			// function that takes in the raw data which are fetched when this component is created and processing so that a useable directory is formed
 			// creating new instance by calling the MainDirectory class and passing it the raw data in the arguments
