@@ -320,7 +320,7 @@ export default {
 						}
 					}
 				`
-			}).then(() => {
+			}).then((data) => {
 				this.$store.commit('infoBox/setSaveTrigger')
 
 				// create a new instance to add the file to the directory on every reqired location
@@ -335,7 +335,7 @@ export default {
 					this.valuesToSave.parentIds)
 				// commiting the edited directory to the store
 				this.$store.commit('directory/setToStoreDirectory', directoryWithAddedEntity.directoryCopy)
-				this.getFileDataToId(this.clickedEntityFileId)
+				this.getFileDataToId(data.data.createFile.id)
 			}).catch((error) => {
 				console.log({ error })
 			})
