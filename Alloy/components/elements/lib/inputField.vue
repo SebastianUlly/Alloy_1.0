@@ -38,13 +38,14 @@
 			/>
 		</div>
 		<div class="results" v-if="result.length">
-			<div v-for="item of result">
-				{{item}}
-
+			<div @click="optionClicked(item)" class="options"  v-for="item of result">
+			
+			{{item}}
+			
 			</div>
 
 		</div>
-		<vue-json-pretty :data="parameters.elementToWatch" />
+		<!-- <vue-json-pretty :data="parameters.elementToWatch" /> -->
 	</div>
 </template>
 
@@ -77,7 +78,7 @@ export default {
 			placeholder: "...",
 			dataToWatch: '',
 			result: [],
-			isResult: false
+			isFocus: false
 		}
 	},
 
@@ -113,6 +114,11 @@ export default {
 	},
 
 	methods: {
+		setIsFocus(){
+		},
+		optionClicked(item){
+			console.log(item)
+		},
 		defaultValue () {
 			// console.log(this.directory)
 			if (this.parameters.default === 'function_consecutiveNumber' && !this.dataOriginal) {
@@ -131,9 +137,9 @@ export default {
 			this.dataToWatch= this.fileData.find(item => item.elementId === this.parameters.elementToWatch)?.data?.text;
 			const res = ZipCodeList.data.filter((item) => item?.plz?.toString().startsWith(this.dataToWatch));
 			for (const obj of res) {
-				this.result.push(obj.plz)
+				this.result.push(obj.ort)
 			}
-			console.log(ZipCodeList.data.filter((item) => item?.plz?.toString().startsWith(this.dataToWatch)));
+		/* 	console.log(ZipCodeList.data.filter((item) => item?.plz?.toString().startsWith(this.dataToWatch))); */
 			if(this.result){
 				this.isResult = true
 			}
@@ -144,18 +150,56 @@ export default {
 
 <style scoped lang="scss">
 @import '../../../assets/scss/componets/inputField.scss';
+
 .results{
 	position: absolute;
 	display:none;
-	width: 93%;
-	height: 100px;
+	width: 97%;
+	max-height: 250px;
 	background-color: #1E1E1E;
-	z-index: 1;
+	z-index: 2;
 	border: 1px solid white;
 	border-radius: 4px;
+	overflow: scroll;
+	box-shadow: inset 0 0 20px rgb(17, 17, 17);
+	overflow-x: hidden;
 }
-.input input:focus ~ .results{
+.options{
+	padding: 4px 15px;
+	z-index: 2;
+}
+ .input:hover .results:hover, .input input:focus ~ .results{
 	display: block;
+}
+.options:hover{
+	background-color: grey;
+}
 
+
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: rgb(83, 83, 83);
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: rgb(155, 155, 155);
+  border-radius: 4px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: rgb(141, 141, 141);
+}
+::-webkit-resizer{
+	display: none;
+}
+::-webkit-scrollbar-corner{
+	display: none;
 }
 </style>
