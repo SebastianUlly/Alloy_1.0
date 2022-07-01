@@ -13,12 +13,14 @@
 	>
 		<!-- input-field -->
 		<input
+			@click="inputClicked()"
 			v-model="dataToEdit"
 			:title="dataToEdit"
 			type="text"
 			:placeholder="placeholder"
 			:class="parameters.editable === false ? 'input__field-disabled' : 'input__field'"
 			:disabled="parameters.editable === false ? true : false"
+			ref = "input"
 		>
 		<!-- label to the input-field -->
 		 <span class="input__label">
@@ -37,7 +39,7 @@
 				:new-data="dataToEdit"
 			/>
 		</div>
-		<div class="results" v-if="result.length">
+		<div ref="results" class="results" v-if="result.length">
 			<div @click="optionClicked(item)" class="options"  v-for="item of result">
 			
 			{{item}}
@@ -78,7 +80,6 @@ export default {
 			placeholder: "...",
 			dataToWatch: '',
 			result: [],
-			isFocus: false
 		}
 	},
 
@@ -114,10 +115,12 @@ export default {
 	},
 
 	methods: {
-		setIsFocus(){
+		inputClicked(){
+			this.$refs.results.classList.replace("resultsDisplayNone","results");
 		},
 		optionClicked(item){
-			console.log(item)
+			this.dataToEdit = item;
+			this.$refs.results.classList.replace("results","resultsDisplayNone");
 		},
 		defaultValue () {
 			// console.log(this.directory)
@@ -152,20 +155,26 @@ export default {
 @import '../../../assets/scss/componets/inputField.scss';
 
 .results{
-	position: absolute;
+	position:absolute;
+	display:flex;
 	display:none;
-	width: 97%;
+	max-width: 100%;
 	max-height: 250px;
 	background-color: #1E1E1E;
 	z-index: 2;
 	border: 1px solid white;
 	border-radius: 4px;
 	overflow: scroll;
-	box-shadow: inset 0 0 20px rgb(17, 17, 17);
 	overflow-x: hidden;
+	box-shadow: 10px 10px 10px rgba(0, 0, 0, 0.452);
+
+}
+.resultsDisplayNone{
+	display: none;
 }
 .options{
-	padding: 4px 15px;
+	padding: 4px 0;
+	padding-left: 15px;
 	z-index: 2;
 }
  .input:hover .results:hover, .input input:focus ~ .results{
