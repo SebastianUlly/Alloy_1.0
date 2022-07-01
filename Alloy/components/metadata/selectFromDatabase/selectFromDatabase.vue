@@ -14,7 +14,7 @@
 
 
     </div>
-     <vue-json-pretty :data="fileData"/>
+   <!--   <vue-json-pretty :data="fileData"/> -->
   </div>
 </template>
 
