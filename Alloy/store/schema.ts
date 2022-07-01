@@ -16,7 +16,9 @@ export const mutations = {
 				isLeaf: boolean,
 				metadata_elements: object[]
 			},
-			elements: object[] }) {
+			elements: object[]
+		}
+	) {
 		const values = {
 			id: schemaData.id,
 			label: schemaData.label,
