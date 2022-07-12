@@ -55,7 +55,7 @@
 import { getConsecutiveNumber } from '~/assets/functions/consecutiveNumber'
 import { mapGetters } from 'vuex'
 import ZipCodeList from '~/zipCodeList.json'
-
+import gql from 'graphql-tag'
 export default {
 	inheritAttrs: false,
 	props: {
@@ -79,7 +79,7 @@ export default {
 			dataToEdit: '',
 			placeholder: "...",
 			dataToWatch: '',
-			result: [],
+			result: ["",""],
 		}
 	},
 
@@ -99,6 +99,26 @@ export default {
 		// watcher to watch the entered data
 		dataToEdit (value) {
 			this.$emit('update', value)
+			this.$apollo.query({
+			variables: {
+				dataToSearch: this.dataToEdit,
+			},
+			query: gql`
+				query ($dataToSearch: String) {
+				addressSearch(searchValue: $dataToSearch) {
+					plz
+					bezirk
+					Ort
+					Bundesland
+					weight
+				}
+				}
+			`}).then((data) => {
+				console.log(data.data.addressSearch)
+			})
+			.catch((error) => {
+				console.log({ error })
+			})
 		},
 
 		fileData: {
@@ -112,11 +132,13 @@ export default {
 	mounted () {
 		this.dataToEdit = this.dataOriginal
 		this.defaultValue()
+		this.getDataToWatch()
 	},
 
 	methods: {
 		inputClicked(){
 			this.$refs.results.classList.replace("resultsDisplayNone","results");
+			
 		},
 		optionClicked(item){
 			this.dataToEdit = item;
@@ -137,7 +159,7 @@ export default {
 		},
 
 		getDataToWatch () {
-			this.dataToWatch= this.fileData.find(item => item.elementId === this.parameters.elementToWatch)?.data?.text;
+			this.dataToWatch = this.fileData.find(item => item.elementId === this.parameters.elementToWatch)?.data?.text;
 			const res = ZipCodeList.data.filter((item) => item?.plz?.toString().startsWith(this.dataToWatch));
 			for (const obj of res) {
 				this.result.push(obj.ort)
@@ -159,6 +181,7 @@ export default {
 	display:flex;
 	display:none;
 	max-width: 100%;
+	width: 95%;
 	max-height: 250px;
 	background-color: #1E1E1E;
 	z-index: 2;
@@ -183,9 +206,6 @@ export default {
 .options:hover{
 	background-color: grey;
 }
-
-
-
 ::-webkit-scrollbar {
   width: 10px;
 }
