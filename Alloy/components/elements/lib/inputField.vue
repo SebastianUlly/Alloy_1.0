@@ -1,4 +1,4 @@
-# name: Single Line Input # author: Sebastian ULLY # type: general input
+[# name: Single Line Input # author: Sebastian ULLY # type: general input
 component # version: 1.0 # date: 01.02.2022 # external dependents: / # internal
 dependents: Has Changed Indicator
 
@@ -35,8 +35,8 @@ dependents: Has Changed Indicator
         {{ item.ort }}
       </div>
     </div>
-    <!--  <vue-json-pretty :data="parameters.elementToWatch" />
-    <vue-json-pretty :data="result" /> -->
+    <!--  <vue-json-pretty :data="parameters.elementToWatch" /> -->
+    <!--  <vue-json-pretty :data="result" /> -->
   </div>
 </template>
 
@@ -44,6 +44,7 @@ dependents: Has Changed Indicator
 import { getConsecutiveNumber } from "~/assets/functions/consecutiveNumber";
 import { mapGetters } from "vuex";
 import gql from "graphql-tag";
+
 export default {
   inheritAttrs: false,
   props: {
@@ -59,6 +60,10 @@ export default {
       type: Object,
       required: false,
       default: null
+    },
+    elementId: {
+      type: String,
+      required: false
     }
   },
 
@@ -104,6 +109,7 @@ export default {
             }
           `
         })
+        //the watcher watch if the dataToEdit value changes and saves the data from the gql in results array
         .then(data => {
           this.result = [];
           if (this.parameters.elementToWatch && this.dataToEdit) {
@@ -115,41 +121,55 @@ export default {
         .catch(error => {
           console.log({ error });
         });
-    },
-
-    fileData: {
-      deep: true,
-      handler() {
-        this.getDataToWatch();
-      }
     }
   },
 
   mounted() {
     this.dataToEdit = this.dataOriginal;
     this.defaultValue();
-    /* this.getDataToWatch() */
   },
-
+  //listens to the event that called as the watched inputfield and fills the correct data in dataToEdit
+  created() {
+    eventTarget.addEventListener("keydown", event => {
+  if (event.isComposing || event.keyCode === 40) {
+    return;
+  }
+  console.log("asd")
+    })
+    this.$nuxt.$on(this.elementId, item => {
+      if (this.parameters.type === "ort") {
+        this.dataToEdit = item.ort;
+      } else if (this.parameters.type === "plz") {
+        this.dataToEdit = item.plz;
+      }
+    });
+  },
   methods: {
+    // method that is called when the input is clicked. It checks if the parameters.elementToWatch exists
+    // and if the dataToEdit is not empty, if both are true it replaces the class
+    // resultsDisplayNone with results
     inputClicked() {
       if (this.parameters.elementToWatch && this.dataToEdit !== "") {
         this.$refs.results.classList.replace("resultsDisplayNone", "results");
       }
     },
+    //when the user clicks on an option in the dropdown it checks if the
+    // parameters.type is plz or ort and sets the dataToEdit to the plz or ort of the clicked item
+    // also replaces the class results with resultsDisplayNone and calls the method startEvent with the
+    // clicked item
+    //the startEvent sends the item to the component with elementToWatch
     optionClicked(item) {
-      if ((this.parameters.type === "plz")) {
+      if (this.parameters.type === "plz") {
         this.dataToEdit = item.plz;
-        console.log(this.parameters.type);
         this.$refs.results.classList.replace("results", "resultsDisplayNone");
-      } else if ((this.parameters.type === "ort")) {
+        this.startEvent(item);
+      } else if (this.parameters.type === "ort") {
         this.dataToEdit = item.ort;
-        console.log(this.parameters.type);
         this.$refs.results.classList.replace("results", "resultsDisplayNone");
+        this.startEvent(item);
       }
     },
     defaultValue() {
-      // console.log(this.directory)
       if (
         this.parameters.default === "function_consecutiveNumber" &&
         !this.dataOriginal
@@ -170,17 +190,14 @@ export default {
         this.dataToEdit = new Date().getFullYear();
       }
     },
-
-    getDataToWatch() {
-      /* this.dataToWatch = this.fileData.find(item => item.elementId === this.parameters.elementToWatch)?.data?.text;
-			const res = ZipCodeList.data.filter((item) => item?.plz?.toString().startsWith(this.dataToWatch));
-			for (const obj of res) {
-				this.result.push(obj.ort)
-			}
-		 	console.log(ZipCodeList.data.filter((item) => item?.plz?.toString().startsWith(this.dataToWatch))); 
-			if(this.result){
-				this.isResult = true
-			} */
+    onKeyDown(key){
+      console.log(key)
+    },
+    // it becomes the data and sends to elementToWatch component
+    startEvent(item) {
+      if (this.parameters.elementToWatch && this.dataToEdit !== "") {
+        this.$nuxt.$emit(this.parameters.elementToWatch, item);
+      }
     }
   }
 };
@@ -196,7 +213,7 @@ export default {
   max-width: 100%;
   width: 95%;
   max-height: 250px;
-  background-color: #1e1e1e;
+  background-color: #1b1b1b;
   z-index: 2;
   border: 1px solid white;
   border-radius: 4px;
@@ -217,7 +234,8 @@ export default {
   display: block;
 }
 .options:hover {
-  background-color: grey;
+  background-color: #1c3349;
+  color: #6bbcff;
 }
 ::-webkit-scrollbar {
   width: 10px;
@@ -245,3 +263,4 @@ export default {
   display: none;
 }
 </style>
+]

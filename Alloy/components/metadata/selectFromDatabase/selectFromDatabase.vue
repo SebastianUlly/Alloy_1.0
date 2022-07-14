@@ -6,6 +6,7 @@
         :label="item.label"
         :data-original="item.textOriginal"
         :parameters="item.parameters"
+        :element-id="item.elementId"
         @update="enterText($event, item)"
       />
       <!-- <vue-json-pretty :data="item.parameters.elementToWatch"/> -->
