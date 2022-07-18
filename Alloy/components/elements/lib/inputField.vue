@@ -17,6 +17,9 @@ dependents: Has Changed Indicator
       "
       :disabled="parameters.editable === false ? true : false"
       ref="input"
+      v-on:keydown.down="optionStepper(1)"
+      v-on:keydown.up="optionStepper(-1)"
+      v-on:keydown.enter="optionClicked(result[optionStepperCounter])"
     />
     <!-- label to the input-field -->
     <span class="input__label">
@@ -30,9 +33,11 @@ dependents: Has Changed Indicator
       <has-changed-indicator :old-data="dataOriginal" :new-data="dataToEdit" />
     </div>
     <div ref="results" class="results" v-if="result.length">
-      <div @click="optionClicked(item)" class="options" v-for="item of result">
+      <div @click="optionClicked(item)" class="options" v-for="(item, index) of result" :id="'active-option' + index" >
         {{ item.plz }},
-        {{ item.ort }}
+        {{ item.ort }},
+        {{ index }},
+        
       </div>
     </div>
     <!--  <vue-json-pretty :data="parameters.elementToWatch" /> -->
@@ -72,7 +77,8 @@ export default {
       dataToEdit: "",
       placeholder: "...",
       dataToWatch: "",
-      result: []
+      result: [],
+      optionStepperCounter: -1
     };
   },
 
@@ -130,12 +136,6 @@ export default {
   },
   //listens to the event that called as the watched inputfield and fills the correct data in dataToEdit
   created() {
-    eventTarget.addEventListener("keydown", event => {
-  if (event.isComposing || event.keyCode === 40) {
-    return;
-  }
-  console.log("asd")
-    })
     this.$nuxt.$on(this.elementId, item => {
       if (this.parameters.type === "ort") {
         this.dataToEdit = item.ort;
@@ -145,6 +145,22 @@ export default {
     });
   },
   methods: {
+    optionStepper(value){
+      let nextStep = this.optionStepperCounter + value; 
+      this.optionStepperCounter = Math.min(this.result.length -1, Math.max(0, nextStep))
+      document.getElementsByClassName("options").forEach(element => {
+        if(element.id === "active-option" + this.optionStepperCounter){
+           document.getElementById("active-option"+ this.optionStepperCounter).style.color = "#6bbcff";
+           //document.getElementById("active-option"+ this.optionStepperCounter).style.background-color = "#1c3349";
+
+           
+           //document.getElementById("active-option"+ this.optionStepperCounter).scrollIntoView();
+           
+        }else{
+          element.style.color = "white";
+        }
+      });
+      },
     // method that is called when the input is clicked. It checks if the parameters.elementToWatch exists
     // and if the dataToEdit is not empty, if both are true it replaces the class
     // resultsDisplayNone with results
