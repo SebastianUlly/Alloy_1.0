@@ -11,7 +11,9 @@ dependents: Has Changed Indicator
       v-model="dataToEdit"
       :title="dataToEdit"
       type="text"
+      :id="'inputId-' + elementId"
       :placeholder="placeholder"
+      autocomplete="off"
       :class="
         parameters.editable === false ? 'input__field-disabled' : 'input__field'
       "
@@ -32,12 +34,15 @@ dependents: Has Changed Indicator
     <div class="input__error">
       <has-changed-indicator :old-data="dataOriginal" :new-data="dataToEdit" />
     </div>
-    <div ref="results" class="results" v-if="result.length">
-      <div @click="optionClicked(item)" class="options" v-for="(item, index) of result" :id="'active-option' + index" >
+    <div ref="results" class="results" v-if="result.length && optionsActive">
+      <div
+        @click="optionClicked(item)"
+        class="options"
+        v-for="(item, index) of result"
+        :id="'active-option' + index"
+      >
         {{ item.plz }},
-        {{ item.ort }},
-        {{ index }},
-        
+        {{ item.ort }}
       </div>
     </div>
     <!--  <vue-json-pretty :data="parameters.elementToWatch" /> -->
@@ -78,7 +83,8 @@ export default {
       placeholder: "...",
       dataToWatch: "",
       result: [],
-      optionStepperCounter: -1
+      optionStepperCounter: -1,
+      optionsActive: false
     };
   },
 
@@ -133,6 +139,8 @@ export default {
   mounted() {
     this.dataToEdit = this.dataOriginal;
     this.defaultValue();
+    this.isTheInputActive();
+    
   },
   //listens to the event that called as the watched inputfield and fills the correct data in dataToEdit
   created() {
@@ -145,22 +153,42 @@ export default {
     });
   },
   methods: {
-    optionStepper(value){
-      let nextStep = this.optionStepperCounter + value; 
-      this.optionStepperCounter = Math.min(this.result.length -1, Math.max(0, nextStep))
+    isTheInputActive(){
+      document.addEventListener("mouseup", e => {
+      // console.log(e)
+      const m = document.getElementById("inputId-" + this.elementId);
+      if (this.parameters.elementToWatch) {
+        if (m === document.activeElement) {
+          this.optionStepperCounter = -1;
+          this.optionsActive = true;
+        } else {
+          this.optionsActive = false;
+        }
+      }
+    });
+    },
+    optionStepper(value) {
+      let nextStep = this.optionStepperCounter + value;
+      this.optionStepperCounter = Math.min(
+        this.result.length - 1,
+        Math.max(0, nextStep)
+      );
       document.getElementsByClassName("options").forEach(element => {
-        if(element.id === "active-option" + this.optionStepperCounter){
-           document.getElementById("active-option"+ this.optionStepperCounter).style.color = "#6bbcff";
-           //document.getElementById("active-option"+ this.optionStepperCounter).style.background-color = "#1c3349";
+        if (element.id === "active-option" + this.optionStepperCounter) {
+          document.getElementById(
+            "active-option" + this.optionStepperCounter
+          ).style.color = "#6bbcff";
+          document.getElementById(
+            "active-option" + this.optionStepperCounter
+          ).style.backgroundColor = "#1c3349";
 
-           
-           //document.getElementById("active-option"+ this.optionStepperCounter).scrollIntoView();
-           
-        }else{
+          //document.getElementById("active-option"+ this.optionStepperCounter).scrollIntoView();
+        } else {
           element.style.color = "white";
+          element.style.backgroundColor = "#1b1b1b";
         }
       });
-      },
+    },
     // method that is called when the input is clicked. It checks if the parameters.elementToWatch exists
     // and if the dataToEdit is not empty, if both are true it replaces the class
     // resultsDisplayNone with results
@@ -175,14 +203,16 @@ export default {
     // clicked item
     //the startEvent sends the item to the component with elementToWatch
     optionClicked(item) {
-      if (this.parameters.type === "plz") {
-        this.dataToEdit = item.plz;
-        this.$refs.results.classList.replace("results", "resultsDisplayNone");
-        this.startEvent(item);
-      } else if (this.parameters.type === "ort") {
-        this.dataToEdit = item.ort;
-        this.$refs.results.classList.replace("results", "resultsDisplayNone");
-        this.startEvent(item);
+      if (item) {
+        if (this.parameters.type === "plz") {
+          this.dataToEdit = item.plz;
+          this.$refs.results.classList.replace("results", "resultsDisplayNone");
+          this.startEvent(item);
+        } else if (this.parameters.type === "ort") {
+          this.dataToEdit = item.ort;
+          this.$refs.results.classList.replace("results", "resultsDisplayNone");
+          this.startEvent(item);
+        }
       }
     },
     defaultValue() {
@@ -205,9 +235,6 @@ export default {
       ) {
         this.dataToEdit = new Date().getFullYear();
       }
-    },
-    onKeyDown(key){
-      console.log(key)
     },
     // it becomes the data and sends to elementToWatch component
     startEvent(item) {
