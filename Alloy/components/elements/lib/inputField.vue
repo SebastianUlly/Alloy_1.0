@@ -153,9 +153,10 @@ export default {
     });
   },
   methods: {
+    //sets the value of optionsActive true or false if the input is cllicked
     isTheInputActive(){
       document.addEventListener("mouseup", e => {
-      // console.log(e)
+      
       const m = document.getElementById("inputId-" + this.elementId);
       if (this.parameters.elementToWatch) {
         if (m === document.activeElement) {
@@ -167,12 +168,14 @@ export default {
       }
     });
     },
+    // called when the up or down arrow keypressed and sets the value of optionStepperCounter
     optionStepper(value) {
       let nextStep = this.optionStepperCounter + value;
       this.optionStepperCounter = Math.min(
         this.result.length - 1,
         Math.max(0, nextStep)
       );
+      // changing the color of the selected option.
       document.getElementsByClassName("options").forEach(element => {
         if (element.id === "active-option" + this.optionStepperCounter) {
           document.getElementById(
@@ -181,8 +184,6 @@ export default {
           document.getElementById(
             "active-option" + this.optionStepperCounter
           ).style.backgroundColor = "#1c3349";
-
-          //document.getElementById("active-option"+ this.optionStepperCounter).scrollIntoView();
         } else {
           element.style.color = "white";
           element.style.backgroundColor = "#1b1b1b";
@@ -197,11 +198,11 @@ export default {
         this.$refs.results.classList.replace("resultsDisplayNone", "results");
       }
     },
-    //when the user clicks on an option in the dropdown it checks if the
+    // when the user clicks on an option in the dropdown it checks if the
     // parameters.type is plz or ort and sets the dataToEdit to the plz or ort of the clicked item
     // also replaces the class results with resultsDisplayNone and calls the method startEvent with the
     // clicked item
-    //the startEvent sends the item to the component with elementToWatch
+    // the startEvent sends the item to the component with elementToWatch
     optionClicked(item) {
       if (item) {
         if (this.parameters.type === "plz") {
