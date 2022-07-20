@@ -20,7 +20,7 @@
 				:element-id="element.elementId"
 				:parameters="element.parameters"
 			/>
-			<vue-json-pretty :data="element" />
+			<!-- <vue-json-pretty :data="element" /> -->
 			<div class="move-icons-container">
 				<v-icon
 					@click="moveDown(element.elementId)"

@@ -5,7 +5,12 @@
 				:element="element"
 				@update="setLabel"
 			/>
-			<input type="checkbox" v-model="required">
+			
+			<div v-for="(item, index) of Object.keys(element.parameters)" :key="index">
+				<component :is="item"></component>
+			</div>
+
+			<vue-json-pretty :data="element" />
 
 			<button class="save-button" @click="saveElement">
 				Element speichern
@@ -18,10 +23,12 @@
 import { mapGetters } from 'vuex'
 
 import LabelEditor from './elementEditor/labelEditor.vue'
+import required from './elementEditor/required.vue'
 
 export default {
 	components: {
-		LabelEditor
+		LabelEditor,
+		required
 	},
 
 	data () {
