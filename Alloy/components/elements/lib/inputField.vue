@@ -34,12 +34,12 @@ dependents: Has Changed Indicator
     <div class="input__error">
       <has-changed-indicator :old-data="dataOriginal" :new-data="dataToEdit" />
     </div>
-    <div ref="results" class="results" v-if="result.length && optionsActive">
+    <div ref="results" class="results" v-if="result.length">
       <div
         @click="optionClicked(item)"
         class="options"
         v-for="(item, index) of result"
-        :id="'active-option' + index"
+        :id="'active-option-' + elementId + '-' + index"
       >
         {{ item.plz }},
         {{ item.ort }}
@@ -84,7 +84,8 @@ export default {
       dataToWatch: "",
       result: [],
       optionStepperCounter: -1,
-      optionsActive: false
+      optionsActive: false,
+      numberOfResults: 7
     };
   },
 
@@ -125,7 +126,7 @@ export default {
         .then(data => {
           this.result = [];
           if (this.parameters.elementToWatch && this.dataToEdit) {
-            for (let i = 0; i < data.data.addressSearch.length; i++) {
+            for (let i = 0; i < this.numberOfResults; i++) {
               this.result.push(data.data.addressSearch[i]);
             }
           }
@@ -139,7 +140,6 @@ export default {
   mounted() {
     this.dataToEdit = this.dataOriginal;
     this.defaultValue();
-    this.isTheInputActive();
     
   },
   //listens to the event that called as the watched inputfield and fills the correct data in dataToEdit
@@ -153,21 +153,6 @@ export default {
     });
   },
   methods: {
-    //sets the value of optionsActive true or false if the input is cllicked
-    isTheInputActive(){
-      document.addEventListener("mouseup", e => {
-      
-      const m = document.getElementById("inputId-" + this.elementId);
-      if (this.parameters.elementToWatch) {
-        if (m === document.activeElement) {
-          this.optionStepperCounter = -1;
-          this.optionsActive = true;
-        } else {
-          this.optionsActive = false;
-        }
-      }
-    });
-    },
     // called when the up or down arrow keypressed and sets the value of optionStepperCounter
     optionStepper(value) {
       let nextStep = this.optionStepperCounter + value;
@@ -175,14 +160,15 @@ export default {
         this.result.length - 1,
         Math.max(0, nextStep)
       );
+       
       // changing the color of the selected option.
       document.getElementsByClassName("options").forEach(element => {
-        if (element.id === "active-option" + this.optionStepperCounter) {
+        if (element.id === 'active-option-' + this.elementId + '-' + this.optionStepperCounter) {
           document.getElementById(
-            "active-option" + this.optionStepperCounter
+           'active-option-' + this.elementId + '-' + this.optionStepperCounter
           ).style.color = "#6bbcff";
           document.getElementById(
-            "active-option" + this.optionStepperCounter
+            'active-option-' + this.elementId + '-' + this.optionStepperCounter
           ).style.backgroundColor = "#1c3349";
         } else {
           element.style.color = "white";
@@ -277,28 +263,32 @@ export default {
 .input input:focus ~ .results {
   display: block;
 }
-.options:hover {
-  background-color: #1c3349;
-  color: #6bbcff;
+.options:hover{
+  background-color: #1c3349 !important;
+  color: #6bbcff !important;
 }
 ::-webkit-scrollbar {
   width: 10px;
+  display: none;
 }
 
 /* Track */
 ::-webkit-scrollbar-track {
   background: rgb(83, 83, 83);
+  display: none;
 }
 
 /* Handle */
 ::-webkit-scrollbar-thumb {
   background: rgb(155, 155, 155);
   border-radius: 4px;
+  display: none;
 }
 
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
   background: rgb(141, 141, 141);
+  display: none;
 }
 ::-webkit-resizer {
   display: none;
