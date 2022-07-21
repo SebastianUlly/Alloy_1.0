@@ -7,7 +7,11 @@
 			/>
 			
 			<div v-for="(item, index) of Object.keys(element.parameters)" :key="index">
-				<component :is="item"></component>
+				<component
+					:is="item"
+					:data-of-property="element.parameters[item]"
+					@update="updateProperty(item)"
+				/>
 			</div>
 
 			<vue-json-pretty :data="element" />
@@ -71,6 +75,10 @@ export default {
 
 		startFunction () {
 			this.element = JSON.parse(JSON.stringify(this.elementToEdit))
+		},
+
+		updateProperty (item, data) {
+			console.log(item, data)
 		}
 	},
 }
