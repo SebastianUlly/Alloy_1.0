@@ -41,8 +41,8 @@ dependents: Has Changed Indicator
         v-for="(item, index) of result"
         :id="'active-option-' + elementId + '-' + index"
       >
-        {{ item.plz }},
-        {{ item.ort }}
+        {{ item.value_2 }},
+        {{ item.value_1 }}
       </div>
     </div>
     <!--  <vue-json-pretty :data="parameters.elementToWatch" /> -->
@@ -85,7 +85,8 @@ export default {
       result: [],
       optionStepperCounter: -1,
       optionsActive: false,
-      numberOfResults: 7
+      numberOfResults: 7,
+      tableToSearch:""
     };
   },
 
@@ -108,15 +109,20 @@ export default {
       this.$apollo
         .query({
           variables: {
+            tableToSearch: this.parameters.materializedViewToSearch,
             dataToSearch: this.dataToEdit
           },
           query: gql`
-            query($dataToSearch: String) {
-              addressSearch(searchValue: $dataToSearch) {
-                plz
-                bezirk
-                ort
-                bundesland
+            query(
+              $tableToSearch: String
+              $dataToSearch: String
+              ) {
+              materializedViewSearch(
+                materializedViewToSearch: $tableToSearch
+                searchValue: $dataToSearch
+                ) {
+                value_1
+                value_2
                 weight
               }
             }
@@ -127,7 +133,7 @@ export default {
           this.result = [];
           if (this.parameters.elementToWatch && this.dataToEdit) {
             for (let i = 0; i < this.numberOfResults; i++) {
-              this.result.push(data.data.addressSearch[i]);
+              this.result.push(data.data.materializedViewSearch[i]);
             }
           }
         })
@@ -144,11 +150,12 @@ export default {
   },
   //listens to the event that called as the watched inputfield and fills the correct data in dataToEdit
   created() {
+    this.tableToSearch = this.parameters.materializedViewToSearch;
     this.$nuxt.$on(this.elementId, item => {
-      if (this.parameters.type === "ort") {
-        this.dataToEdit = item.ort;
-      } else if (this.parameters.type === "plz") {
-        this.dataToEdit = item.plz;
+      if (this.parameters.searchValue === "value_1") {
+        this.dataToEdit = item.value_1;
+      } else if (this.parameters.searchValue === "value_2") {
+        this.dataToEdit = item.value_2;
       }
     });
   },
@@ -185,18 +192,18 @@ export default {
       }
     },
     // when the user clicks on an option in the dropdown it checks if the
-    // parameters.type is plz or ort and sets the dataToEdit to the plz or ort of the clicked item
+    // parameters.searchValue is plz or ort and sets the dataToEdit to the plz or ort of the clicked item
     // also replaces the class results with resultsDisplayNone and calls the method startEvent with the
     // clicked item
     // the startEvent sends the item to the component with elementToWatch
     optionClicked(item) {
       if (item) {
-        if (this.parameters.type === "plz") {
-          this.dataToEdit = item.plz;
+        if (this.parameters.searchValue === "value_2") {
+          this.dataToEdit = item.value_2;
           this.$refs.results.classList.replace("results", "resultsDisplayNone");
           this.startEvent(item);
-        } else if (this.parameters.type === "ort") {
-          this.dataToEdit = item.ort;
+        } else if (this.parameters.searchValue === "value_1") {
+          this.dataToEdit = item.value_1;
           this.$refs.results.classList.replace("results", "resultsDisplayNone");
           this.startEvent(item);
         }
