@@ -43,6 +43,9 @@
 			<button @click="saveSchema()">
 				Schema speichern
 			</button>
+			<button @click="resetSchema()">
+				Reset Schema
+			</button>
 		</v-card>
 		<v-card class="container">
 			<ElementEditor />
@@ -147,6 +150,7 @@ export default {
 					this.$store.commit('schemaEditor/setSchemaMetadata', data.data.querySchemaById.metadata)
 					this.$store.commit('schemaEditor/setSchemaElements', data.data.querySchemaById.elements)
 					this.$store.commit('schemaEditor/setSchemaLayout', data.data.querySchemaById.layout)
+					this.$store.commit('schemaEditor/setSchemaFromDatabase', data.data.querySchemaById)
 				}).catch((error) => {
 					console.log({ error })
 				})
@@ -191,6 +195,10 @@ export default {
 			}).catch((error) => {
 				console.log({ error })
 			})
+		},
+
+		resetSchema () {
+			this.$store.commit('schemaEditor/resetSchema')
 		}
 	},
 }

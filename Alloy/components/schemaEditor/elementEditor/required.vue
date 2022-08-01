@@ -25,7 +25,11 @@ export default {
 		},
 
 		dataToEdit () {
-			this.$emit('update', this.dataToEdit)
+			const payload = {
+				key: 'required',
+				value: this.dataToEdit
+			}
+			this.$emit('update', payload)
 		}
 	}
 }

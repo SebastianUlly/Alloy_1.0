@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import { v4 as uuidv4 } from 'uuid'
+import { stat } from 'fs'
 
 export const state = () => ({
 	schemaId: '',
@@ -8,7 +9,8 @@ export const state = () => ({
 	schemaElements: [],
 	schemaLayout: [],
 	elementIdToEdit: '',
-	elementToEdit: null
+	elementToEdit: null,
+	schemaFromDatabase: null
 })
 
 export const mutations = {
@@ -172,14 +174,28 @@ export const mutations = {
 				position: Number,
 				parentId: String,
 				parameters: Object
-			}[]
+			}[],
+			schemaMetadata: {
+				metadata_elements: {
+					elementId: String,
+					label: String,
+					position: Number,
+					parentId: String,
+					parameters: Object
+				} []
+			}
 		},
 		elementId: String
 	) {
 		Vue.set(state, 'elementIdToEdit', elementId)
 
-		const element = state.schemaElements.find(item => item.elementId === elementId)
-		Vue.set(state, 'elementToEdit', element)
+		const elementFromElements = state.schemaElements.find(item => item.elementId === elementId)
+		if (elementFromElements) {
+			Vue.set(state, 'elementToEdit', elementFromElements)
+		} else {
+			const elementFromMeadata = state.schemaMetadata.metadata_elements.find(item => item.elementId === elementId)
+			Vue.set(state, 'elementToEdit', elementFromMeadata)
+		}
 	},
 
 	moveElementByElementId (
@@ -213,6 +229,39 @@ export const mutations = {
 		}
 	},
 
+	moveMetadataElementByElementId (
+		state: {
+			schemaMetadata: {
+				metadata_elements: {
+					elementId: String,
+					position: Number,
+					parentId: Number
+				} [],
+			}
+		},
+		payload: {
+			elementId: String,
+			direction: String
+		}
+	) {
+		console.log(payload.elementId, payload.direction)
+
+		let elementToMove = state.schemaMetadata.metadata_elements.find(item => item.elementId === payload.elementId)
+		
+		console.log(elementToMove?.position)
+		if (payload.direction === 'up') {
+			const elementForcedToMove = state.schemaMetadata.metadata_elements.find(item => item.position === (elementToMove?.position - 1) && item.parentId === 0)
+			console.log(elementForcedToMove?.position)
+			elementToMove?.position -= 1
+			elementForcedToMove?.position += 1
+		} else if (payload.direction === 'down') {
+			const elementForcedToMove = state.schemaMetadata.metadata_elements.find(item => item.position === (elementToMove?.position + 1) && item.parentId === 0)
+			console.log(elementForcedToMove?.position)
+			elementToMove?.position += 1
+			elementForcedToMove?.position -= 1
+		}
+	},
+
 	setLabelOfElement (
 		state: {
 			schemaElements: {
@@ -225,8 +274,10 @@ export const mutations = {
 	) {
 		const elementToEdit = state.schemaElements.find(item => item.elementId === state.elementIdToEdit)
 		console.log(elementToEdit)
+		if (elementToEdit) {
+			elementToEdit.label = label
+		}
 		
-		elementToEdit?.label = label
 	},
 
 	setParametersOfElement (
@@ -234,6 +285,7 @@ export const mutations = {
 			schemaElements: {
 				label: String,
 				elementId: String
+				parameters: object
 			} [],
 			elementIdToEdit: String
 		},
@@ -242,7 +294,100 @@ export const mutations = {
 		const elementToEdit = state.schemaElements.find(item => item.elementId === state.elementIdToEdit)
 		console.log(elementToEdit)
 		
-		elementToEdit?.parameters = payload
+		if (elementToEdit) {
+			elementToEdit.parameters = payload
+		}
+	},
+
+	setElementOfSchema (
+		state: {
+			schemaElements: {
+				label: String,
+				parentId: any,
+				elementId: String,
+				parameters: object,
+				componentId: String,
+				position: Number,
+				validations: object
+			}[],
+			schemaMetadata: {
+				metadata_elements: {
+					label: String,
+					parentId: any,
+					elementId: String,
+					parameters: object,
+					componentId: String,
+					position: Number,
+					validations: object
+				} []
+			}
+		},
+		elementToSave: {
+			label: String,
+			parentId: any,
+			elementId: String,
+			parameters: object,
+			componentId: String,
+			position: Number,
+			validations: object
+		}
+	) {
+		const schemaElementsCopy = JSON.parse(JSON.stringify(state.schemaElements))
+		const indexInSchemaElements = schemaElementsCopy.findIndex(item => { return item.elementId === elementToSave.elementId })
+		if (indexInSchemaElements !== -1) {
+			schemaElementsCopy[indexInSchemaElements] = elementToSave
+			Vue.set(state, 'schemaElements', schemaElementsCopy)
+		} else {
+			console.log('ajsd')
+			const schemaMetadataCopy = JSON.parse(JSON.stringify(state.schemaMetadata))
+			const indexInSchemaElements = schemaMetadataCopy.metadata_elements.findIndex(item => { return item.elementId === elementToSave.elementId })
+			if (indexInSchemaElements) {
+				schemaMetadataCopy[indexInSchemaElements] = elementToSave
+				Vue.set(state, 'schemaMetadata', schemaMetadataCopy)
+			}
+		}
+	},
+
+	setSchemaFromDatabase (
+		state: {
+			schemaFromDatabase: {
+				id: String,
+				label: String,
+				metadata: Object
+				elements: Object[]
+			}
+		},
+		schema: {
+			id: String,
+			label: String,
+			metadata: Object
+			elements: Object[]
+		}
+	) {
+		Vue.set(state, 'schemaFromDatabase', schema)
+	},
+
+	resetSchema (
+		state: {
+			schemaId: String,
+			schemaLabel: String,
+			schemaMetadata: [],
+			schemaElements: {}[],
+			schemaFromDatabase: {
+				id: String,
+				label: String,
+				metadata: Object,
+				elements: Object[],
+				layout: Object
+			}
+		}
+	) {
+		console.log(state.schemaFromDatabase.elements, state.schemaElements)
+		Vue.set(state, 'schemaId', state.schemaFromDatabase.id)
+		Vue.set(state, 'schemaLabel', state.schemaFromDatabase.label)
+		Vue.set(state, 'schemaMetadata', state.schemaFromDatabase.metadata)
+		Vue.set(state, 'schemaElements', state.schemaFromDatabase.elements)
+		Vue.set(state, 'schemaLayout', state.schemaFromDatabase.layout)
 	}
 }
 

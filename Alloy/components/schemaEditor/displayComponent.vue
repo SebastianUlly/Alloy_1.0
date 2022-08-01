@@ -47,6 +47,7 @@ export default {
 			deep: true,
 			handler () {
 				this.getData()
+				console.log('skdljf')
 			}
 		},
 

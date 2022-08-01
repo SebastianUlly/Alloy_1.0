@@ -10,15 +10,23 @@
 				<component
 					:is="item"
 					:data-of-property="element.parameters[item]"
-					@update="updateProperty(item)"
+					@update="updateProperty"
 				/>
 			</div>
 
-			<vue-json-pretty :data="element" />
 
 			<button class="save-button" @click="saveElement">
 				Element speichern
 			</button>
+			<button
+				:disabled="JSON.stringify(element) === JSON.stringify(elementToEdit)"
+				:style="(JSON.stringify(element) === JSON.stringify(elementToEdit)) ? 'opacity: 0.4' : 'opacity: 1'"
+				class="reset-button" @click="resetElement"
+			>
+				Reset Element
+			</button>
+
+			<vue-json-pretty :data="element" />
 		</div>
 	</div>
 </template>
@@ -66,19 +74,24 @@ export default {
 
 	methods: {
 		setLabel (data) {
-			// 	.$store.commit('schemaEditor/setLabelOfElement', data)
+			this.element.label = data
 		},
 
 		saveElement () {
-			console.log(this.element)
+			this.$store.commit('schemaEditor/setElementOfSchema', this.element)
+			this.$store.commit("schemaEditor/setElementIdToEdit", this.element.elementId);
+		},
+
+		resetElement () {
+			this.startFunction()
 		},
 
 		startFunction () {
 			this.element = JSON.parse(JSON.stringify(this.elementToEdit))
 		},
 
-		updateProperty (item, data) {
-			console.log(item, data)
+		updateProperty (data) {
+			this.element.parameters[data.key] = data.value
 		}
 	},
 }
@@ -88,6 +101,15 @@ export default {
 .save-button {
 	position: absolute;
 	bottom: 10px;
+	border: white solid 2px;
+	border-radius: 4px;
+	padding: 10px 20px;
+}
+
+.reset-button {
+	position: absolute;
+	bottom: 10px;
+	right: 10px;
 	border: white solid 2px;
 	border-radius: 4px;
 	padding: 10px 20px;

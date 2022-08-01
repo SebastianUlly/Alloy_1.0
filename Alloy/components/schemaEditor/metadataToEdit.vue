@@ -3,17 +3,36 @@
 		<div
 			v-for="element of nestedArray"
 			:key="element.elementId"
-			class="component-container"
+			class="component-container"	
 		>
-			<div>
-				<displayComponent
-					v-if="!element.parentId"
-					:element-id="element.elementId"
-					:children="element.children"
-					:label="element.label"
-					:parameters="element.parameters"
-				/>
-
+			<ParentComponent
+				class="component"
+				v-if="!element.parentId && element.children.length"
+				:element-id="element.elementId"
+				:children="element.children"
+				:label="element.label"
+				:parameters="element.parameters"
+			/>
+			<display-component
+				v-else
+				class="component"
+				:label="element.label"
+				:element-id="element.elementId"
+				:parameters="element.parameters"
+			/>
+			<!-- <vue-json-pretty :data="element" /> -->
+			<div class="move-icons-container">
+				<v-icon
+					@click="moveDown(element.elementId)"
+				>
+					mdi-arrow-down-bold
+				</v-icon>
+				<!-- arrow up to move the node "up" in its array, up = in the direction of the top of the website -->
+				<v-icon
+					@click="moveUp(element.elementId)"
+				>
+					mdi-arrow-up-bold
+				</v-icon>
 			</div>
 		</div>
 	</div>
@@ -21,20 +40,15 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import FileId from '~/components/metadata/fileId'
-import FileName from '~/components/metadata/fileName'
-import FileParents from '~/components/metadata/fileParents'
 import { NestedArray } from '~/assets/classes/arrayClasses'
-import projectPreview from '~/components/metadata/projectPreview/projectPreview'
 import displayComponent from './displayComponent.vue'
+
+import ParentComponent from './elementEditor/parentElement.vue'
 
 export default {
 	components: {
-		FileId,
-		FileName,
-		FileParents,
-		projectPreview,
-		displayComponent
+		displayComponent,
+		ParentComponent
 	},
 	data () {
 		return {
@@ -53,6 +67,24 @@ export default {
 				this.nestedArray = new NestedArray(value.metadata_elements, 'elementId', undefined).nestedArray
 			}
 		}
+	},
+
+	methods: {
+		moveDown (elementId) {
+			const payload = {
+				elementId,
+				direction: 'down'
+			}
+			this.$store.commit('schemaEditor/moveMetadataElementByElementId', payload)
+		},
+
+		moveUp (elementId) {
+			const payload = {
+				elementId,
+				direction: 'up'
+			}
+			this.$store.commit('schemaEditor/moveMetadataElementByElementId', payload)
+		}
 	}
 }
 </script>
@@ -67,7 +99,11 @@ export default {
 	padding: 5px;
 }
 
-.element {
-	padding: 20px;
+.component {
+	width: 100%;
+}
+
+.move-icons-container {
+	display: flex;
 }
 </style>
