@@ -34,17 +34,21 @@ dependents: Has Changed Indicator
     <div class="input__error">
       <has-changed-indicator :old-data="dataOriginal" :new-data="dataToEdit" />
     </div>
-    <div ref="results" class="results" v-if="result.length">
+    <div ref="results" class="results">
       <div
         @click="optionClicked(item)"
         class="options"
         v-for="(item, index) of result"
         :id="'active-option-' + elementId + '-' + index"
       >
+        <span v-if="item">
         {{ item.value_2 }},
         {{ item.value_1 }}
+        </span>
       </div>
+      
     </div>
+   <!--  <vue-json-pretty :data="result"/> -->
     <!--  <vue-json-pretty :data="parameters.elementToWatch" /> -->
     <!--  <vue-json-pretty :data="result" /> -->
   </div>
@@ -132,8 +136,12 @@ export default {
         .then(data => {
           this.result = [];
           if (this.parameters.elementToWatch && this.dataToEdit) {
-            for (let i = 0; i < this.numberOfResults; i++) {
-              this.result.push(data.data.materializedViewSearch[i]);
+            let counter = 0;
+            for (const item of data.data.materializedViewSearch) {
+              if(counter < this.numberOfResults){
+                this.result.push(item);
+                counter++;
+              }
             }
           }
         })
@@ -192,7 +200,7 @@ export default {
       }
     },
     // when the user clicks on an option in the dropdown it checks if the
-    // parameters.searchValue is plz or ort and sets the dataToEdit to the plz or ort of the clicked item
+    // parameters.searchValue is value_2 or value_1 and sets the dataToEdit to the value_2 or value_1 of the clicked item
     // also replaces the class results with resultsDisplayNone and calls the method startEvent with the
     // clicked item
     // the startEvent sends the item to the component with elementToWatch
