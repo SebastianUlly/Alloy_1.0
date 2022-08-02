@@ -18,6 +18,12 @@
 		>
 			Schema Editor
 		</v-btn>
+		<v-btn
+			text
+			to="/frontEnd"
+		>
+			Front End
+		</v-btn>
 	</v-app-bar>
 </template>
 
