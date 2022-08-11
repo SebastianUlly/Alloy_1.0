@@ -11,6 +11,12 @@
 		>
 			Data Editor
 		</v-btn>
+		<v-btn
+			text
+			to="/pointEditor"
+		>
+			Point Editor
+		</v-btn>
 		<!-- button to navigate to the schemaEditor, but only if the logged in user is allowed to -->
 		<v-btn
 			text
