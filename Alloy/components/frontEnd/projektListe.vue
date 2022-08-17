@@ -1,9 +1,11 @@
 <template>
   <div>
+    <input type="text" v-model="search" />
     <v-data-table
       :headers="headers"
       :items="items"
       :items-per-page="20"
+      :search="search"
       class="elevation-1"
     ></v-data-table>
     <button @click="test()">Test Button</button>
@@ -14,11 +16,22 @@
 import gql from "graphql-tag";
 
 export default {
-  
   data() {
     return {
-      headers: [],
-      items: []
+      headers: [
+        {
+          text: "Projektnummer",
+          align: "start",
+          sortable: true,
+          value: "projectnumber"
+        },
+        { text: "Jahr", value: "date", sortable: false },
+        { text: "Projekt", value: "project", sortable: false },
+        { text: "Apotheke", value: "pharmacy", sortable: false },
+        { text: "Zustand", value: "status", sortable: false }
+      ],
+      items: [],
+      search: ""
     };
   },
   apollo: {
@@ -32,9 +45,28 @@ export default {
     `
   },
   methods: {
-    test(){
-      console.log(this.fileBySchemaId, this.fileBySchemaId.length)
+    start() {
+      this.items = this.fileBySchemaId.map(rowItem => {
+        let item = Object.values(rowItem);
+        let temp = [
+          item[0],
+          ...Object.values(item[1]).map(element => {
+            return element.data?.text;
+          }),
+          item[2]
+        ];
+        return {
+          projectnumber: temp[0],
+          date: temp[2],
+          project: temp[1],
+          pharmacy: temp[4],
+          status: temp[3]
+        };
+      });
     }
+  },
+  mounted() {
+    this.start();
   }
 };
 </script>
