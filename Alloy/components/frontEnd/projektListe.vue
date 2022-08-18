@@ -1,5 +1,6 @@
 <template>
   <div>
+    <vue-json-pretty :data="querySchemaById.metadata"/>
     <input type="text" v-model="search" />
     <v-data-table
       :headers="headers"
@@ -8,13 +9,13 @@
       :search="search"
       class="elevation-1"
     ></v-data-table>
-    <button @click="test()">Test Button</button>
+    <button @click="dataFill()">Test Button</button>
   </div>
 </template>
 
 <script>
 import gql from "graphql-tag";
-
+import { mapGetters } from "vuex";
 export default {
   data() {
     return {
@@ -35,6 +36,7 @@ export default {
     };
   },
   apollo: {
+    //data with query from the projects
     fileBySchemaId: gql`
       query Files {
         fileBySchemaId(schemaId: "44111b55-c2b8-4e30-97d3-452aed86c1f4") {
@@ -42,9 +44,24 @@ export default {
           data
         }
       }
+    `,
+    //data with query from the metadata
+    querySchemaById: gql`
+      query PreviewList {
+        querySchemaById(id: "44111b55-c2b8-4e30-97d3-452aed86c1f4") {
+          metadata
+        }
+      }
     `
   },
   methods: {
+    //test button to fill the header
+    dataFill() {
+      for(const i = 0; i < querySchemaById.metadata.metadata_elements[0].parameters.previewList.length; i++){
+        this.headers.push(querySchemaById.metadata.metadata_elements[0].parameters.previewList[i])
+      }
+    },
+    //converts the objects to array and fills the items array
     start() {
       this.items = this.fileBySchemaId.map(rowItem => {
         let item = Object.values(rowItem);
@@ -67,6 +84,11 @@ export default {
   },
   mounted() {
     this.start();
+  },
+  computed: {
+    ...mapGetters({
+      fileValues: "file/getFileValues"
+    })
   }
 };
 </script>
