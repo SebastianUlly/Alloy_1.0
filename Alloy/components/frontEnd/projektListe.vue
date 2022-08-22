@@ -1,6 +1,8 @@
 <template>
   <div>
-    <vue-json-pretty :data="querySchemaById.metadata"/>
+    <vue-json-pretty v-if="querySchemaById" :data="querySchemaById" />
+    <!-- <vue-json-pretty v-if="fileBySchemaId" :data="fileBySchemaId"/> -->
+
     <input type="text" v-model="search" />
     <v-data-table
       :headers="headers"
@@ -49,7 +51,9 @@ export default {
     querySchemaById: gql`
       query PreviewList {
         querySchemaById(id: "44111b55-c2b8-4e30-97d3-452aed86c1f4") {
+          label
           metadata
+          elements
         }
       }
     `
@@ -57,33 +61,61 @@ export default {
   methods: {
     //test button to fill the header
     dataFill() {
-      for(const i = 0; i < querySchemaById.metadata.metadata_elements[0].parameters.previewList.length; i++){
-        this.headers.push(querySchemaById.metadata.metadata_elements[0].parameters.previewList[i])
+      for (const elementIdToFind of this.querySchemaById.metadata
+        .metadata_elements[0].parameters.previewList) {
+        for (const item of this.querySchemaById.elements) {
+          if (item.elementId === elementIdToFind) {
+            this.headers.push({
+              text: item.label,
+              sortable: true,
+              value: "test"
+            });
+          } 
+        }
+        for (const itemInMetadata of this.querySchemaById.metadata.metadata_elements) {
+              if (itemInMetadata.elementId === elementIdToFind) {
+                this.headers.push({
+                  text: itemInMetadata.label,
+                  sortable: true,
+                  value: "test"
+                });
+              }
+            }
       }
     },
     //converts the objects to array and fills the items array
     start() {
-      this.items = this.fileBySchemaId.map(rowItem => {
-        let item = Object.values(rowItem);
-        let temp = [
-          item[0],
-          ...Object.values(item[1]).map(element => {
-            return element.data?.text;
-          }),
-          item[2]
-        ];
-        return {
-          projectnumber: temp[0],
-          date: temp[2],
-          project: temp[1],
-          pharmacy: temp[4],
-          status: temp[3]
-        };
-      });
+      if (this.fileBySchemaId) {
+        this.items = this.fileBySchemaId.map(rowItem => {
+          let item = Object.values(rowItem);
+          let temp = [
+            item[0],
+            ...Object.values(item[1]).map(element => {
+              return element.data?.text;
+            }),
+            item[2]
+          ];
+          return {
+            projectnumber: temp[0],
+            date: temp[2],
+            project: temp[1],
+            pharmacy: temp[4],
+            status: temp[3]
+          };
+        });
+      }
     }
   },
   mounted() {
     this.start();
+  },
+  watch: {
+    fileBySchemaId: {
+      deep: true,
+      handler() {
+        this.start();
+      }
+    }
   },
   computed: {
     ...mapGetters({
@@ -96,6 +128,6 @@ export default {
 <style>
 .elevation-1 {
   margin-top: 100px;
-  max-width: 50%;
+  max-width: 80%;
 }
 </style>
