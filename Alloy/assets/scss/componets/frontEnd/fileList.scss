@@ -1,0 +1,41 @@
+.elevation-1 {
+	max-width: 100%;
+}
+.mx-2{
+	margin-left: 0px;
+	height: 45px;
+	width: 45px;
+	background-color: #26C654;
+	border-radius: 4px;
+}
+.icons{
+	display: flex;
+	gap: 12px;
+}
+.body{
+	margin-top: 25px;
+}
+.topSection{
+	display: flex;
+	align-items: center;
+}
+.elevation-1 {
+   background-color: #1E1E1E !important;
+}
+.v-data-table-header th, .v-data-table__wrapper td{
+    border-bottom: thin solid #ffffff73 !important; 
+}
+.copy {
+    color: white;
+  }
+  .copy.animated i {
+    animation: fadeOut 1s;
+  }
+  @keyframes fadeOut {
+    0% {
+      color: #5bc356;
+    }
+    100% {
+      color: white;
+    }
+  }
