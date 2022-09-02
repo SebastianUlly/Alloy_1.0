@@ -26,8 +26,6 @@ export default {
         }
     }
 }
-
-
 </script>
 
 <style>
@@ -59,5 +57,4 @@ export default {
     float: right;
     margin-left: 85%;
 }
-
 </style>
