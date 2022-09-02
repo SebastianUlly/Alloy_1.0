@@ -1,14 +1,15 @@
-.elevation-1 {
+.table{
 	max-width: 100%;
 }
-.mx-2{
+.addProject{
 	margin-left: 0px;
 	height: 45px;
 	width: 45px;
 	background-color: #26C654;
 	border-radius: 4px;
 }
-.icons{
+/*iconts under the actions */
+div.icons{
 	display: flex;
 	gap: 12px;
 }
@@ -19,7 +20,7 @@
 	display: flex;
 	align-items: center;
 }
-.elevation-1 {
+.table{
    background-color: #1E1E1E !important;
 }
 .v-data-table-header th, .v-data-table__wrapper td{
@@ -27,15 +28,15 @@
 }
 .copy {
     color: white;
-  }
-  .copy.animated i {
+}
+.copy.animated i {
     animation: fadeOut 1s;
-  }
-  @keyframes fadeOut {
-    0% {
-      color: #5bc356;
-    }
+}
+@keyframes fadeOut {
+  	0% {
+      	color: #5bc356;
+  	}
     100% {
-      color: white;
-    }
-  }
+		color: white;
+  	}
+}

@@ -2,12 +2,12 @@
 	<div>
 		<div class="topSection">
 			<button
-				class="mx-2"
+				class="addProject"
 				color="green"
 			>
 				<v-icon
 					small
-					class="addButton">
+					class="addProject">
 					mdi-note-plus-outline
 				</v-icon>
 			</button>
@@ -28,26 +28,29 @@
 				:items="items"
 				:items-per-page="20"
 				:search="search"
-				class="elevation-1"
+				class="table"
 				:header-props="{ sortIcon: null }"
 			>
-				<template #item.actions="{item}">
-					<div class="icons">
-						<v-icon>
-							mdi-timer-edit-outline
-						</v-icon>
-						<v-icon>
-							mdi-pencil-outline
-						</v-icon>
-						<button
-							@click=copyToClipboard(item) 
-							class="copy"
-							title="In die Zwischenablage kopieren!">
+				<template 
+					#item.actions="{item}"
+					v-slot:item="props">
+						<div class="icons">
 							<v-icon>
-								mdi-content-copy
+								mdi-timer-edit-outline
 							</v-icon>
-						</button>
-					</div>
+							<v-icon>
+								mdi-pencil-outline
+							</v-icon>
+							<button
+								@click=copyToClipboard(item) 
+								class="copy"
+								:ref="item.id"
+								title="In die Zwischenablage kopieren!">
+								<v-icon>
+									mdi-content-copy
+								</v-icon>
+							</button>
+						</div>
 				</template>
 			</v-data-table>
 		</div>
@@ -71,7 +74,8 @@ export default {
             items: [],
             search: "",
 			year: "",
-			copy:[]
+			copy:[],
+			timeout: null,
         };
     },
     apollo: {
@@ -106,12 +110,14 @@ export default {
     },
     methods: {
 		copyToClipboard(dataToCopy){
-			clearTimeout(this.timeout);
-			this.$refs.copyButton?.classList.remove("animated");
-			this.$refs.copyButton?.classList.add("animated");
+			const refName = dataToCopy.id;
+			//adding animated class to the correct copy SVG
+			this.$refs[refName]?.classList.remove("animated");
+			this.$refs[refName]?.classList.add("animated");
 			this.timeout = setTimeout(() => {
-        		this.$refs.copyButton?.classList.remove("animated");
+        		this.$refs[refName]?.classList.remove("animated");
       		}, 500);
+			//copying the text to the clipboard without the last element of array
 		 	navigator.clipboard.writeText(Object.values(dataToCopy).slice(0,4).join("-"));
 		},
 		captureMySearchValue(value){
@@ -207,6 +213,8 @@ export default {
                             newRow[currentKey] = currentValue;
                         }
                     }
+					//adding the elementId to the items array
+					newRow["id"] = rawItem.id;
                     //pushing the newRow to the items Array 
                     this.items.push(newRow);
                 }
