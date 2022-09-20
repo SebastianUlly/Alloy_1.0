@@ -8,6 +8,7 @@
 	</div>
 </template>
 <script>
+import { data } from "browserslist";
 import gql from "graphql-tag";
 export default {
     data() {
@@ -30,6 +31,7 @@ export default {
     },
     created(){
         /* this.searchAvailableYears(); */
+        this.year = new Date().getFullYear();
     },
     apollo:{
          /* fileBySchemaId: gql `
@@ -69,8 +71,7 @@ export default {
 	width:86%;
 	height: 70%;
 	color: white;
-	padding-left: 5px;
-	padding-top: 2px;
+    text-align: center;
 }
 .selectYearOption{
 	background-color:#1E1E1E;

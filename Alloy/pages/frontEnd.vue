@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="background">
     <div class="leftSection">
     <projektListe />
     </div>
@@ -7,7 +7,6 @@
 </template>
 <script>
   import projektListe from "~/components/frontEnd/projektListe";
-  import search from "~/components/frontEnd/search";
   export default {
     components: {
       projektListe
@@ -17,9 +16,9 @@
 	}
   };
 </script>
-<style>
+<style scoped>
   .leftSection{
-    max-width: 60%;
+    /* max-width: 100%; */
   }
 
 

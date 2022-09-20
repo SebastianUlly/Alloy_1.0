@@ -1,59 +1,64 @@
 <template>
-	<div>
-		<div class="topSection">
-			<button
-				class="addProject"
-				color="green"
-			>
-				<v-icon
-					small
-					class="addProject">
-					mdi-note-plus-outline
-				</v-icon>
-			</button>
-			<selectYear @sendYear="captureMyYear" />
-			<search @sendValue="captureMySearchValue"/>
-		</div>
-		
-		<div class="body">
-		<!-- <vue-json-pretty v-if="querySchemaById" :data="querySchemaById" /> -->
-		<!-- <vue-json-pretty v-if="fileBySchemaId" :data="fileBySchemaId"/> -->
-		<!-- <vue-json-pretty :data="directory[0].hierarchy"/> -->
-		<!-- <h1>Headers</h1>
-		<vue-json-pretty :data="headers" />  -->
-		<!-- <vue-json-pretty :data="fileBySchemaId[1].id" /> -->
-		<!-- <vue-json-pretty :data="items" /> -->
-			<v-data-table
-				:headers="headers"
-				:items="items"
-				:items-per-page="20"
-				:search="search"
-				class="table"
-				:header-props="{ sortIcon: null }"
-			>
-				<template 
-					#item.actions="{item}"
-					v-slot:item="props">
-						<div class="icons">
-							<v-icon>
-								mdi-timer-edit-outline
-							</v-icon>
-							<v-icon>
-								mdi-pencil-outline
-							</v-icon>
-							<button
-								@click=copyToClipboard(item) 
-								class="copy"
-								:ref="item.id"
-								title="In die Zwischenablage kopieren!">
+	<div class="container">
+		<div>
+			<div class="topSection">
+				<v-btn
+					style="min-width:0"
+					class="addProject"
+					color="green"
+					@click="openNewProject(true)"
+				>
+					<v-icon>
+						mdi-note-plus-outline
+					</v-icon>
+				</v-btn>
+				<div class="searchContainer">
+					<selectYear class="selectYearComponent" @sendYear="captureMyYear" />
+					<search @sendValue="captureMySearchValue"/>
+				</div>
+			</div>
+			
+			<div class="body">
+				<popUp @closeNewProject="openNewProject($event)" v-if="popUp"/>
+			<!-- <vue-json-pretty v-if="querySchemaById" :data="querySchemaById" /> -->
+			<!-- <vue-json-pretty v-if="fileBySchemaId" :data="fileBySchemaId"/> -->
+			<!-- <vue-json-pretty :data="directory[0].hierarchy"/> -->
+			<!-- <h1>Headers</h1>
+			<vue-json-pretty :data="headers" />  -->
+			<!-- <vue-json-pretty :data="fileBySchemaId[1].id" /> -->
+			<!-- <vue-json-pretty :data="items" /> -->
+				<v-data-table
+					:headers="headers"
+					:items="items"
+					:items-per-page="20"
+					:search="search"
+					class="table"
+					:header-props="{ sortIcon: null }"
+				>
+					<template 
+						#item.actions="{item}"
+						v-slot:item="props">
+							<div class="icons">
 								<v-icon>
-									mdi-content-copy
+									mdi-timer-edit-outline
 								</v-icon>
-							</button>
-						</div>
-				</template>
-			</v-data-table>
-		</div>
+								<v-icon>
+									mdi-pencil-outline
+								</v-icon>
+								<button
+									@click=copyToClipboard(item) 
+									class="copyIcon"
+									:ref="item.id"
+									title="In die Zwischenablage kopieren!">
+									<v-icon>
+										mdi-content-copy
+									</v-icon>
+								</button>
+							</div>
+					</template>
+				</v-data-table>
+			</div>
+	</div>
 	</div>
 	
 </template>
@@ -63,11 +68,14 @@ import gql from "graphql-tag";
 import { mapGetters } from "vuex";
 import search from "~/components/frontEnd/search";
 import selectYear from "~/components/frontEnd/selectYear";
+import popUp from "~/components/frontEnd/lib/popUp";
+
 export default {
-	 components: {
-      search,
-	  selectYear
-	 },
+	components: {
+    search,
+    selectYear,
+    popUp,
+},
     data() {
         return {
             headers: [],
@@ -76,6 +84,7 @@ export default {
 			year: "",
 			copy:[],
 			timeout: null,
+			popUp: false
         };
     },
     apollo: {
@@ -109,6 +118,9 @@ export default {
 		`
     },
     methods: {
+		openNewProject(value){
+			this.popUp = value;
+		},
 		copyToClipboard(dataToCopy){
 			const refName = dataToCopy.id;
 			//adding animated class to the correct copy SVG
@@ -129,9 +141,9 @@ export default {
         //test button to fill the header
         dataFill() {
             //filling the headers based on previewList
-            for (const elementIdToFind of this.querySchemaById.metadata.metadata_elements[0].parameters.previewList) {
+            for (const elementIdToFind of this.querySchemaById.metadata?.metadata_elements[0].parameters.previewList) {
                 //merge the elements and the metadata
-                for (const item of [...this.querySchemaById.elements, ...this.querySchemaById.metadata.metadata_elements]) {
+                for (const item of [...this.querySchemaById.elements, ...this.querySchemaById.metadata?.metadata_elements]) {
                     //if the element ID is the same as we need, it will push the label and add the elementIdToFind to the label
                     if (item.elementId === elementIdToFind) {
 						if(item.label === "Jahr"){
@@ -237,7 +249,7 @@ export default {
 };
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 @import url('~/assets/scss/componets/frontEnd/fileList.scss');
 
 </style>

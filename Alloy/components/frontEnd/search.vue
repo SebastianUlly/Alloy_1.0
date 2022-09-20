@@ -28,11 +28,10 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 .searchField{
     width: 500px;
     height: 50px;
-    margin-left:auto;
     background-color: #1E1E1E;
     border-radius: 2px;
     display: flex;

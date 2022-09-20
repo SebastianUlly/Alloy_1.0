@@ -1,12 +1,18 @@
+ .container{ 
+	display: flex; 
+}
 .table{
 	max-width: 100%;
 }
 .addProject{
-	margin-left: 0px;
-	height: 45px;
-	width: 45px;
-	background-color: #26C654;
-	border-radius: 4px;
+	width:49px;
+	height: 49px;
+}
+.selectYearComponent{
+	margin: 0 10px 0 0;
+}
+.searchContainer{
+	display:flex;
 }
 /*iconts under the actions */
 div.icons{
@@ -19,18 +25,19 @@ div.icons{
 .topSection{
 	display: flex;
 	align-items: center;
+	justify-content: space-between;
 }
 .table{
    background-color: #1E1E1E !important;
 }
 /*set the color of line */
-.v-data-table-header th, .v-data-table__wrapper td{
+ .v-data-table-header th, .v-data-table__wrapper td{
     border-bottom: thin solid #ffffff73 !important; 
 }
-.copy {
+.copyIcon {
     color: white;
 }
-.copy.animated i {
+.copyIcon.animated i {
     animation: fadeOut 1s;
 }
 @keyframes fadeOut {
