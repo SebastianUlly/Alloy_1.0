@@ -1,20 +1,39 @@
 <template>
     <div class="body">
         <div class="label">
-            Label
+            {{label}}
         </div>
         <div class="inputDiv">
             <select class="myInput" type="text">
-                <option value="">MDE</option>
-                <option value="">WQD</option>
-                <option value="">VAD</option>
-                <option value="">VAD</option>
+                <option disabled selected value="default"> {{label}} auswählen</option>
+                <option value="">asd</option>
+                <option value="">asd</option>
+                <option value="">asd</option>
             </select>
-            <v-icon class="mdi-chevron">mdi-chevron-down</v-icon>
         </div>
+        <v-icon class="mdi-chevron">mdi-chevron-down</v-icon>
     </div>
 </template>
+<script>
+export default{
+    props: {
+        elementId: {
+            type: String
+        },
+        label: {
+            type: String
+        }
+    },
+    data(){
+        return{
 
+        }
+    },
+    methods:{
+        
+    }
+}
+</script>
 <style scoped>
 .body{
     margin-bottom: 10px;
@@ -37,6 +56,7 @@
     outline: none;
 }
 .myInput{
+    background-color: rgba(0, 0, 0, 0);
     width: 100%;
     padding-left: 10px;
     padding-top: 4px;
@@ -58,6 +78,5 @@ option{
     position: absolute;
     right: 10px;
     top:4px;
-    z-index: 0;
 }
 </style>

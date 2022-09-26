@@ -21,17 +21,21 @@
                 </button>
             </span>
         </div>
-        <div class="popUpBody">
+        <div class="popUpBody" v-if="querySchemaById">
             <div class="inputContainer">
-                <frontEndInput class="col-6th"/>
-                <frontEndInput class="col-6th"/>
-                <frontEndSelectInput class="col-3th"/>
-                <frontEndInput class="col-3th"/>
-                <frontEndInput class="col-1th"/>
+                    <component
+                    v-for="item of querySchemaById.elements" :key="item.elementId"
+					:is="item.componentId"
+					:elementId="item.elementId"
+                    :class="item.size"
+                    :label="item.label"
+                    :required="item.required"
+				    />
+                <!-- <vue-json-pretty :data="querySchemaById" /> -->
             </div>
         </div>
         <div class="addButtonDiv">
-            <v-btn class="addButton" color="green" large style="min-width:0"> Projekt hinzufügen</v-btn>
+            <v-btn class="addButton" @click=testFunction() :loading="false" color="green" large style="min-width:0"> Projekt hinzufügen</v-btn>
         </div>
           <!-- <vue-json-pretty :data="nestedArray" /> -->
     </div>
@@ -44,10 +48,12 @@ import { v4 as uuidv4 } from "uuid"
 import { NestedArray } from '~/assets/classes/arrayClasses'
 import frontEndInput from '~/components/frontEnd/lib/inputComponenets/frontEndInput'
 import frontEndSelectInput from '~/components/frontEnd/lib/inputComponenets/frontEndSelectInput'
+import FrontEndSelectInput from "./inputComponenets/frontEndSelectInput.vue"
 export default {
     components:{
-        frontEndInput,
-        frontEndSelectInput,
+    frontEndInput,
+    frontEndSelectInput,
+    FrontEndSelectInput
 },
     data(){
         return{
@@ -66,6 +72,10 @@ export default {
         },
         createNewFileId(){
             const newId = uuidv4();
+        },
+        testFunction(){
+            const newId = uuidv4();
+            console.log(newId)
         }
     },
     created() {
@@ -74,7 +84,7 @@ export default {
     apollo:{
         querySchemaById: gql `
 			query PreviewList {
-				querySchemaById(id: "44111b55-c2b8-4e30-97d3-452aed86c1f4") {
+				querySchemaById(id: "ca78b111-d1f0-4b4b-b82c-c7e727804b0b") {
                     id
 					label
 					metadata
@@ -82,13 +92,17 @@ export default {
 				}
 			}
 		`
-    }, 
+    },
+    created(){
+
+        this.createNewFileId();
+    },
     computed: {
 		...mapGetters({
 			schemaMetadata: 'schema/getSchemaMetadata'
 		})
 	},
-    watch: {
+    /* watch: {
         querySchemaById: {
 			deep: true,
 			handler () {
@@ -96,7 +110,7 @@ export default {
                 this.nestedArrayElements = new NestedArray(this.querySchemaById.elements, "elementId", undefined).nestedArray
 			}
 		} 
-	}
+	} */
 }
 
 </script>
@@ -104,6 +118,9 @@ export default {
 <style lang="scss" scoped>
 $gap-size: 15px;
 $columns: 12;
+.test{
+    width: auto;
+}
 .popUp{
     position: absolute;
     top: 300px;
@@ -162,13 +179,18 @@ $columns: 12;
   width: 100%;
   gap: $gap-size;
 }
+.inputAlignCenter{
+    align-items: center;
+}
+.inputAlignRight{
+    align-items: right;
+}
 @mixin col-x-list {
   @for $i from 1 through $columns {
     @for $j from 1 through $i {
       .col-#{$j}-#{$i}th {
         width: calc(calc(calc(100% - calc(#{$gap-size / #{$j}} * #{$i - $j})) / #{$i}) * #{$j});
         display: flex;
-        align-items: center;
         justify-content: center;
         object-fit: cover;
       }
@@ -176,11 +198,11 @@ $columns: 12;
     .col-#{$i}th {
         width: calc(calc(100% - calc(#{$gap-size} * #{$i - 1})) / #{$i});
         display: flex;
-        align-items: center;
         justify-content: center;
         object-fit: cover;
       }
    } 
 }
+
 @include col-x-list;
 </style>
