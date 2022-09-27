@@ -3,7 +3,7 @@
     <div v-for="item of children" :key="item.elementId">
       <component
         :is="item.componentId"
-        :elementId="elementId"
+        :elementId="item.elementId"
         :options="files"
         :selectLimit="parameters.selectLimit"
         @myevent="callback"

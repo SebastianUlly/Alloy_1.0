@@ -1,53 +1,57 @@
 import Vue from 'vue'
 
 export const state = () => ({
-	allowedElements: [],
+	permissionIds: [],
 	expirationTime: null,
-	userName: ''
+	userId: ''
 })
 
 export const mutations = {
 	// function to set the tokeninfo to the store
 	setTokenInfo (
 		state: {
-			allowedElements: string[],
+			permissionIds: string[],
 			expirationTime: number,
-			userName: string },
+			userId: string },
 		tokenInfo: {
-			allowed_elements: string[],
+			permissionIds: string[],
 			exp: number,
-			username: string
+			userId: string
 		}
 	) {
-		// setting the allowedElements-array of the user
-		Vue.set(state, 'allowedElements', tokenInfo.allowed_elements)
+		// setting the permissionIds-array of the user
+		Vue.set(state, 'permissionIds', tokenInfo.permissionIds)
 		// setting the expirationtime of the token
 		Vue.set(state, 'expirationTime', tokenInfo.exp)
-		// setting the username
-		Vue.set(state, 'userName', tokenInfo.username)
+		// setting the userId
+		Vue.set(state, 'userId', tokenInfo.userId)
 	},
 
 	// function to reset the tokeninfo in the store
-	resetTokenInfo (state: { allowedElements: string[], expirationTime: number }) {
-		Vue.set(state, 'allowedElements', [])
+	resetTokenInfo (state: { permissionIds: string[], expirationTime: number }) {
+		Vue.set(state, 'permissionIds', [])
 		Vue.set(state, 'expirationTime', null)
-		Vue.set(state, 'userName', '')
+		Vue.set(state, 'userId', '')
 	}
 }
 
 export const getters = {
-	// getter to get the allowedElements-array
-	getAllowedElements (state: { allowedElements: string[] }) {
-		return state.allowedElements
+	// getter to get the permissionIds-array
+	getPermissionIds (state: { permissionIds: string[] }) {
+		return state.permissionIds
 	},
 
-	// getter to get the expirationtime of the token
-	getExpirationTime (state: { expirationTime: number }) {
-		return state.expirationTime
+	checkPermissionId: (state: { permissionIds: string[] }) => (permissionIdToCheck: string) => {
+		return state.permissionIds.includes(permissionIdToCheck)
 	},
 
-	// getter to get the username
-	getUserName (state: { userName: string }) {
-		return state.userName
+	// // getter to get the expirationtime of the token
+	// getExpirationTime (state: { expirationTime: number }) {
+	// 	return state.expirationTime
+	// },
+
+	// getter to get the userId
+	getUserId (state: { userId: string }) {
+		return state.userId
 	}
 }
