@@ -6,15 +6,16 @@
         <div class="inputDiv">
             <select class="myInput" type="text">
                 <option disabled selected value="default"> {{label}} auswählen</option>
-                <option value="">asd</option>
-                <option value="">asd</option>
-                <option value="">asd</option>
+                <option
+                v-for="(item, index) in files"
+                >{{item}}</option>
             </select>
         </div>
         <v-icon class="mdi-chevron">mdi-chevron-down</v-icon>
     </div>
 </template>
 <script>
+import gql from "graphql-tag";
 export default{
     props: {
         elementId: {
@@ -22,15 +23,57 @@ export default{
         },
         label: {
             type: String
+        },
+        parameters:{
+            type: Object
         }
     },
     data(){
         return{
-
+            files:[]
         }
     },
     methods:{
-        
+        //get the file by the schema of parameters
+        getfile() {
+            if(this.parameters?.selectableSchema){
+                this.$apollo.query({
+                variables: {
+                    schemaId: this.parameters?.selectableSchema,
+                },
+                query: gql`
+                    query ($schemaId: String) {
+                        fileBySchemaId(schemaId: $schemaId) {
+                            id
+                            label
+                            data
+                        }
+                    }
+                `,
+            //filling the files array with the data of elementData.elementId
+            }).then((data) => {
+                const temp = data.data.fileBySchemaId;
+                this.files = temp.map(
+                    function (item, index, array) {
+                        return item.data.find(
+                            (elementData) => elementData.elementId === "91f42e63-98b4-462b-bf65-58b416718cb0"
+                        )?.data?.text;
+                    }
+                )
+
+            }).catch((error) => {
+                console.log({ error });
+            });
+            }else if(this.parameters.options)
+            {
+                this.files = this.parameters.options
+            }
+            
+
+        }
+    },
+    mounted(){
+        this.getfile();
     }
 }
 </script>

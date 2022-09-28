@@ -2,8 +2,8 @@
     <div class="popUp">
         <div class="popUpTop">
             <span class="infoIcon">
-                <v-icon>
-                    mdi-note-plus-outline
+                <v-icon v-if="icon">
+                {{icon}}
                 </v-icon>
             </span>
             <span class="label">
@@ -27,15 +27,15 @@
                     v-for="item of querySchemaById.elements" :key="item.elementId"
 					:is="item.componentId"
 					:elementId="item.elementId"
-                    :class="item.size"
                     :label="item.label"
-                    :required="item.required"
+                    :parameters="item.parameters"
+                    :class="item.parameters.size"
 				    />
                 <!-- <vue-json-pretty :data="querySchemaById" /> -->
             </div>
         </div>
         <div class="addButtonDiv">
-            <v-btn class="addButton" @click=testFunction() :loading="false" color="green" large style="min-width:0"> Projekt hinzufügen</v-btn>
+            <v-btn class="addButton" @click=test() :loading="false" color="green" large style="min-width:0"> Projekt hinzufügen</v-btn>
         </div>
           <!-- <vue-json-pretty :data="nestedArray" /> -->
     </div>
@@ -51,36 +51,43 @@ import frontEndSelectInput from '~/components/frontEnd/lib/inputComponenets/fron
 import FrontEndSelectInput from "./inputComponenets/frontEndSelectInput.vue"
 export default {
     components:{
-    frontEndInput,
-    frontEndSelectInput,
-    FrontEndSelectInput
-},
+        frontEndInput,
+        frontEndSelectInput,
+        FrontEndSelectInput
+    },
     data(){
         return{
             payload:"",
             nestedArray: null,
-            nestedArrayElements: null
+            nestedArrayElements: null,
+            icon: ""
         }
     },
+
+    computed:  {
+        ...mapGetters({
+            directory: 'directory/getDirectory'
+        })
+    },
     methods:{
+        //close the popUp window
         closeNewProject(){
             this.$emit('closeNewProject', false)
         },
         createNewFile () {
-            
             this.$store.commit(file => setFile, payload)
         },
-        createNewFileId(){
+        createNewFile(){
+            //generate new file id for the project
             const newId = uuidv4();
-        },
-        testFunction(){
-            const newId = uuidv4();
-            console.log(newId)
+
+
         }
     },
     created() {
-        this.createNewFileId();
+        this.createNewFile();
     },
+    //queries the data from the database from the New-Project-PopUp
     apollo:{
         querySchemaById: gql `
 			query PreviewList {
@@ -93,24 +100,17 @@ export default {
 			}
 		`
     },
-    created(){
-
-        this.createNewFileId();
-    },
-    computed: {
-		...mapGetters({
-			schemaMetadata: 'schema/getSchemaMetadata'
-		})
-	},
-    /* watch: {
+    watch: {
         querySchemaById: {
 			deep: true,
 			handler () {
-				this.nestedArray = new NestedArray(this.querySchemaById.metadata.metadata_elements, 'elementId', undefined).nestedArray;
-                this.nestedArrayElements = new NestedArray(this.querySchemaById.elements, "elementId", undefined).nestedArray
+                //updating the icon if its available
+                this.icon = String(this.querySchemaById?.metadata?.icon);
+				// this.nestedArray = new NestedArray(this.querySchemaById.metadata.metadata_elements, 'elementId', undefined).nestedArray;
+                // this.nestedArrayElements = new NestedArray(this.querySchemaById.elements, "elementId", undefined).nestedArray
 			}
 		} 
-	} */
+	}
 }
 
 </script>

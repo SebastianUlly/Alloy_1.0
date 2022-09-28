@@ -54,13 +54,16 @@
 										mdi-content-copy
 									</v-icon>
 								</button>
+								<!-- <v-alert class="copyAlert" type="success">Etwas kopiert!!!</v-alert> -->
 							</div>
 					</template>
 				</v-data-table>
 			</div>
-	</div>
-	</div>
-	
+		</div>
+		<v-snackbar :top="true" height="10px" v-model="snackbar" color="green" :timeout="timeoutSnackbar">
+			{{ text }}
+		</v-snackbar>
+	</div>	
 </template>
 
 <script>
@@ -69,12 +72,13 @@ import { mapGetters } from "vuex";
 import search from "~/components/frontEnd/search";
 import selectYear from "~/components/frontEnd/selectYear";
 import popUp from "~/components/frontEnd/lib/popUp";
+import { MainDirectory } from '~/assets/directoryClasses'
 
 export default {
 	components: {
     search,
     selectYear,
-    popUp,
+    popUp
 },
     data() {
         return {
@@ -84,10 +88,31 @@ export default {
 			year: "",
 			copy:[],
 			timeout: null,
-			popUp: false
+			popUp: false,
+			snackbar: false,
+			text: '',
+      		timeoutSnackbar: 1200,
         };
     },
     apollo: {
+		files: gql`
+			query {
+				files {
+					fileId: id
+					label
+					schemaId
+				}
+			}
+		`,
+		schema: gql`
+			query Schemes {
+				schema {
+					id
+					label
+					metadata
+				}
+			} 
+		`,
         //data with query from the projects
         fileBySchemaId: gql `
 			query Files {
@@ -123,6 +148,9 @@ export default {
 		},
 		copyToClipboard(dataToCopy){
 			const refName = dataToCopy.id;
+			//setting the snackbar true
+			this.snackbar = true;
+			this.text = `${Object.values(dataToCopy).slice(0,4).join("-")} in der Zwischenablage kopiert!`
 			//adding animated class to the correct copy SVG
 			this.$refs[refName]?.classList.remove("animated");
 			this.$refs[refName]?.classList.add("animated");
@@ -232,14 +260,33 @@ export default {
                 }
             }
         },
+
+		completeDirectory () {
+			// function that takes in the raw data which are fetched when this component is created and processing so that a useable directory is formed
+			// creating new instance by calling the MainDirectory class and passing it the raw data in the arguments
+			const directory = new MainDirectory(JSON.parse(JSON.stringify(this.directory)), this.files, this.schema)
+			// storing the newly created directory in the store
+			this.$store.commit('directory/setToStoreDirectory', directory)
+		},
     },
     watch: {
+		directory: {
+deep: true,
+handler () {
+	this.completeDirectory()
+}
+		},
         querySchemaById: {
             deep: true,
             handler() {
                 this.dataFill();
             }
-        }
+        },
+		snackbar: {
+			handler(){
+				console.log(this.snackbar)
+			}
+		}
     },
     computed: {
         ...mapGetters({

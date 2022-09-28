@@ -4,7 +4,8 @@ export const state = () => ({
 	values: {},
 	data: [],
 	valuesToSave: {},
-	dataToSave: []
+	dataToSave: [],
+	fileList: []
 })
 
 export const mutations = {
@@ -58,6 +59,10 @@ export const mutations = {
 
 	resetEnteredData (state: { dataToSave: object[] }) {
 		state.dataToSave = []
+	},
+
+	setFileList (state: { fileList: object[] }, fileListToSet: object[]) {
+		Vue.set(state, 'fileList', fileListToSet)
 	}
 }
 

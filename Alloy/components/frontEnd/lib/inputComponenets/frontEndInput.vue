@@ -7,7 +7,8 @@
             class="inputDiv"
             ref="inputX">
             <input
-                :placeholder="elementId"
+                :disabled="!parameters.editable"
+                :style="'text-align:' + parameters.align"
                 v-model= "inputValue"
                 class="myInput"
                 type="text">
@@ -15,16 +16,17 @@
     </div>
 </template>
 <script>
+import gql from "graphql-tag";
 export default{
     props: {
-        elementId: {
+        elementId:{
             type: String
         },
-        label: {
+        label:{
             type: String
         },
-        required:{
-            type: Boolean
+        parameters:{
+            type: Object
         }
     },
     data(){
@@ -33,12 +35,39 @@ export default{
             isInputOkValue: false
         }
     },
+    apollo:{
+        directory: gql `
+			query egal{
+				directory{
+					id
+					hierarchy
+				} 
+			}
+		`
+    },
     methods:{
-        sendEvent(){
-            this.$emit('inputOk', this.isInputOkValue);
+        //checking the database default value
+        setDefaultValue(){
+            if(this.parameters.default === "currentYear"){    
+                this.inputValue = new Date().getFullYear();
+            }else if(this.parameters.default === "consecutiveNumber" &&  this.directory[0]?.hierarchy){
+                let currentFolder = "";
+                for(let item of this.directory[0]?.hierarchy){
+                     if(item.name == new Date().getFullYear()){
+                        currentFolder = item.id;
+                    }
+                }
+                this.inputValue = ++this.directory[0].hierarchy.filter(item => item.parentId == currentFolder).map(item => parseInt(item.name)).sort((a,b) => b - a)[0];
+            }
         },
+        //send the 
+        sendEvent(){
+            this.$emit('inputOk', this.inputValue);
+        },
+        //checks if the parameters.required are true and if so, makes the frame of the inputfield red
+        //sending with an event to the parent componenet if the field  is filled or not
         isInputOk(){
-            if(this.inputValue === "" && this.required){
+            if(this.inputValue === "" && this.parameters.required){
                 this.$refs.inputX.classList.add("myInputError");
                 this.isInputOkValue = false
             }else{
@@ -47,7 +76,16 @@ export default{
             }
         }
     },
+    mounted(){
+        this.setDefaultValue()
+    },
      watch: {
+        direcotry:{
+            deep: true,
+            handler(){
+                this.setDefaultValue();
+            }
+        },
         inputValue:{
             handler(){
                 this.isInputOk()
@@ -55,9 +93,6 @@ export default{
         }
     } 
 }
-
-
-
 
 </script>
 <style scoped>
@@ -92,9 +127,8 @@ export default{
     outline: none;
 }
 .myInput{
+    padding: 3px 5px 0 5px;
     width: 100%;
-    padding-left: 10px;
-    padding-top: 4px;
     color:white;
     outline-offset: 0px;
     outline: none;
