@@ -30,12 +30,15 @@
                     :label="item.label"
                     :parameters="item.parameters"
                     :class="item.parameters.size"
+                    @update="getDataFromComponent"
+                    @getCurrentFolderId = "setParentId"
 				    />
                 <!-- <vue-json-pretty :data="querySchemaById" /> -->
             </div>
         </div>
         <div class="addButtonDiv">
-            <v-btn class="addButton" @click=test() :loading="false" color="green" large style="min-width:0"> Projekt hinzufügen</v-btn>
+            <v-btn class="addButton" @click=createFile() :loading="false" color="green" large style="min-width:0"> Projekt hinzufügen</v-btn>
+            <v-btn class="addButton" @click=test() :loading="false" color="green" large style="min-width:0">test</v-btn>
         </div>
           <!-- <vue-json-pretty :data="nestedArray" /> -->
     </div>
@@ -46,6 +49,7 @@ import gql from "graphql-tag"
 import { mapGetters } from 'vuex'
 import { v4 as uuidv4 } from "uuid"
 import { NestedArray } from '~/assets/classes/arrayClasses'
+import { AddEntityToDirectory } from '~/assets/directoryClasses'
 import frontEndInput from '~/components/frontEnd/lib/inputComponenets/frontEndInput'
 import frontEndSelectInput from '~/components/frontEnd/lib/inputComponenets/frontEndSelectInput'
 import FrontEndSelectInput from "./inputComponenets/frontEndSelectInput.vue"
@@ -66,26 +70,100 @@ export default {
 
     computed:  {
         ...mapGetters({
-            directory: 'directory/getDirectory'
+            directory: 'directory/getDirectory',
+            getDataToSave: 'file/getDataToSave',
+            getValuesToSave: 'file/getValuesToSave'
         })
     },
     methods:{
+        test(){
+            console.log(this.getValuesToSave.schemaId,this.querySchemaById?.metadata?.isLeaf, this.getValuesToSave.fileId, this.getValuesToSave.label)
+        },
+        //getting the parentId from the actual folder
+        setParentId(parentId){
+            this.$store.commit("file/setParentIdsToEnteredValues", [parentId])
+        },
+        getDataFromComponent(data){
+           //if the data = name than commit it to the setFileNameToEnteredValues otherwise to the setEnteredData
+            if(data.elementId === "75e96f94-0103-4804-abc0-5331ea980e9b"){
+                this.$store.commit("file/setFileNameToEnteredValues", data.data.text)
+            } else{
+                this.$store.commit("file/setEnteredData", data)
+            }
+        },
         //close the popUp window
         closeNewProject(){
             this.$emit('closeNewProject', false)
         },
-        createNewFile () {
-            this.$store.commit(file => setFile, payload)
-        },
         createNewFile(){
             //generate new file id for the project
             const newId = uuidv4();
+            this.$store.commit("file/setFileIdToEnteredValues", newId),
+            //sending the schemaId
+            this.$store.commit("file/setSchemaIdToEnteredValues", this.querySchemaById.metadata.schemaId)
+        },
+        createFile () {
+			this.$apollo.mutate({
+				variables: {
+					metadata: this.getValuesToSave,
+					elementsData: this.getDataToSave
+				},
 
+				mutation: gql`
+					mutation (
+						$metadata: JSON
+						$elementsData: JSON
+					) {
+						createFile (
+							metadata: $metadata
+							elementsData: $elementsData
+						) {
+							id
+						}
+					}
+				`
+			}).then((data) => {
+                // create a new instance to add the file to the directory on every reqired location
+				const directoryWithAddedEntity = new AddEntityToDirectory(
+					this.directory,
+					{
+						fileId: this.getValuesToSave.fileId,
+						label: this.getValuesToSave.label,
+						schemaId: this.getValuesToSave.schemaId,
+						isLeaf: this.querySchemaById?.metadata?.isLeaf
+					},
+					this.getValuesToSave.parentIds)
+				// commiting the edited directory to the store
+				this.$store.commit('directory/setToStoreDirectory', directoryWithAddedEntity.directoryCopy)
+                this.saveDirectory()
+			}).catch((error) => {
+				console.log({ error })
+			})
+		},
 
-        }
-    },
-    created() {
-        this.createNewFile();
+        // function to save the changed directory (SUL)
+		saveDirectory () {
+			this.$apollo.mutate({
+				variables: {
+					directory: this.directory
+				},
+
+				mutation: gql`
+					mutation(
+						$directory: JSON
+					) {
+						saveDirectory(
+							directory: $directory
+						) {
+							id
+						}
+					}
+				`
+			}).then(() => {
+			}).catch((error) => {
+				console.log({ error })
+			})
+		},
     },
     //queries the data from the database from the New-Project-PopUp
     apollo:{
@@ -106,8 +184,7 @@ export default {
 			handler () {
                 //updating the icon if its available
                 this.icon = String(this.querySchemaById?.metadata?.icon);
-				// this.nestedArray = new NestedArray(this.querySchemaById.metadata.metadata_elements, 'elementId', undefined).nestedArray;
-                // this.nestedArrayElements = new NestedArray(this.querySchemaById.elements, "elementId", undefined).nestedArray
+                this.createNewFile();
 			}
 		} 
 	}

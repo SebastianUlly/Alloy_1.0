@@ -91,7 +91,7 @@ export default {
 			popUp: false,
 			snackbar: false,
 			text: '',
-      		timeoutSnackbar: 1200,
+      		timeoutSnackbar: 2200,
         };
     },
     apollo: {
@@ -150,7 +150,7 @@ export default {
 			const refName = dataToCopy.id;
 			//setting the snackbar true
 			this.snackbar = true;
-			this.text = `${Object.values(dataToCopy).slice(0,4).join("-")} in der Zwischenablage kopiert!`
+			this.text = "Projekt in der Zwischenablage kopiert!"
 			//adding animated class to the correct copy SVG
 			this.$refs[refName]?.classList.remove("animated");
 			this.$refs[refName]?.classList.add("animated");
@@ -281,12 +281,7 @@ handler () {
             handler() {
                 this.dataFill();
             }
-        },
-		snackbar: {
-			handler(){
-				console.log(this.snackbar)
-			}
-		}
+        }
     },
     computed: {
         ...mapGetters({

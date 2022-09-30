@@ -4,10 +4,11 @@
             {{label}}
         </div>
         <div class="inputDiv">
-            <select class="myInput" type="text">
-                <option disabled selected value="default"> {{label}} auswählen</option>
+            <select class="myInput" v-model="inputValue" type="text">
+                <option disabled selected value="default"></option>
                 <option
                 v-for="(item, index) in files"
+                :value="item"
                 >{{item}}</option>
             </select>
         </div>
@@ -30,10 +31,20 @@ export default{
     },
     data(){
         return{
-            files:[]
+            files:[],
+            inputValue: ""
         }
     },
     methods:{
+        sendEvent(){
+            const payload = {
+                elementId: this.elementId,
+                data:{
+                    text : this.inputValue
+                } 
+            }
+            this.$emit('update', payload);
+        },
         //get the file by the schema of parameters
         getfile() {
             if(this.parameters?.selectableSchema){
@@ -74,6 +85,13 @@ export default{
     },
     mounted(){
         this.getfile();
+    },
+    watch:{
+        inputValue:{
+            handler(){
+                this.sendEvent();
+            }
+        }
     }
 }
 </script>
@@ -81,12 +99,9 @@ export default{
 .body{
     margin-bottom: 10px;
     position: relative;
-    /* margin: 25px 0; */
     width:100%;
-    /* height: 45px; */
 }
 .inputDiv{
-   /*  margin-top: 14px; */
     height:31px;
     background-color: #282828;
     border-style: solid;
@@ -120,6 +135,6 @@ option{
 .mdi-chevron{
     position: absolute;
     right: 10px;
-    top:4px;
+    top: 4px;
 }
 </style>

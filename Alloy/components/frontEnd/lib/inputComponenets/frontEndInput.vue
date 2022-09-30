@@ -3,7 +3,7 @@
         <div class="label">
            {{label}}
         </div>
-        <div 
+        <div
             class="inputDiv"
             ref="inputX">
             <input
@@ -32,7 +32,8 @@ export default{
     data(){
         return{
             inputValue:"",
-            isInputOkValue: false
+            isInputOkValue: false,
+            tempValue: ""
         }
     },
     apollo:{
@@ -48,21 +49,44 @@ export default{
     methods:{
         //checking the database default value
         setDefaultValue(){
+           
             if(this.parameters.default === "currentYear"){    
-                this.inputValue = new Date().getFullYear();
+                this.inputValue = new Date().getFullYear().toString();
             }else if(this.parameters.default === "consecutiveNumber" &&  this.directory[0]?.hierarchy){
-                let currentFolder = "";
+                
+                let currentFolderId = "";
                 for(let item of this.directory[0]?.hierarchy){
                      if(item.name == new Date().getFullYear()){
-                        currentFolder = item.id;
+                        currentFolderId = item.id;
+                        this.$emit('getCurrentFolderId', item.id)
                     }
                 }
-                this.inputValue = ++this.directory[0].hierarchy.filter(item => item.parentId == currentFolder).map(item => parseInt(item.name)).sort((a,b) => b - a)[0];
-            }
+                //filtering the array where the parentId == currentFolderId
+                this.tempValue = (++this.directory[0].hierarchy.filter(
+                //converting the elements to int 
+                item => item.parentId == currentFolderId).map(
+                // converting the array of objects to an array of numbers, sorting it and
+                // returning the first element, converting back to string
+                item => parseInt(item.name)).sort((a,b) => b - a)[0]).toString();
+                //converting to the correct form
+                if(this.tempValue.length == 2){
+                    this.inputValue = "0" + this.tempValue;
+                }else if(this.tempValue.length == 1){
+                    this.inputValue = "00" + this.tempValue;
+                } else{
+                    inputValue = this.tempValue;
+                } 
+            }   
         },
         //send the 
         sendEvent(){
-            this.$emit('inputOk', this.inputValue);
+            const payload = {
+                elementId: this.elementId,
+                data:{
+                    text : this.inputValue
+                }
+            }
+            this.$emit('update', payload);
         },
         //checks if the parameters.required are true and if so, makes the frame of the inputfield red
         //sending with an event to the parent componenet if the field  is filled or not
@@ -77,7 +101,7 @@ export default{
         }
     },
     mounted(){
-        this.setDefaultValue()
+        this.setDefaultValue();
     },
      watch: {
         direcotry:{
@@ -88,7 +112,8 @@ export default{
         },
         inputValue:{
             handler(){
-                this.isInputOk()
+                this.isInputOk();
+                this.sendEvent();
             }
         }
     } 
@@ -99,12 +124,9 @@ export default{
 .body{
     margin-bottom: 10px;
     position: relative;
-    /* margin: 25px 0; */
     width:100%;
-    /* height: 45px; */
 }
 .inputDiv{
-   /*  margin-top: 14px; */
     height:31px;
     background-color: #282828;
     border-style: solid;
@@ -113,8 +135,10 @@ export default{
     border-radius: 3px;
     width: 100%;
 }
+.inputDiv:has(.myInput:disabled){
+    border-color:gray;
+}
 .myInputError{
-   /*  margin-top: 14px; */
     height:31px;
     background-color: #282828;
     border-style: solid;
@@ -133,10 +157,17 @@ export default{
     outline-offset: 0px;
     outline: none;
 }
+.myInput:disabled{
+    color:gray;
+}
 .label{
+    color: white;
     position:absolute;
     left: 4px;
     top: -15px;
     font-size: 11px;
 }
+/* .body:has(.myInput:disabled) .label{
+    color: grey;
+} */
 </style>
