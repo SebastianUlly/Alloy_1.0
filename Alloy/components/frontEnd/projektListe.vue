@@ -19,14 +19,9 @@
 			</div>
 			
 			<div class="body">
-				<popUp @closeNewProject="openNewProject($event)" v-if="popUp"/>
-			<!-- <vue-json-pretty v-if="querySchemaById" :data="querySchemaById" /> -->
-			<!-- <vue-json-pretty v-if="fileBySchemaId" :data="fileBySchemaId"/> -->
-			<!-- <vue-json-pretty :data="directory[0].hierarchy"/> -->
-			<!-- <h1>Headers</h1>
-			<vue-json-pretty :data="headers" />  -->
-			<!-- <vue-json-pretty :data="fileBySchemaId[1].id" /> -->
-			<!-- <vue-json-pretty :data="items" /> -->
+				<popUp @closeNewProject="openNewProject($event)"
+					   @saveSuccess=""
+					   v-if="popUp"/>
 				<v-data-table
 					:headers="headers"
 					:items="items"
@@ -166,7 +161,6 @@ export default {
 		captureMyYear(myYear){
 			this.year = myYear;
 		},
-        //test button to fill the header
         dataFill() {
             //filling the headers based on previewList
             for (const elementIdToFind of this.querySchemaById.metadata?.metadata_elements[0].parameters.previewList) {
@@ -232,7 +226,6 @@ export default {
                     //reseting the temorary new row
                     let newRow = {};
                     //merge the elements and the metadata
-                    // for (const elementIdToFind of [...this.querySchemaById.metadata.metadata_elements[0].parameters.previewList, ...this.querySchemaById.metadata.metadata_elements]) {
 					for (const elementIdToFind of this.querySchemaById.metadata.metadata_elements[0].parameters.previewList) {
                         //creating the currentItem variable that contains the elementId of the currentItem
                         let currentItem = rawItem.data.find(item => item.elementId === elementIdToFind);
@@ -264,17 +257,17 @@ export default {
 		completeDirectory () {
 			// function that takes in the raw data which are fetched when this component is created and processing so that a useable directory is formed
 			// creating new instance by calling the MainDirectory class and passing it the raw data in the arguments
-			const directory = new MainDirectory(JSON.parse(JSON.stringify(this.directory)), this.files, this.schema)
+			const directory = new MainDirectory(JSON.parse(JSON.stringify(this.directory[0].hierarchy)), this.files, this.schema)
 			// storing the newly created directory in the store
 			this.$store.commit('directory/setToStoreDirectory', directory)
 		},
     },
     watch: {
 		directory: {
-deep: true,
-handler () {
-	this.completeDirectory()
-}
+			deep: true,
+			handler () {
+				this.completeDirectory()
+			}
 		},
         querySchemaById: {
             deep: true,

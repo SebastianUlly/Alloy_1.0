@@ -77,7 +77,7 @@ export default {
     },
     methods:{
         test(){
-            console.log(this.getValuesToSave.schemaId,this.querySchemaById?.metadata?.isLeaf, this.getValuesToSave.fileId, this.getValuesToSave.label)
+            console.log(this.directory)
         },
         //getting the parentId from the actual folder
         setParentId(parentId){
@@ -134,7 +134,7 @@ export default {
 					},
 					this.getValuesToSave.parentIds)
 				// commiting the edited directory to the store
-				this.$store.commit('directory/setToStoreDirectory', directoryWithAddedEntity.directoryCopy)
+				this.$store.commit('directory/setToStoreDirectory', directoryWithAddedEntity.directoryCopy);
                 this.saveDirectory()
 			}).catch((error) => {
 				console.log({ error })
@@ -143,6 +143,7 @@ export default {
 
         // function to save the changed directory (SUL)
 		saveDirectory () {
+
 			this.$apollo.mutate({
 				variables: {
 					directory: this.directory
@@ -160,6 +161,7 @@ export default {
 					}
 				`
 			}).then(() => {
+                this.$emit("saveSuccess")
 			}).catch((error) => {
 				console.log({ error })
 			})

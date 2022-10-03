@@ -17,6 +17,7 @@
 </template>
 <script>
 import gql from "graphql-tag";
+import { mapGetters } from "vuex"
 export default{
     props: {
         elementId:{
@@ -36,39 +37,31 @@ export default{
             tempValue: ""
         }
     },
-    apollo:{
-        directory: gql `
-			query egal{
-				directory{
-					id
-					hierarchy
-				} 
-			}
-		`
-    },
     methods:{
         //checking the database default value
         setDefaultValue(){
-           
             if(this.parameters.default === "currentYear"){    
                 this.inputValue = new Date().getFullYear().toString();
-            }else if(this.parameters.default === "consecutiveNumber" &&  this.directory[0]?.hierarchy){
-                
+            }else if(this.parameters.default === "consecutiveNumber" &&  this.directory){
                 let currentFolderId = "";
-                for(let item of this.directory[0]?.hierarchy){
+                for(let item of this.directory){
                      if(item.name == new Date().getFullYear()){
                         currentFolderId = item.id;
                         this.$emit('getCurrentFolderId', item.id)
                     }
                 }
-                //filtering the array where the parentId == currentFolderId
-                this.tempValue = (++this.directory[0].hierarchy.filter(
-                //converting the elements to int 
-                item => item.parentId == currentFolderId).map(
-                // converting the array of objects to an array of numbers, sorting it and
-                // returning the first element, converting back to string
-                item => parseInt(item.name)).sort((a,b) => b - a)[0]).toString();
-                //converting to the correct form
+                //tempArray is a filtered array that contains the projects with the actual year
+                const tempArray = this.directory.filter(item => item.parentId === currentFolderId)
+                let tempArrayInt = [];
+                //converting the strings to Int for the mathMax function
+                for(let i = 0; i < tempArray.length; i++){
+                    tempArrayInt.push(parseInt(tempArray[i].name))
+                }
+                //search for the biggest number
+                let tempValueInt = Math.max(...tempArrayInt)
+                //adding one to the biggest number and converts back to string
+                this.tempValue = (++tempValueInt).toString()
+                //adding the 0 and 00 to reach the desired format
                 if(this.tempValue.length == 2){
                     this.inputValue = "0" + this.tempValue;
                 }else if(this.tempValue.length == 1){
@@ -102,6 +95,11 @@ export default{
     },
     mounted(){
         this.setDefaultValue();
+    },
+    computed:{
+        ...mapGetters({
+            directory : "directory/getDirectory"
+        })
     },
      watch: {
         direcotry:{
