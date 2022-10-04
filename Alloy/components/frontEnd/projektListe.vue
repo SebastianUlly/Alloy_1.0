@@ -19,10 +19,13 @@
 			</div>
 			
 			<div class="body">
-				<popUp @closeNewProject="openNewProject($event)"
-					   @saveSuccess=""
-					   v-if="popUp"/>
+				<popUp
+					v-if="popUp"
+					@closeNewProject="openNewProject($event)"
+					@saveSuccess="projectSaved"
+				/>
 				<v-data-table
+					v-if="headers"
 					:headers="headers"
 					:items="items"
 					:items-per-page="20"
@@ -49,13 +52,18 @@
 										mdi-content-copy
 									</v-icon>
 								</button>
-								<!-- <v-alert class="copyAlert" type="success">Etwas kopiert!!!</v-alert> -->
 							</div>
 					</template>
 				</v-data-table>
 			</div>
 		</div>
-		<v-snackbar :top="true" height="10px" v-model="snackbar" color="green" :timeout="timeoutSnackbar">
+		<v-snackbar
+			:top="true"
+			height="10px"
+			v-model="snackbar"
+			color="green"
+			:timeout="timeoutSnackbar"
+		>
 			{{ text }}
 		</v-snackbar>
 	</div>	
@@ -87,6 +95,11 @@ export default {
 			snackbar: false,
 			text: '',
       		timeoutSnackbar: 2200,
+			files: null,
+			schema: null,
+			querySchemaById: null,
+			fileBySchemaId: null,
+			directory: null
         };
     },
     apollo: {
@@ -137,7 +150,24 @@ export default {
 			}
 		`
     },
+
     methods: {
+		// function that is called when the project has been successfully saved
+		projectSaved () {
+			// refetching of all the files
+			this.$apollo.queries.files.refetch()
+			// refetching of all the schema
+			this.$apollo.queries.schema.refetch()
+			// refetching of all the projects
+			this.$apollo.queries.fileBySchemaId.refetch()
+			// refetching of the project-query
+			this.$apollo.queries.querySchemaById.refetch()
+			// refetching of the directory
+			this.$apollo.queries.directory.refetch()
+			// setting the popUp-value to false (closing the popUp)
+			this.popUp = false
+		},
+
 		openNewProject(value){
 			this.popUp = value;
 		},
@@ -162,6 +192,9 @@ export default {
 			this.year = myYear;
 		},
         dataFill() {
+			console.log('hdaksj')
+			this.headers = []
+			this.items = []
             //filling the headers based on previewList
             for (const elementIdToFind of this.querySchemaById.metadata?.metadata_elements[0].parameters.previewList) {
                 //merge the elements and the metadata
@@ -263,18 +296,42 @@ export default {
 		},
     },
     watch: {
+		// watcher to react to changes in the directory when it is called from the API
 		directory: {
+			deep: true,
+			handler () {
+				this.completeDirectory()
+				this.dataFill()
+			}
+		},
+		// watcher to react to changes in the files when they are called from the API
+		files: {
 			deep: true,
 			handler () {
 				this.completeDirectory()
 			}
 		},
+		// watcher to react to changes in the schema when they are called from the API
+		schema: {
+			deep: true,
+			handler () {
+				this.completeDirectory()
+			}
+		},
+		// watcher to react to changes in the projectSchema when it is called from the API
         querySchemaById: {
             deep: true,
             handler() {
                 this.dataFill();
             }
-        }
+        },
+		// watcher to react to changes in the project-files when they are called from the API
+		fileBySchemaId: {
+			deep: true,
+			handler () {
+				this.dataFill()
+			}
+		}
     },
     computed: {
         ...mapGetters({
