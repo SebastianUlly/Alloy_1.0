@@ -38,7 +38,6 @@
         </div>
         <div class="addButtonDiv">
             <v-btn class="addButton" @click=createFile() :loading="false" color="green" large style="min-width:0"> Projekt hinzufügen</v-btn>
-            <v-btn class="addButton" @click=test() :loading="false" color="green" large style="min-width:0">test</v-btn>
         </div>
           <!-- <vue-json-pretty :data="nestedArray" /> -->
     </div>

@@ -5,7 +5,6 @@
         </div>
         <div class="inputDiv">
             <select class="myInput" v-model="inputValue" type="text">
-                <!-- <option disabled selected value="default"></option> -->
                 <option
                 v-for="(item, index) in files"
                 :value="item"
@@ -47,6 +46,9 @@ export default{
         },
         //get the file by the schema of parameters
         getfile() {
+            if(this.parameters.default){
+                this.inputValue = this.parameters.default;
+            }
             if(this.parameters?.selectableSchema){
                 this.$apollo.query({
                 variables: {
@@ -71,10 +73,11 @@ export default{
                         )?.data?.text;
                     }
                 )
-
+                
             }).catch((error) => {
                 console.log({ error });
             });
+            
             }else if(this.parameters.options)
             {
                 this.files = this.parameters.options

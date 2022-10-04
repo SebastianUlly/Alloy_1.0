@@ -17,7 +17,6 @@
 					<search @sendValue="captureMySearchValue"/>
 				</div>
 			</div>
-			
 			<div class="body">
 				<popUp
 					v-if="popUp"
@@ -32,6 +31,8 @@
 					:search="search"
 					class="table"
 					:header-props="{ sortIcon: null }"
+					:sort-by="'Nummer'"
+					:sort-desc="true"
 				>
 					<template 
 						#item.actions="{item}"
@@ -206,7 +207,7 @@ export default {
 								text: item.label,
 								align:'center',
 								/*  width: "1%",  */
-								sortable: true,
+								sortable: false,
 								value: item.label.replace(/[^a-zA-Z ]/g, ""),
 								elementId: elementIdToFind,
 								filter: value => {
