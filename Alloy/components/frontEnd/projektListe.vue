@@ -182,7 +182,7 @@ export default {
 								}
                         	})	
 						}
-						/* else if(item.label === "Nummer"){
+						 else if(item.label === "Nummer"){
 							this.headers.push({
 								text: item.label,
 								width:"5%",
@@ -192,7 +192,7 @@ export default {
 								elementId: elementIdToFind
 							})
 						}
-						else if(item.label === "Apo"){
+						/* else if(item.label === "Apo"){
 							this.headers.push({
 								text: item.label,
 								width:"1%",
@@ -201,7 +201,7 @@ export default {
 								value: item.label.replace(/[^a-zA-Z ]/g, ""),
 								elementId: elementIdToFind
 							})
-						}  */
+						}   */
 						else{
 							this.headers.push({
 								text: item.label,
