@@ -193,107 +193,110 @@ export default {
 			this.year = myYear;
 		},
         dataFill() {
-			console.log('hdaksj')
 			this.headers = []
 			this.items = []
-            //filling the headers based on previewList
-            for (const elementIdToFind of this.querySchemaById.metadata?.metadata_elements[0].parameters.previewList) {
-                //merge the elements and the metadata
-                for (const item of [...this.querySchemaById.elements, ...this.querySchemaById.metadata?.metadata_elements]) {
-                    //if the element ID is the same as we need, it will push the label and add the elementIdToFind to the label
-                    if (item.elementId === elementIdToFind) {
-						if(item.label === "Jahr"){
-							this.headers.push({
-								text: item.label,
-								align:'center',
-								/*  width: "1%",  */
-								sortable: false,
-								value: item.label.replace(/[^a-zA-Z ]/g, ""),
-								elementId: elementIdToFind,
-								filter: value => {
-									if (!this.year) return true
-									return value.toString().includes(this.year.toString())
-								}
-                        	})	
+			if (this.querySchemaById && this.directory && this.fileBySchemaId) {
+				//filling the headers based on previewList
+				for (const elementIdToFind of this.querySchemaById.metadata?.metadata_elements[0].parameters.previewList) {
+					//merge the elements and the metadata
+					for (const item of [...this.querySchemaById.elements, ...this.querySchemaById.metadata?.metadata_elements]) {
+						//if the element ID is the same as we need, it will push the label and add the elementIdToFind to the label
+						if (item.elementId === elementIdToFind) {
+							if(item.label === "Jahr"){
+								this.headers.push({
+									text: item.label,
+									align:'center',
+									/*  width: "1%",  */
+									sortable: false,
+									value: item.label.replace(/[^a-zA-Z ]/g, ""),
+									elementId: elementIdToFind,
+									filter: value => {
+										if (!this.year) return true
+										return value.toString().includes(this.year.toString())
+									}
+								})	
+							}
+							 else if(item.label === "Nummer"){
+								this.headers.push({
+									text: item.label,
+									width:"5%",
+									align:'left',
+									sortable: true,
+									value: item.label.replace(/[^a-zA-Z ]/g, ""),
+									elementId: elementIdToFind
+								})
+							}
+							/* else if(item.label === "Apo"){
+								this.headers.push({
+									text: item.label,
+									width:"1%",
+									align:'left',
+									sortable: true,
+									value: item.label.replace(/[^a-zA-Z ]/g, ""),
+									elementId: elementIdToFind
+								})
+							}   */
+							else{
+								this.headers.push({
+									text: item.label,
+									align:'center',
+									sortable: true,
+									value: item.label.replace(/[^a-zA-Z ]/g, ""),
+									elementId: elementIdToFind
+							});
+							}
+							
 						}
-						 else if(item.label === "Nummer"){
-							this.headers.push({
-								text: item.label,
-								width:"5%",
-								align:'left',
-								sortable: true,
-								value: item.label.replace(/[^a-zA-Z ]/g, ""),
-								elementId: elementIdToFind
-							})
+					}
+				}
+				this.headers.push({
+					text: "Actions",
+					align:'center',
+					sortable: false,
+					value: "actions"
+				});
+				for (const rawItem of this.fileBySchemaId) {
+					if (this.directory[0].hierarchy.some(e => e.fileId === rawItem.id)) {
+						//reseting the temorary new row
+						let newRow = {};
+						//merge the elements and the metadata
+						for (const elementIdToFind of this.querySchemaById.metadata.metadata_elements[0].parameters.previewList) {
+							//creating the currentItem variable that contains the elementId of the currentItem
+							let currentItem = rawItem.data.find(item => item.elementId === elementIdToFind);
+							//creating the currentKey variable that contains the elementId of the headers
+							let currentKey = this.headers.find(item => item.elementId === elementIdToFind)?.value;
+							//setting the currentValue default to undefined
+							let currentValue;
+							if (currentItem) {
+								//if the currentItem exists sets to the currentValue of currentItem.data.text or to an empty string
+								currentValue = currentItem.data.text ?? "";
+							}
+							else if (rawItem.label && (currentKey === 'Nummer')) {
+								//if the data was not in elements than it muss be the label of rawItem
+								currentValue = rawItem.label;
+							}
+							//if the currentKey and the currentValue not undefined, than set the newRows value to currentValue
+							if (currentKey && currentValue) {
+								newRow[currentKey] = currentValue;
+							}
 						}
-						/* else if(item.label === "Apo"){
-							this.headers.push({
-								text: item.label,
-								width:"1%",
-								align:'left',
-								sortable: true,
-								value: item.label.replace(/[^a-zA-Z ]/g, ""),
-								elementId: elementIdToFind
-							})
-						}   */
-						else{
-							this.headers.push({
-								text: item.label,
-								align:'center',
-								sortable: true,
-								value: item.label.replace(/[^a-zA-Z ]/g, ""),
-								elementId: elementIdToFind
-                        });
-						}
-                        
-                    }
-                }
-            }
-            this.headers.push({
-                text: "Actions",
-				align:'center',
-                sortable: false,
-                value: "actions"
-            });
-            for (const rawItem of this.fileBySchemaId) {
-                if (this.directory[0].hierarchy.some(e => e.fileId === rawItem.id)) {
-                    //reseting the temorary new row
-                    let newRow = {};
-                    //merge the elements and the metadata
-					for (const elementIdToFind of this.querySchemaById.metadata.metadata_elements[0].parameters.previewList) {
-                        //creating the currentItem variable that contains the elementId of the currentItem
-                        let currentItem = rawItem.data.find(item => item.elementId === elementIdToFind);
-                        //creating the currentKey variable that contains the elementId of the headers
-                        let currentKey = this.headers.find(item => item.elementId === elementIdToFind)?.value;
-                        //setting the currentValue default to undefined
-                        let currentValue;
-                        if (currentItem) {
-                            //if the currentItem exists sets to the currentValue of currentItem.data.text or to an empty string
-                            currentValue = currentItem.data.text ?? "";
-                        }
-                        else if (rawItem.label && (currentKey === 'Nummer')) {
-                            //if the data was not in elements than it muss be the label of rawItem
-                            currentValue = rawItem.label;
-                        }
-                        //if the currentKey and the currentValue not undefined, than set the newRows value to currentValue
-                        if (currentKey && currentValue) {
-                            newRow[currentKey] = currentValue;
-                        }
-                    }
-					//adding the elementId to the items array
-					newRow["id"] = rawItem.id;
-                    //pushing the newRow to the items Array 
-                    this.items.push(newRow);
-                }
-            }
+						//adding the elementId to the items array
+						newRow["id"] = rawItem.id;
+						//pushing the newRow to the items Array 
+						this.items.push(newRow);
+					}
+				}
+			}
         },
 
 		completeDirectory () {
-			// function that takes in the raw data which are fetched when this component is created and processing so that a useable directory is formed
-			// creating new instance by calling the MainDirectory class and passing it the raw data in the arguments
-			const directory = new MainDirectory(JSON.parse(JSON.stringify(this.directory[0].hierarchy)), this.files, this.schema)
-			// storing the newly created directory in the store
-			this.$store.commit('directory/setToStoreDirectory', directory)
+			if (this.directory) {
+				// function that takes in the raw data which are fetched when this component is created and processing so that a useable directory is formed
+				// creating new instance by calling the MainDirectory class and passing it the raw data in the arguments
+				const directory = new MainDirectory(JSON.parse(JSON.stringify(this.directory[0].hierarchy)), this.files, this.schema)
+				// storing the newly created directory in the store
+				this.$store.commit('directory/setToStoreDirectory', directory)
+			}
 		},
     },
     watch: {
@@ -344,5 +347,4 @@ export default {
 
 <style lang="scss" scoped>
 @import url('~/assets/scss/componets/frontEnd/fileList.scss');
-
 </style>
