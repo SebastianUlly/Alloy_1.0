@@ -75,9 +75,6 @@ export default {
         })
     },
     methods:{
-        test(){
-            console.log(this.directory)
-        },
         //getting the parentId from the actual folder
         setParentId(parentId){
             this.$store.commit("file/setParentIdsToEnteredValues", [parentId])
