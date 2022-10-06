@@ -77,7 +77,7 @@ import search from "~/components/frontEnd/search";
 import selectYear from "~/components/frontEnd/selectYear";
 import popUp from "~/components/frontEnd/lib/popUp";
 import { MainDirectory } from '~/assets/directoryClasses'
-
+import  { mergeSchemas } from '~/assets/classes/objectClasses'
 export default {
 	components: {
     search,
@@ -100,7 +100,8 @@ export default {
 			schema: null,
 			querySchemaById: null,
 			fileBySchemaId: null,
-			directory: null
+			directory: null,
+			ids:["ca78b111-d1f0-4b4b-b82c-c7e727804b0b", "77ffa6dc-8676-4ee3-acae-d12697f608a1"]
         };
     },
     apollo: {
@@ -169,8 +170,35 @@ export default {
 			this.popUp = false
 		},
 
-		openNewProject(value){
+		async openNewProject(value){
 			this.popUp = value;
+			//variable to store the schemas
+			let schemas = [];
+			//query the both schema
+			for(const item of this.ids){
+				await this.$apollo.query({
+					variables:{
+						id: item
+					},
+					query: gql`
+						query($id: String){
+							querySchemaById( id: $id){
+								id
+								label
+								metadata
+								elements
+							}
+						}
+					`
+				}).then((data) => {  
+					//if both schemas are loaded, sending them to the mergeSchemas function to merge
+					schemas.push(data.data.querySchemaById)
+					if(schemas.length === this.ids.length){
+						let asd3 = mergeSchemas(schemas[0], schemas[1]);
+						console.log(asd3)
+					}
+				})
+			}
 		},
 		copyToClipboard(dataToCopy){
 			const refName = dataToCopy.id;
