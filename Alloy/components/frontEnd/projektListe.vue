@@ -1,28 +1,37 @@
 <template>
 	<div class="container">
 		<div>
+			<!-- the top sectioin contains the new addProject button yearSelect and the SearchFIeld -->
 			<div class="topSection">
+				<!-- the button sets the popUp variable true and the popUp window will appear -->
 				<v-btn
 					style="min-width:0"
 					class="addProject"
 					color="green"
 					@click="openNewProject(true)"
 				>
+					<!-- the icon with the file and + -->
 					<v-icon>
 						mdi-note-plus-outline
 					</v-icon>
 				</v-btn>
+				<!-- the search container contains the events of searchComponent and the yearSelector -->
 				<div class="searchContainer">
 					<selectYear class="selectYearComponent" @sendYear="captureMyYear" />
 					<search @sendValue="captureMySearchValue"/>
 				</div>
 			</div>
+			<!-- the body div contains the data table and the popUp component if its opened -->
 			<div class="body">
 				<popUp
 					v-if="popUp"
 					@closeNewProject="openNewProject($event)"
 					@saveSuccess="projectSaved"
+					:popUpSchema = "popUpSchema"
+					:clickedFile = "clickedFile"
 				/>
+				<!-- the headers must be filled up with the data from the schema -->
+				<!-- custom sorting, styleing settings can be made here -->
 				<v-data-table
 					v-if="headers"
 					:headers="headers"
@@ -34,21 +43,29 @@
 					:sort-by="'Nummer'"
 					:sort-desc="true"
 				>
+					<!-- this template contains the last column with the action buttons -->
 					<template 
 						#item.actions="{item}"
 						v-slot:item="props">
+							<!-- the icons div contains the action icons and buttons-->
 							<div class="icons">
+								<!-- the first icon is a timer watch with a small pencil at the corner, its open the set time popup-->
 								<v-icon>
 									mdi-timer-edit-outline
 								</v-icon>
-								<v-icon>
-									mdi-pencil-outline
-								</v-icon>
+								<!-- the pencil icon is in the middle, it opens the edit project popUp -->
+								<button @click="openEditProject(item)">
+									<v-icon> 
+										mdi-pencil-outline
+									</v-icon>
+								</button>
+								<!-- copy to the clipboard icon is the last icon, if clicked, calls the copyToClipboard functioin and the snackbar function, copyes the text to the clipboard -->
 								<button
 									@click=copyToClipboard(item) 
 									class="copyIcon"
 									:ref="item.id"
 									title="In die Zwischenablage kopieren!">
+									<!-- copy icon -->
 									<v-icon>
 										mdi-content-copy
 									</v-icon>
@@ -58,6 +75,7 @@
 				</v-data-table>
 			</div>
 		</div>
+		<!-- the snackbar that appears on the top for 2,2s if the copy symbol clicked -->
 		<v-snackbar
 			:top="true"
 			height="10px"
@@ -77,7 +95,7 @@ import search from "~/components/frontEnd/search";
 import selectYear from "~/components/frontEnd/selectYear";
 import popUp from "~/components/frontEnd/lib/popUp";
 import { MainDirectory } from '~/assets/directoryClasses'
-import  { mergeSchemas } from '~/assets/classes/objectClasses'
+import { mergeSchemas } from '~/assets/classes/objectClasses'
 export default {
 	components: {
     search,
@@ -101,7 +119,9 @@ export default {
 			querySchemaById: null,
 			fileBySchemaId: null,
 			directory: null,
-			ids:["ca78b111-d1f0-4b4b-b82c-c7e727804b0b", "77ffa6dc-8676-4ee3-acae-d12697f608a1"]
+			popUpSchema: {},
+			ids:["ca78b111-d1f0-4b4b-b82c-c7e727804b0b", "77ffa6dc-8676-4ee3-acae-d12697f608a1"],
+			clickedFile:""
         };
     },
     apollo: {
@@ -169,13 +189,10 @@ export default {
 			// setting the popUp-value to false (closing the popUp)
 			this.popUp = false
 		},
-
-		async openNewProject(value){
-			this.popUp = value;
-			//variable to store the schemas
+		async getDataForPopUp(id){
 			let schemas = [];
 			//query the both schema
-			for(const item of this.ids){
+			for(const item of id){
 				await this.$apollo.query({
 					variables:{
 						id: item
@@ -190,16 +207,29 @@ export default {
 							}
 						}
 					`
-				}).then((data) => {  
+				}).then((data) => {
 					//if both schemas are loaded, sending them to the mergeSchemas function to merge
 					schemas.push(data.data.querySchemaById)
-					if(schemas.length === this.ids.length){
-						let asd3 = mergeSchemas(schemas[0], schemas[1]);
-						console.log(asd3)
+					if(id.length === schemas.length && id.length != 1){
+						this.popUpSchema = mergeSchemas(schemas[0], schemas[1]);
+					}else if(id.length == 1){
+						this.popUpSchema = data.data.querySchemaById;
 					}
 				})
 			}
 		},
+		openEditProject(item){
+			this.getDataForPopUp(["ca78b111-d1f0-4b4b-b82c-c7e727804b0b", "77ffa6dc-8676-4ee3-acae-d12697f608a1"]);
+			this.popUp = true;
+			this.clickedFile = item.id;
+		},
+		//set the boolean variable true and the popUp opens
+		openNewProject(value){
+			this.clickedFile = null;
+			this.popUp = value;
+			this.getDataForPopUp(["ca78b111-d1f0-4b4b-b82c-c7e727804b0b"]);
+		},
+		/* copyes the file data to the clipboard without the status */
 		copyToClipboard(dataToCopy){
 			const refName = dataToCopy.id;
 			//setting the snackbar true
@@ -214,9 +244,11 @@ export default {
 			//copying the text to the clipboard without the last element of array
 		 	navigator.clipboard.writeText(Object.values(dataToCopy).slice(0,4).join("-"));
 		},
+		//captureing the search value from the search component
 		captureMySearchValue(value){
 			this.search = value;
 		},
+		//capturing the selected year from the component
 		captureMyYear(myYear){
 			this.year = myYear;
 		},
@@ -313,8 +345,8 @@ export default {
                     this.items.push(newRow);
                 }
             }
+			
         },
-
 		completeDirectory () {
 			// function that takes in the raw data which are fetched when this component is created and processing so that a useable directory is formed
 			// creating new instance by calling the MainDirectory class and passing it the raw data in the arguments
@@ -357,6 +389,7 @@ export default {
 		fileBySchemaId: {
 			deep: true,
 			handler () {
+				this.$store.commit('file/setFileList', this.fileBySchemaId)
 				this.dataFill()
 			}
 		}

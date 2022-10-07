@@ -47,7 +47,7 @@ export const mutations = {
 		state.valuesToSave.schemaId = schemaId
 	},
 
-	setEnteredData (state: { dataToSave: { elementId: string, data: any }[] }, payload: { elementId: string, data: any }) {
+	setEnteredData (state: { dataToSave: { elementId: string, data: any }[] }, payload: { elementId: string, data: any}) {
 		const arrayToSave = state.dataToSave
 		const element = arrayToSave.find(item => item.elementId === payload.elementId)
 		if (element) {
@@ -81,5 +81,9 @@ export const getters = {
 
 	getValuesToSave (state: { valuesToSave: object[] }) {
 		return state.valuesToSave
+	},
+
+	getFileList (state: { fileList: object[] }) {
+		return state.fileList
 	}
 }

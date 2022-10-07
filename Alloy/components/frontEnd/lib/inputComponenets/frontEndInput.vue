@@ -1,11 +1,14 @@
 <template>
     <div class="body">
+        <!-- the label of the input component -->
         <div class="label">
            {{label}}
         </div>
+        <!-- the inputDiv contains the inputfield --> 
         <div
             class="inputDiv"
             ref="inputX">
+            <!-- the input becomes the parameters from the parameters prop -->
             <input
                 :disabled="!parameters.editable"
                 :style="'text-align:' + parameters.align"
@@ -16,7 +19,6 @@
     </div>
 </template>
 <script>
-import gql from "graphql-tag";
 import { mapGetters } from "vuex"
 export default{
     props: {
@@ -27,6 +29,12 @@ export default{
             type: String
         },
         parameters:{
+            type: Object
+        },
+        elementIdToSearch:{
+            type: String
+        },
+        data:{
             type: Object
         }
     },
@@ -40,9 +48,13 @@ export default{
     methods:{
         //checking the database default value
         setDefaultValue(){
-            if(this.parameters.default === "currentYear"){    
+            console.log(this.data)
+            if(this.elementIdToSearch && this.elementId !=="75e96f94-0103-4804-abc0-5331ea980e9b" && this.data != undefined){
+             this.inputValue = (this.data.data.find(item => item.elementId === this.elementId).data.text)
+            } 
+            else if(this.parameters.default === "currentYear"){    
                 this.inputValue = new Date().getFullYear().toString();
-            }else if(this.parameters.default === "consecutiveNumber" &&  this.directory){
+            }else if(this.parameters.default === "consecutiveNumber" &&  this.directory && !this.elementIdToSearch){
                 let currentFolderId = "";
                 for(let item of this.directory){
                      if(item.name == new Date().getFullYear()){
@@ -71,7 +83,7 @@ export default{
                 } 
             }   
         },
-        //send the 
+        //sends the payload to the parent
         sendEvent(){
             const payload = {
                 elementId: this.elementId,
@@ -98,7 +110,8 @@ export default{
     },
     computed:{
         ...mapGetters({
-            directory : "directory/getDirectory"
+            directory : "directory/getDirectory",
+           
         })
     },
      watch: {
@@ -116,7 +129,6 @@ export default{
         }
     } 
 }
-
 </script>
 <style scoped>
 .body{

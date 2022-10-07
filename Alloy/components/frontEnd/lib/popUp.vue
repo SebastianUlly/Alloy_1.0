@@ -1,30 +1,34 @@
 <template>
     <div class="popUp">
+        <!-- the popUpTop is the upper section of a popUp window, it contains the icon label and the close button -->
         <div class="popUpTop">
+            <!-- icon -->
             <span class="infoIcon">
                 <v-icon v-if="icon">
-                {{icon}}
+                    {{icon}}
                 </v-icon>
             </span>
-            <span class="label">
-                Projekt hinzufügen
+            <!-- the label -->
+            <span class="label" v-if="popUpSchema.label">
+              {{popUpSchema.label}}
             </span> 
+            <!-- close button with white background closes the popUp window-->
             <span  class="closeIcon">
-                <div class="whiteBackground">
-                </div>
-                <button
-                @click="closeNewProject()"
-                >
+                <!-- the white background for the close button -->
+                <div class="whiteBackground"></div>
+                <button @click="closeNewProject()">
+                    <!-- the close box is transparent and not white in the middle -->
                     <v-icon color="red" large>
                         mdi-close-box
                     </v-icon>
                 </button>
             </span>
         </div>
-        <div class="popUpBody" v-if="querySchemaById">
+        <!-- the popUpBody contains the input components and the button-->
+        <div class="popUpBody" v-if="popUpSchema && sendDataToInputs">
             <div class="inputContainer">
                     <component
-                    v-for="item of querySchemaById.elements" :key="item.elementId"
+                    v-for="item of popUpSchema.elements" :key="item.elementId"
 					:is="item.componentId"
 					:elementId="item.elementId"
                     :label="item.label"
@@ -32,14 +36,21 @@
                     :class="item.parameters.size"
                     @update="getDataFromComponent"
                     @getCurrentFolderId = "setParentId"
+                    :elementIdToSearch = "clickedFile"
+                    :data="sendDataToInputs"
 				    />
-                <!-- <vue-json-pretty :data="querySchemaById" /> -->
             </div>
         </div>
+        <!-- add button at the bottom of popUp window calls the createFile function that saves the file to the database-->
         <div class="addButtonDiv">
-            <v-btn class="addButton" @click=createFile() :loading="false" color="green" large style="min-width:0"> Projekt hinzufügen</v-btn>
+            <v-btn
+                class="addButton"
+                @click=createFile()
+                :loading="false"
+                color="green"
+                large
+                style="min-width:0"> Projekt hinzufügen </v-btn>
         </div>
-          <!-- <vue-json-pretty :data="nestedArray" /> -->
     </div>
 </template>
 
@@ -47,12 +58,19 @@
 import gql from "graphql-tag"
 import { mapGetters } from 'vuex'
 import { v4 as uuidv4 } from "uuid"
-import { NestedArray } from '~/assets/classes/arrayClasses'
 import { AddEntityToDirectory } from '~/assets/directoryClasses'
 import frontEndInput from '~/components/frontEnd/lib/inputComponenets/frontEndInput'
 import frontEndSelectInput from '~/components/frontEnd/lib/inputComponenets/frontEndSelectInput'
 import FrontEndSelectInput from "./inputComponenets/frontEndSelectInput.vue"
 export default {
+    props:{
+        popUpSchema:{
+            type: Object
+        },
+        clickedFile:{
+            type: String
+        }
+    },
     components:{
         frontEndInput,
         frontEndSelectInput,
@@ -63,7 +81,8 @@ export default {
             payload:"",
             nestedArray: null,
             nestedArrayElements: null,
-            icon: ""
+            icon: "",
+            sendDataToInputs: {}
         }
     },
 
@@ -71,32 +90,49 @@ export default {
         ...mapGetters({
             directory: 'directory/getDirectory',
             getDataToSave: 'file/getDataToSave',
-            getValuesToSave: 'file/getValuesToSave'
+            getValuesToSave: 'file/getValuesToSave',
+            fileList : "file/getFileList"
         })
     },
+    created(){
+        this.searchFile()
+    },
     methods:{
+        searchFile(){
+            if(this.clickedFile){
+                for(let item of this.fileList){
+                    if(item.id === this.clickedFile){
+                        this.sendDataToInputs = item
+                    }
+                }   
+            }
+            
+        },
         //getting the parentId from the actual folder
         setParentId(parentId){
-            this.$store.commit("file/setParentIdsToEnteredValues", [parentId])
+            this.$store.commit("file/setParentIdsToEnteredValues", [parentId]);
         },
         getDataFromComponent(data){
            //if the data = name than commit it to the setFileNameToEnteredValues otherwise to the setEnteredData
             if(data.elementId === "75e96f94-0103-4804-abc0-5331ea980e9b"){
-                this.$store.commit("file/setFileNameToEnteredValues", data.data.text)
+                this.$store.commit("file/setFileNameToEnteredValues", data.data.text);
             } else{
-                this.$store.commit("file/setEnteredData", data)
+                this.$store.commit("file/setEnteredData", data);
             }
         },
         //close the popUp window
         closeNewProject(){
-            this.$emit('closeNewProject', false)
+            this.$emit('closeNewProject', false);
         },
         createNewFile(){
+            if(!this.clickedFile){
             //generate new file id for the project
             const newId = uuidv4();
-            this.$store.commit("file/setFileIdToEnteredValues", newId),
+            this.$store.commit("file/setFileIdToEnteredValues", newId);
             //sending the schemaId
-            this.$store.commit("file/setSchemaIdToEnteredValues", this.querySchemaById.metadata.schemaId)
+            this.$store.commit("file/setSchemaIdToEnteredValues", this.popUpSchema.metadata.schemaId);
+            }
+            
         },
         createFile () {
 			this.$apollo.mutate({
@@ -126,7 +162,7 @@ export default {
 						fileId: this.getValuesToSave.fileId,
 						label: this.getValuesToSave.label,
 						schemaId: this.getValuesToSave.schemaId,
-						isLeaf: this.querySchemaById?.metadata?.isLeaf
+						isLeaf: this.popUpSchema?.metadata?.isLeaf
 					},
 					this.getValuesToSave.parentIds)
 				// commiting the edited directory to the store
@@ -136,22 +172,19 @@ export default {
 				console.log({ error })
 			})
 		},
-
         // function to save the changed directory (SUL)
 		saveDirectory () {
-
 			this.$apollo.mutate({
 				variables: {
 					directory: this.directory
 				},
-
 				mutation: gql`
 					mutation(
 						$directory: JSON
-					) {
+					){
 						saveDirectory(
 							directory: $directory
-						) {
+						){
 							id
 						}
 					}
@@ -163,25 +196,12 @@ export default {
 			})
 		},
     },
-    //queries the data from the database from the New-Project-PopUp
-    apollo:{
-        querySchemaById: gql `
-			query PreviewList {
-				querySchemaById(id: "ca78b111-d1f0-4b4b-b82c-c7e727804b0b") {
-                    id
-					label
-					metadata
-					elements
-				}
-			}
-		`
-    },
     watch: {
-        querySchemaById: {
+        popUpSchema: {
 			deep: true,
 			handler () {
                 //updating the icon if its available
-                this.icon = String(this.querySchemaById?.metadata?.icon);
+                this.icon = String(this.popUpSchema?.metadata?.icon);
                 this.createNewFile();
 			}
 		} 

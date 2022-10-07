@@ -1,16 +1,20 @@
 <template>
     <div class="body">
+        <!-- the label of the select input componenet -->
         <div class="label">
             {{label}}
         </div>
         <div class="inputDiv">
+            <!-- the selector loads the select options -->
             <select class="myInput" v-model="inputValue" type="text">
+                <!-- writing out the optioins -->
                 <option
                 v-for="(item, index) in files"
                 :value="item"
                 >{{item}}</option>
             </select>
         </div>
+        <!-- dropdown arrow -->
         <v-icon class="mdi-chevron">mdi-chevron-down</v-icon>
     </div>
 </template>
@@ -35,6 +39,7 @@ export default{
         }
     },
     methods:{
+        //sending the selected data to the store
         sendEvent(){
             const payload = {
                 elementId: this.elementId,
@@ -49,6 +54,7 @@ export default{
             if(this.parameters.default){
                 this.inputValue = this.parameters.default;
             }
+            //querying the Apotheken of the selectable schema
             if(this.parameters?.selectableSchema){
                 this.$apollo.query({
                 variables: {
@@ -63,7 +69,7 @@ export default{
                         }
                     }
                 `,
-            //filling the files array with the data of elementData.elementId
+            //filling the files array with the data of fileBySchemaId.data where elementData.elementId (name field of an apotheke) is the same
             }).then((data) => {
                 const temp = data.data.fileBySchemaId;
                 this.files = temp.map(
@@ -73,23 +79,21 @@ export default{
                         )?.data?.text;
                     }
                 )
-                
             }).catch((error) => {
                 console.log({ error });
             });
-            
+            //if its not an pharmacy than fills it with the parameters.options from the parent component
             }else if(this.parameters.options)
             {
                 this.files = this.parameters.options
             }
-            
-
         }
     },
     mounted(){
         this.getfile();
     },
     watch:{
+        //if the input value changes calls the sendEvent
         inputValue:{
             handler(){
                 this.sendEvent();

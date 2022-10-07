@@ -116,7 +116,6 @@ export function mergeSchemas (destination, source){
 	 let metadata =_.merge(destination.metadata, source.metadata);
 	 let elements = [];
 	 for(let destinationItem of destination.elements){
-		console.log(destinationItem)
 		let foundPair = false;
 		for(let sourceItem of source.elements){
 			if(destinationItem.elementId == sourceItem.elementId){
