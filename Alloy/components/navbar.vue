@@ -13,15 +13,13 @@
 		</v-btn>
 		<!-- button to navigate to the schemaEditor, but only if the logged in user is allowed to -->
 		<v-btn
-			v-if="checkPermission('89f18d53-9495-45a1-bf8f-4ed66358a687')"
 			text
 			to="/schemaEditor"
 		>
 			Schema Editor
 		</v-btn>
-		{{ checkPermission('bae13b03-d59f-48b7-8cdf-0eb502e333b6') }}
+		
 		<v-btn
-			v-if="checkPermission('bae13b03-d59f-48b7-8cdf-0eb502e333b6')"
 			text
 			to="/frontEnd"
 		>

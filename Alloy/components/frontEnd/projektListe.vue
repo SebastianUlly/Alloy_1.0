@@ -24,7 +24,7 @@
 			<!-- the body div contains the data table and the popUp component if its opened -->
 			<div class="body">
 				<popUp
-					v-if="popUp"
+					v-if="popUp && popUpSchema"
 					@closeNewProject="openNewProject($event)"
 					@saveSuccess="projectSaved"
 					:popUpSchema = "popUpSchema"
@@ -33,7 +33,7 @@
 				<!-- the headers must be filled up with the data from the schema -->
 				<!-- custom sorting, styleing settings can be made here -->
 				<v-data-table
-					v-if="headers"
+					v-if="headers && items"
 					:headers="headers"
 					:items="items"
 					:items-per-page="20"
@@ -119,7 +119,7 @@ export default {
 			querySchemaById: null,
 			fileBySchemaId: null,
 			directory: null,
-			popUpSchema: {},
+			popUpSchema: null,
 			ids:["ca78b111-d1f0-4b4b-b82c-c7e727804b0b", "77ffa6dc-8676-4ee3-acae-d12697f608a1"],
 			clickedFile:""
         };
@@ -191,6 +191,8 @@ export default {
 		},
 		async getDataForPopUp(id){
 			let schemas = [];
+			// this.popUpSchema has to empty every time a new schema has to be loaded
+			this.popUpSchema = null;
 			//query the both schema
 			for(const item of id){
 				await this.$apollo.query({
@@ -210,9 +212,9 @@ export default {
 				}).then((data) => {
 					//if both schemas are loaded, sending them to the mergeSchemas function to merge
 					schemas.push(data.data.querySchemaById)
-					if(id.length === schemas.length && id.length != 1){
+					if(id.length === schemas.length && id.length !== 1){
 						this.popUpSchema = mergeSchemas(schemas[0], schemas[1]);
-					}else if(id.length == 1){
+					}else if(id.length === 1){
 						this.popUpSchema = data.data.querySchemaById;
 					}
 				})
@@ -255,7 +257,7 @@ export default {
         dataFill() {
 			this.headers = []
 			this.items = []
-			if (this.querySchemaById && this.directory && this.fileBySchemaId) {
+			if (this.querySchemaById && this.directory && this.fileBySchemaId && this.files && this.schema) {
 				//filling the headers based on previewList
 				for (const elementIdToFind of this.querySchemaById.metadata?.metadata_elements[0].parameters.previewList) {
 					//merge the elements and the metadata
@@ -349,7 +351,7 @@ export default {
 			}
         },
 		completeDirectory () {
-			if (this.directory) {
+			if (this.directory && this.files && this.schema) {
 				// function that takes in the raw data which are fetched when this component is created and processing so that a useable directory is formed
 				// creating new instance by calling the MainDirectory class and passing it the raw data in the arguments
 				const directory = new MainDirectory(JSON.parse(JSON.stringify(this.directory[0].hierarchy)), this.files, this.schema)

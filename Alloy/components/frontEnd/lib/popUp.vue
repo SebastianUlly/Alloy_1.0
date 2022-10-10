@@ -44,12 +44,13 @@
         <!-- add button at the bottom of popUp window calls the createFile function that saves the file to the database-->
         <div class="addButtonDiv">
             <v-btn
+                v-if="popUpSchema.metadata"
                 class="addButton"
-                @click=createFile()
+                @click="selectFunction(popUpSchema.metadata.saveFunction)"
                 :loading="false"
                 color="green"
                 large
-                style="min-width:0"> Projekt hinzufügen </v-btn>
+                style="min-width:0"> Speichern </v-btn>
         </div>
     </div>
 </template>
@@ -98,6 +99,48 @@ export default {
         this.searchFile()
     },
     methods:{
+        createFile(){
+                this.$apollo.mutate({
+				variables: {
+					metadata: this.getValuesToSave,
+					elementsData: this.getDataToSave
+				},
+
+				mutation: gql`
+					mutation (
+						$metadata: JSON
+						$elementsData: JSON
+					) {
+						createFile (
+							metadata: $metadata
+							elementsData: $elementsData
+						) {
+							id
+						}
+					}
+				`
+                }).then((data) => {
+                    // create a new instance to add the file to the directory on every reqired location
+                    const directoryWithAddedEntity = new AddEntityToDirectory(
+                        this.directory,
+                        {
+                            fileId: this.getValuesToSave.fileId,
+                            label: this.getValuesToSave.label,
+                            schemaId: this.getValuesToSave.schemaId,
+                            isLeaf: this.popUpSchema?.metadata?.isLeaf
+                        },
+                        this.getValuesToSave.parentIds)
+                    // commiting the edited directory to the store
+                    this.$store.commit('directory/setToStoreDirectory', directoryWithAddedEntity.directoryCopy);
+                    this.saveDirectory()
+                }).catch((error) => {
+                    console.log({ error })
+                })
+		},
+        //calls the desired function
+        selectFunction(functionName){
+            this[functionName]();
+        },
         searchFile(){
             if(this.clickedFile){
                 for(let item of this.fileList){
@@ -131,11 +174,17 @@ export default {
             this.$store.commit("file/setFileIdToEnteredValues", newId);
             //sending the schemaId
             this.$store.commit("file/setSchemaIdToEnteredValues", this.popUpSchema.metadata.schemaId);
+            //when clickedFile exists than it will commit the correct elementId, schemaId and parentId
+            } else if(this.clickedFile) {
+                this.$store.commit("file/setFileIdToEnteredValues", this.clickedFile);
+                this.$store.commit("file/setSchemaIdToEnteredValues", this.popUpSchema.metadata.schemaId);
+                this.$store.commit("file/setParentIdsToEnteredValues", this.directory.find(item => item.fileId === this.clickedFile)?.parentId);
             }
             
         },
-        createFile () {
-			this.$apollo.mutate({
+        //updating file and refresh the projektListe
+        updateFile(){
+            this.$apollo.mutate({
 				variables: {
 					metadata: this.getValuesToSave,
 					elementsData: this.getDataToSave
@@ -146,7 +195,7 @@ export default {
 						$metadata: JSON
 						$elementsData: JSON
 					) {
-						createFile (
+						updateFile (
 							metadata: $metadata
 							elementsData: $elementsData
 						) {
@@ -154,26 +203,14 @@ export default {
 						}
 					}
 				`
-			}).then((data) => {
-                // create a new instance to add the file to the directory on every reqired location
-				const directoryWithAddedEntity = new AddEntityToDirectory(
-					this.directory,
-					{
-						fileId: this.getValuesToSave.fileId,
-						label: this.getValuesToSave.label,
-						schemaId: this.getValuesToSave.schemaId,
-						isLeaf: this.popUpSchema?.metadata?.isLeaf
-					},
-					this.getValuesToSave.parentIds)
-				// commiting the edited directory to the store
-				this.$store.commit('directory/setToStoreDirectory', directoryWithAddedEntity.directoryCopy);
-                this.saveDirectory()
-			}).catch((error) => {
-				console.log({ error })
-			})
-		},
+                }).then(() => {
+                    this.$emit("saveSuccess")
+                }).catch((error) => {
+                    console.log({ error })
+                })
+        },
         // function to save the changed directory (SUL)
-		saveDirectory () {
+		saveDirectory(){
 			this.$apollo.mutate({
 				variables: {
 					directory: this.directory
@@ -199,12 +236,12 @@ export default {
     watch: {
         popUpSchema: {
 			deep: true,
-			handler () {
+			handler(){
                 //updating the icon if its available
                 this.icon = String(this.popUpSchema?.metadata?.icon);
                 this.createNewFile();
 			}
-		} 
+		}
 	}
 }
 
