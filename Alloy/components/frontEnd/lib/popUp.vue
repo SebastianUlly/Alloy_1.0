@@ -3,17 +3,17 @@
         <!-- the popUpTop is the upper section of a popUp window, it contains the icon label and the close button -->
         <div class="popUpTop">
             <!-- icon -->
-            <span class="infoIcon">
+            <div class="infoIcon">
                 <v-icon v-if="icon">
                     {{icon}}
                 </v-icon>
-            </span>
+            </div>
             <!-- the label -->
             <span class="label" v-if="popUpSchema.label">
-              {{popUpSchema.label}}
+                {{popUpSchema.label}}
             </span> 
             <!-- close button with white background closes the popUp window-->
-            <span  class="closeIcon">
+            <div  class="closeIcon">
                 <!-- the white background for the close button -->
                 <div class="whiteBackground"></div>
                 <button @click="closeNewProject()">
@@ -22,46 +22,47 @@
                         mdi-close-box
                     </v-icon>
                 </button>
-            </span>
+            </div>
         </div>
         <!-- the popUpBody contains the input components and the button-->
         <div class="popUpBody" v-if="popUpSchema && sendDataToInputs">
             <div class="inputContainer">
                     <component
-                    v-for="item of popUpSchema.elements" :key="item.elementId"
-					:is="item.componentId"
-					:elementId="item.elementId"
-                    :label="item.label"
-                    :parameters="item.parameters"
-                    :class="item.parameters.size"
-                    @update="getDataFromComponent"
-                    @getCurrentFolderId = "setParentId"
-                    :elementIdToSearch = "clickedFile"
-                    :data="sendDataToInputs"
+                        v-for="item of popUpSchema.elements" :key="item.elementId"
+                        :is="item.componentId"
+                        :elementId="item.elementId"
+                        :label="item.label"
+                        :parameters="item.parameters"
+                        :class="item.parameters.size"
+                        @update="getDataFromComponent"
+                        @getCurrentFolderId="setParentId"
+                        :elementIdToSearch="clickedFile"
+                        :data="sendDataToInputs"
 				    />
             </div>
         </div>
         <!-- add button at the bottom of popUp window calls the createFile function that saves the file to the database-->
         <div class="addButtonDiv">
             <v-btn
+                v-if="popUpSchema.metadata"
                 class="addButton"
-                @click=createFile()
+                @click="selectFunction(popUpSchema.metadata.saveFunction)"
                 :loading="false"
                 color="green"
                 large
-                style="min-width:0"> Projekt hinzufügen </v-btn>
+                style="min-width:0"> Speichern </v-btn>
         </div>
     </div>
 </template>
 
 <script>
-import gql from "graphql-tag"
-import { mapGetters } from 'vuex'
-import { v4 as uuidv4 } from "uuid"
-import { AddEntityToDirectory } from '~/assets/directoryClasses'
-import frontEndInput from '~/components/frontEnd/lib/inputComponenets/frontEndInput'
-import frontEndSelectInput from '~/components/frontEnd/lib/inputComponenets/frontEndSelectInput'
-import FrontEndSelectInput from "./inputComponenets/frontEndSelectInput.vue"
+import gql from "graphql-tag";
+import { mapGetters } from "vuex";
+import { v4 as uuidv4 } from "uuid";
+import { AddEntityToDirectory } from "~/assets/directoryClasses";
+import frontEndInput from "~/components/frontEnd/lib/inputComponenets/frontEndInput";
+import frontEndSelectInput from "~/components/frontEnd/lib/inputComponenets/frontEndSelectInput";
+
 export default {
     props:{
         popUpSchema:{
@@ -73,8 +74,7 @@ export default {
     },
     components:{
         frontEndInput,
-        frontEndSelectInput,
-        FrontEndSelectInput
+        frontEndSelectInput
     },
     data(){
         return{
@@ -88,16 +88,61 @@ export default {
 
     computed:  {
         ...mapGetters({
-            directory: 'directory/getDirectory',
-            getDataToSave: 'file/getDataToSave',
-            getValuesToSave: 'file/getValuesToSave',
+            directory: "directory/getDirectory",
+            getDataToSave: "file/getDataToSave",
+            getValuesToSave: "file/getValuesToSave",
             fileList : "file/getFileList"
         })
     },
     created(){
         this.searchFile()
     },
+    mounted () {
+        this.createNewFile()
+    },
     methods:{
+        createFile(){
+            this.$apollo.mutate({
+            variables: {
+                metadata: this.getValuesToSave,
+                elementsData: this.getDataToSave
+            },
+
+            mutation: gql`
+                mutation (
+                    $metadata: JSON
+                    $elementsData: JSON
+                ) {
+                    createFile (
+                        metadata: $metadata
+                        elementsData: $elementsData
+                    ) {
+                        id
+                    }
+                }
+            `
+            }).then((data) => {
+                // create a new instance to add the file to the directory on every reqired location
+                const directoryWithAddedEntity = new AddEntityToDirectory(
+                    this.directory,
+                    {
+                        fileId: this.getValuesToSave.fileId,
+                        label: this.getValuesToSave.label,
+                        schemaId: this.getValuesToSave.schemaId,
+                        isLeaf: this.popUpSchema?.metadata?.isLeaf
+                    },
+                    this.getValuesToSave.parentIds)
+                // commiting the edited directory to the store
+                this.$store.commit('directory/setToStoreDirectory', directoryWithAddedEntity.directoryCopy);
+                this.saveDirectory()
+            }).catch((error) => {
+                console.log({ error })
+            })
+		},
+        //calls the desired function
+        selectFunction(functionName){
+            this[functionName]();
+        },
         searchFile(){
             if(this.clickedFile){
                 for(let item of this.fileList){
@@ -114,9 +159,9 @@ export default {
         },
         getDataFromComponent(data){
            //if the data = name than commit it to the setFileNameToEnteredValues otherwise to the setEnteredData
-            if(data.elementId === "75e96f94-0103-4804-abc0-5331ea980e9b"){
+            if(data.elementId === "75e96f94-0103-4804-abc0-5331ea980e9b") {
                 this.$store.commit("file/setFileNameToEnteredValues", data.data.text);
-            } else{
+            } else {
                 this.$store.commit("file/setEnteredData", data);
             }
         },
@@ -125,17 +170,23 @@ export default {
             this.$emit('closeNewProject', false);
         },
         createNewFile(){
-            if(!this.clickedFile){
-            //generate new file id for the project
-            const newId = uuidv4();
-            this.$store.commit("file/setFileIdToEnteredValues", newId);
-            //sending the schemaId
-            this.$store.commit("file/setSchemaIdToEnteredValues", this.popUpSchema.metadata.schemaId);
-            }
-            
+            console.log(this.clickedFile)
+            //when clickedFile exists than it will commit the correct elementId, schemaId and parentId
+            if(this.clickedFile) {
+                this.$store.commit("file/setFileIdToEnteredValues", this.clickedFile);
+                this.$store.commit("file/setSchemaIdToEnteredValues", this.popUpSchema.metadata.schemaId);
+                this.$store.commit("file/setParentIdsToEnteredValues", this.directory.find(item => item.fileId === this.clickedFile)?.parentId);
+            } else {
+                //generate new file id for the project
+                const newId = uuidv4();
+                this.$store.commit("file/setFileIdToEnteredValues", newId);
+                //sending the schemaId
+                this.$store.commit("file/setSchemaIdToEnteredValues", this.popUpSchema.metadata.schemaId);
+            } 
         },
-        createFile () {
-			this.$apollo.mutate({
+        //updating file and refresh the projektListe
+        updateFile() {
+            this.$apollo.mutate({
 				variables: {
 					metadata: this.getValuesToSave,
 					elementsData: this.getDataToSave
@@ -146,7 +197,7 @@ export default {
 						$metadata: JSON
 						$elementsData: JSON
 					) {
-						createFile (
+						updateFile (
 							metadata: $metadata
 							elementsData: $elementsData
 						) {
@@ -154,26 +205,14 @@ export default {
 						}
 					}
 				`
-			}).then((data) => {
-                // create a new instance to add the file to the directory on every reqired location
-				const directoryWithAddedEntity = new AddEntityToDirectory(
-					this.directory,
-					{
-						fileId: this.getValuesToSave.fileId,
-						label: this.getValuesToSave.label,
-						schemaId: this.getValuesToSave.schemaId,
-						isLeaf: this.popUpSchema?.metadata?.isLeaf
-					},
-					this.getValuesToSave.parentIds)
-				// commiting the edited directory to the store
-				this.$store.commit('directory/setToStoreDirectory', directoryWithAddedEntity.directoryCopy);
-                this.saveDirectory()
-			}).catch((error) => {
-				console.log({ error })
-			})
-		},
+                }).then(() => {
+                    this.$emit("saveSuccess")
+                }).catch((error) => {
+                    console.log({ error })
+                })
+        },
         // function to save the changed directory (SUL)
-		saveDirectory () {
+		saveDirectory(){
 			this.$apollo.mutate({
 				variables: {
 					directory: this.directory
@@ -194,17 +233,18 @@ export default {
 			}).catch((error) => {
 				console.log({ error })
 			})
-		},
+		}
     },
+
     watch: {
         popUpSchema: {
 			deep: true,
 			handler () {
                 //updating the icon if its available
                 this.icon = String(this.popUpSchema?.metadata?.icon);
-                this.createNewFile();
+                //this.createNewFile();
 			}
-		} 
+		}
 	}
 }
 

@@ -30,6 +30,12 @@ export default{
         },
         parameters:{
             type: Object
+        },
+        elementIdToSearch:{
+            type: String
+        },
+        data:{
+            type: Object
         }
     },
     data(){
@@ -39,6 +45,11 @@ export default{
         }
     },
     methods:{
+        setValue(){
+            if(this.elementIdToSearch && this.elementId !=="75e96f94-0103-4804-abc0-5331ea980e9b" && this.data != undefined){
+                this.inputValue = (this.data.data.find(item => item.elementId === this.elementId).data.text)
+            }
+        },
         //sending the selected data to the store
         sendEvent(){
             const payload = {
@@ -91,6 +102,7 @@ export default{
     },
     mounted(){
         this.getfile();
+        this.setValue();
     },
     watch:{
         //if the input value changes calls the sendEvent

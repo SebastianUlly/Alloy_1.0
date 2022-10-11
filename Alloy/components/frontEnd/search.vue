@@ -18,6 +18,9 @@ export default {
             searchValue:""
         }
     },
+    created(){
+        this.$emit('sendValue', this.searchValue)
+    },
     watch:{
         searchValue:{
             handler(){

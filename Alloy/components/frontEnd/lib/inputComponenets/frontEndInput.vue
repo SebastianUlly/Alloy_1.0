@@ -48,10 +48,13 @@ export default{
     methods:{
         //checking the database default value
         setDefaultValue(){
-            console.log(this.data)
+            //console.log(this.data)
             if(this.elementIdToSearch && this.elementId !=="75e96f94-0103-4804-abc0-5331ea980e9b" && this.data != undefined){
-             this.inputValue = (this.data.data.find(item => item.elementId === this.elementId).data.text)
-            } 
+                this.inputValue = (this.data.data.find(item => item.elementId === this.elementId).data.text)
+            }
+            else if(this.elementIdToSearch && this.elementId =="75e96f94-0103-4804-abc0-5331ea980e9b" && this.data != undefined){
+                this.inputValue = this.data.label
+            }
             else if(this.parameters.default === "currentYear"){    
                 this.inputValue = new Date().getFullYear().toString();
             }else if(this.parameters.default === "consecutiveNumber" &&  this.directory && !this.elementIdToSearch){
@@ -105,7 +108,7 @@ export default{
             }
         }
     },
-    mounted(){
+    created(){
         this.setDefaultValue();
     },
     computed:{
