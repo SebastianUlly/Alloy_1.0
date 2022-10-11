@@ -374,6 +374,7 @@ export default {
 			deep: true,
 			handler () {
 				this.completeDirectory()
+				this.dataFill()
 			}
 		},
 		// watcher to react to changes in the schema when they are called from the API
@@ -381,6 +382,7 @@ export default {
 			deep: true,
 			handler () {
 				this.completeDirectory()
+				this.dataFill()
 			}
 		},
 		// watcher to react to changes in the projectSchema when it is called from the API
