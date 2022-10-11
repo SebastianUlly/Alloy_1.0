@@ -2,7 +2,8 @@ import Vue from 'vue'
 
 export const state = () => ({
 	expirationTime: null,
-	userName: ''
+	userName: '',
+	permissionIds: []
 })
 
 export const mutations = {
@@ -10,22 +11,33 @@ export const mutations = {
 	setTokenInfo (
 		state: {
 			expirationTime: number,
-			userName: string },
+			userName: string
+			permissionIds: string[]
+		},
 		tokenInfo: {
 			exp: number,
-			name: string
+			name: string,
+			permissionIds: string[]
 		}
 	) {
 		// setting the expirationtime of the token
 		Vue.set(state, 'expirationTime', tokenInfo.exp)
 		// setting the username
 		Vue.set(state, 'userName', tokenInfo.name)
+		// setting the username
+		Vue.set(state, 'permissionIds', tokenInfo.permissionIds)
 	},
 
 	// function to reset the tokeninfo in the store
 	resetTokenInfo (state: { expirationTime: number }) {
 		Vue.set(state, 'expirationTime', null)
 		Vue.set(state, 'userName', '')
+	},
+
+	checkPermission (state: { permissionIds: string[] }, permissionIdToCheck: string) {
+		console.log(state.permissionIds.includes(permissionIdToCheck))
+		return state.permissionIds.includes(permissionIdToCheck)
+		// return true
 	}
 }
 

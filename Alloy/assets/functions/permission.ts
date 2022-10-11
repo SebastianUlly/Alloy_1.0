@@ -1,26 +1,29 @@
-export function checkPermission (
-	ctx: object,
+import gql from 'graphql-tag'
+
+export async function  checkPermission (
+	apollo: any,
 	permissionId: String
 ) {
-	// ctx.apollo.query({
-	// 	variables: {
-	// 		permissionId
-	// 	},
+	await apollo.defaultClient.query({
+		variables: {
+			permissionId
+		},
 
-	// 	query: gql`
-	// 		query (
-	// 			$permissionId: String
-	// 		) {
-	// 			checkPermission (
-	// 				permissionId: $permissionId
-	// 			) {
-	// 				value
-	// 			}
-	// 		}
-	// 	`
-	// }).then((data) => {
-	// 	console.log(data)
-	// }).catch((error) => {
-	// 	console.log({ error })
-	// })
+		query: gql`
+			query (
+				$permissionId: String
+			) {
+				checkPerimssionId (
+					permissionId: $permissionId
+				)
+			}
+		`
+	}).then((data) => {
+		console.log(data.data.checkPerimssionId)
+		return data.data.checkPerimssionId
+		
+	}).catch((error) => {
+		console.log({ error })
+		return false
+	})
 }

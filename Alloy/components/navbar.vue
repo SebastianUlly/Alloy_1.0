@@ -11,17 +11,15 @@
 		>
 			Data Editor
 		</v-btn>
-		<!-- button to navigate to the schemaEditor, but only if the logged in user is allowed to -->
 		<v-btn
-			v-if="checkPermission('89f18d53-9495-45a1-bf8f-4ed66358a687')"
+			v-if="test"
 			text
 			to="/schemaEditor"
 		>
 			Schema Editor
 		</v-btn>
-		{{ checkPermission('bae13b03-d59f-48b7-8cdf-0eb502e333b6') }}
 		<v-btn
-			v-if="checkPermission('bae13b03-d59f-48b7-8cdf-0eb502e333b6')"
+			
 			text
 			to="/frontEnd"
 		>
@@ -47,7 +45,6 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import gql from 'graphql-tag'
 
 // import { checkPermission } from '~/assets/functions/permission'
 
@@ -55,7 +52,11 @@ export default {
 	computed: {
 		...mapGetters({
 			tokenExpirationTime: 'authentication/getExpirationTime'
-		})
+		}),
+
+		test () {
+			return this.$store.commit('authentication/checkPermission', '3fde6c2c-0867-4aba-9442-f4eeccf467ff')
+		}
 	},
 
 	methods: {
@@ -66,32 +67,8 @@ export default {
 			this.$store.commit('authentication/resetTokenInfo')
 			// redirecting the client to the startpage
 			this.$router.push('/')
-		},
-
-		checkPermission (permissionId) {
-			let result
-			this.$apollo.query({
-				variables: {
-					permissionId
-				},
-
-				query: gql`
-					query (
-						$permissionId: String
-					) {
-						checkPerimssionId (
-							permissionId: $permissionId
-						)
-					}
-				`
-			}).then((data) => {
-				console.log('permission-boolean: ', data.data.checkPerimssionId)
-				result = data.data.checkPerimssionId
-			}).catch((error) => {
-				console.log({ error })
-			})
-			return result
 		}
+		
 	},
 }
 </script>
