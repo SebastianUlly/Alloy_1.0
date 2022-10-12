@@ -5,6 +5,7 @@
 			<div class="topSection">
 				<!-- the button sets the popUp variable true and the popUp window will appear -->
 				<v-btn
+					v-if="checkPermissionIdsHere('a9c5c480-c9d9-4564-9e21-3c78c493f203')"
 					style="min-width:0"
 					class="addProject"
 					color="green"
@@ -17,8 +18,8 @@
 				</v-btn>
 				<!-- the search container contains the events of searchComponent and the yearSelector -->
 				<div class="searchContainer">
-					<selectYear class="selectYearComponent" @sendYear="captureMyYear" />
-					<search @sendValue="captureMySearchValue"/>
+					<selectYear class="selectYearComponent" @sendYear="captureMyYear" v-if="checkPermissionIdsHere('b77ac80c-39ea-4550-b04c-843ad07a3672')"/>
+					<search @sendValue="captureMySearchValue" v-if="checkPermissionIdsHere('b77ac80c-39ea-4550-b04c-843ad07a3672')"/>
 				</div>
 			</div>
 			<!-- the body div contains the data table and the popUp component if its opened -->
@@ -33,7 +34,7 @@
 				<!-- the headers must be filled up with the data from the schema -->
 				<!-- custom sorting, styleing settings can be made here -->
 				<v-data-table
-					v-if="headers && items"
+					v-if="headers && items && checkPermissionIdsHere('576f02ff-7e02-401c-872e-ab3a2972ca2b')"
 					:headers="headers"
 					:items="items"
 					:items-per-page="20"
@@ -50,17 +51,20 @@
 							<!-- the icons div contains the action icons and buttons-->
 							<div class="icons">
 								<!-- the first icon is a timer watch with a small pencil at the corner, its open the set time popup-->
-								<v-icon>
-									mdi-timer-edit-outline
-								</v-icon>
+								<button v-if="checkPermissionIdsHere('658c3149-1004-4ab9-9c1c-032390a61497')">
+									<v-icon>
+										mdi-timer-edit-outline
+									</v-icon>
+								</button>
 								<!-- the pencil icon is in the middle, it opens the edit project popUp -->
-								<button @click="openEditProject(item)">
+								<button @click="openEditProject(item)" v-if="checkPermissionIdsHere('b4ac64b2-48ab-4509-84bf-d82e3196c1d1')">
 									<v-icon> 
 										mdi-pencil-outline
 									</v-icon>
 								</button>
 								<!-- copy to the clipboard icon is the last icon, if clicked, calls the copyToClipboard functioin and the snackbar function, copyes the text to the clipboard -->
 								<button
+									v-if="checkPermissionIdsHere('006f7d44-7c87-4292-990f-31385e56dfb8')"
 									@click=copyToClipboard(item) 
 									class="copyIcon"
 									:ref="item.id"
@@ -96,6 +100,7 @@ import selectYear from "~/components/frontEnd/selectYear";
 import popUp from "~/components/frontEnd/lib/popUp";
 import { MainDirectory } from '~/assets/directoryClasses'
 import { mergeSchemas } from '~/assets/classes/objectClasses'
+import { checkPermissionId } from '~/assets/functions/permission'
 export default {
 	components: {
     search,
@@ -264,7 +269,8 @@ export default {
 					for (const item of [...this.querySchemaById.elements, ...this.querySchemaById.metadata?.metadata_elements]) {
 						//if the element ID is the same as we need, it will push the label and add the elementIdToFind to the label
 						if (item.elementId === elementIdToFind) {
-							if(item.label === "Jahr"){
+							
+							if(item.label === "Jahr" && this.checkPermissionIdsHere(item.permissionId)){
 								this.headers.push({
 									text: item.label,
 									align:'center',
@@ -278,7 +284,7 @@ export default {
 									}
 								})	
 							}
-							 else if(item.label === "Nummer"){
+							else if(item.label === "Nummer"){
 								this.headers.push({
 									text: item.label,
 									width:"5%",
@@ -359,6 +365,12 @@ export default {
 				this.$store.commit('directory/setToStoreDirectory', directory)
 			}
 		},
+		checkPermissionIdsHere (arg) {
+			if (this.permissions) {
+				return checkPermissionId(this.permissions, arg)
+			}
+			return false
+		}
     },
     watch: {
 		// watcher to react to changes in the directory when it is called from the API
@@ -403,7 +415,8 @@ export default {
     },
     computed: {
         ...mapGetters({
-            getDirectory: "directory/getDirectory"
+            getDirectory: "directory/getDirectory",
+			permissions: 'authentication/getPermissionIds'
         })
     },
 };

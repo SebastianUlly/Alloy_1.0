@@ -19,7 +19,7 @@
 			Schema Editor
 		</v-btn>
 		<v-btn
-			v-if="checkPermissionIdsHere('435b48cc-5a55-4980-9880-73e7f40f5471')"
+			v-if="checkPermissionIdsHere('f4c526cb-95af-44db-8902-81bc7bcc9059')"
 			text
 			to="/frontEnd"
 		>
