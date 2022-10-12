@@ -12,14 +12,14 @@
 			Data Editor
 		</v-btn>
 		<v-btn
-			v-if="test"
+			v-if="checkPermissionIdsHere('3fde6c2c-0867-4aba-9442-f4eeccf467ff')"
 			text
 			to="/schemaEditor"
 		>
 			Schema Editor
 		</v-btn>
 		<v-btn
-			
+			v-if="checkPermissionIdsHere('435b48cc-5a55-4980-9880-73e7f40f5471')"
 			text
 			to="/frontEnd"
 		>
@@ -47,16 +47,16 @@
 import { mapGetters } from 'vuex'
 
 // import { checkPermission } from '~/assets/functions/permission'
+import { checkPermissionId } from '~/assets/functions/permission'
 
 export default {
 	computed: {
 		...mapGetters({
-			tokenExpirationTime: 'authentication/getExpirationTime'
+			tokenExpirationTime: 'authentication/getExpirationTime',
+			permissions: 'authentication/getPermissionIds'
 		}),
 
-		test () {
-			return this.$store.commit('authentication/checkPermission', '3fde6c2c-0867-4aba-9442-f4eeccf467ff')
-		}
+		
 	},
 
 	methods: {
@@ -67,8 +67,14 @@ export default {
 			this.$store.commit('authentication/resetTokenInfo')
 			// redirecting the client to the startpage
 			this.$router.push('/')
+		},
+
+		checkPermissionIdsHere (arg) {
+			if (this.permissions) {
+				return checkPermissionId(this.permissions, arg)
+			}
+			return false
 		}
-		
 	},
 }
 </script>

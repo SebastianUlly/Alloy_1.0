@@ -32,12 +32,6 @@ export const mutations = {
 	resetTokenInfo (state: { expirationTime: number }) {
 		Vue.set(state, 'expirationTime', null)
 		Vue.set(state, 'userName', '')
-	},
-
-	checkPermission (state: { permissionIds: string[] }, permissionIdToCheck: string) {
-		console.log(state.permissionIds.includes(permissionIdToCheck))
-		return state.permissionIds.includes(permissionIdToCheck)
-		// return true
 	}
 }
 
@@ -50,5 +44,9 @@ export const getters = {
 	// getter to get the username
 	getUserName (state: { userName: string }) {
 		return state.userName
+	},
+
+	getPermissionIds (state: { permissionIds: string[] }) {
+		return state.permissionIds
 	}
 }
