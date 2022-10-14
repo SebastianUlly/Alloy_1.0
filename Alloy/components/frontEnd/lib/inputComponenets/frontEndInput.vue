@@ -10,7 +10,7 @@
             ref="inputX">
             <!-- the input becomes the parameters from the parameters prop -->
             <input
-                :disabled="!parameters.editable"
+                :disabled="setEditable(parameters.editable)"
                 :style="'text-align:' + parameters.align"
                 v-model= "inputValue"
                 class="myInput"
@@ -20,6 +20,7 @@
 </template>
 <script>
 import { mapGetters } from "vuex"
+import { checkPermissionId } from '~/assets/functions/permission'
 export default{
     props: {
         elementId:{
@@ -46,6 +47,23 @@ export default{
         }
     },
     methods:{
+        //checks if the permissionId is in the permissions list and sends the permissionId to the checkPermissionId function
+        checkPermissionIdsHere (arg) {
+			if (this.permissions) {
+				return checkPermissionId(this.permissions, arg)
+			}
+			return false
+		},
+        //check if the parameters.editable is a boolian or a permissionId
+        setEditable(value){ 
+            if(typeof value === "boolean"){
+                return !value
+            } 
+            //if it is not a boolean, than use the checkPermissionIdsHere function to return a value
+            else{
+                return !this.checkPermissionIdsHere(value);
+            }
+        },
         //checking the database default value
         setDefaultValue(){
             //console.log(this.data)
@@ -110,11 +128,12 @@ export default{
     },
     created(){
         this.setDefaultValue();
+        this.setEditable();
     },
     computed:{
         ...mapGetters({
             directory : "directory/getDirectory",
-           
+            permissions: 'authentication/getPermissionIds'
         })
     },
      watch: {

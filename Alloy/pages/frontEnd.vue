@@ -8,7 +8,8 @@
 <script>
 import projektListe from "~/components/frontEnd/projektListe";
 import Cookie from 'js-cookie'
-
+import Vue from 'vue'
+Vue.prototype.$hostname = 'your variable name'
 export default {
     components: {
       	projektListe
@@ -16,10 +17,12 @@ export default {
 
 	created () {
 		this.getToken()
+		
 	},
-
+	
 	methods: {
 		getToken () {
+			
 			const token = Cookie.get('apollo-token')
 			// if a token is found
 			if (token) {
@@ -31,7 +34,7 @@ export default {
 				const payload = JSON.parse(window.atob(base64))
 
 				// console.log(payload)
-
+				
 				// coomiting the payload to the store
 				this.$store.commit('authentication/setTokenInfo', payload)
 			}

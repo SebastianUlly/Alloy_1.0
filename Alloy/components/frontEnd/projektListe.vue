@@ -131,6 +131,7 @@ export default {
 			popUpSchema: null,
 			ids:["ca78b111-d1f0-4b4b-b82c-c7e727804b0b", "77ffa6dc-8676-4ee3-acae-d12697f608a1"],
 			clickedFile:""
+			
         };
     },
     apollo: {
@@ -264,6 +265,8 @@ export default {
 			this.year = myYear;
 		},
         dataFill() {
+			console.log(this.checkPermissionIdsHere('a9c5c480-c9d9-4564-9e21-3c78c493f203'))
+			console.log(this.$hostname)
 			this.headers = []
 			this.items = []
 			if (this.querySchemaById && this.directory && this.fileBySchemaId && this.files && this.schema) {
