@@ -38,6 +38,7 @@
                         @getCurrentFolderId="setParentId"
                         :elementIdToSearch="clickedFile"
                         :data="sendDataToInputs"
+                        :permissions="item.permissions"
 				    />
             </div>
         </div>
@@ -79,8 +80,6 @@ export default {
     data(){
         return{
             payload:"",
-            nestedArray: null,
-            nestedArrayElements: null,
             icon: "",
             sendDataToInputs: {}
         }
@@ -170,7 +169,7 @@ export default {
             this.$emit('closeNewProject', false);
         },
         createNewFile(){
-            console.log(this.clickedFile)
+            //console.log(this.clickedFile)
             //when clickedFile exists than it will commit the correct elementId, schemaId and parentId
             if(this.clickedFile) {
                 this.$store.commit("file/setFileIdToEnteredValues", this.clickedFile);

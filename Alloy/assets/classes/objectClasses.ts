@@ -113,8 +113,10 @@ import _ from 'lodash';
 export function mergeSchemas (destination, source){
 	 let id =  source.id;
 	 let label = source.label;
+	 /* Merging the metadata of the destination and source. */
 	 let metadata =_.merge(destination.metadata, source.metadata);
 	 let elements = [];
+	 /* Merging two objects. */
 	 for(let destinationItem of destination.elements){
 		let foundPair = false;
 		for(let sourceItem of source.elements){
@@ -128,7 +130,7 @@ export function mergeSchemas (destination, source){
 			elements.push(destinationItem);
 		}
 	 }
-
+	//console.log(elements)
 	return {
 		id: id,
 		label: label,

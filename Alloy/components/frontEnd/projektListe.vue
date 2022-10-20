@@ -237,6 +237,7 @@ export default {
 		},
 		//set the boolean variable true and the popUp opens
 		openNewProject(value){
+			this.$store.commit("file/resetEnteredData")
 			this.clickedFile = null;
 			this.popUp = value;
 			this.getDataForPopUp(["ca78b111-d1f0-4b4b-b82c-c7e727804b0b"]);
@@ -265,7 +266,6 @@ export default {
 			this.year = myYear;
 		},
         dataFill() {
-			console.log(this.checkPermissionIdsHere('a9c5c480-c9d9-4564-9e21-3c78c493f203'))
 			console.log(this.$hostname)
 			this.headers = []
 			this.items = []
@@ -329,12 +329,14 @@ export default {
 					}
 				}
 				//pushing the actions row to the headers
-				this.headers.push({
-					text: "Actions",
-					align:'center',
-					sortable: false,
-					value: "actions"
-				});
+				if(this.checkPermissionIdsHere('1acc9577-f847-4c8a-bc58-b32812d16ce6')){
+					this.headers.push({
+						text: "Actions",
+						align:'center',
+						sortable: false,
+						value: "actions"
+					});
+				}
 				for (const rawItem of this.fileBySchemaId) {
 					if (this.directory[0].hierarchy.some(e => e.fileId === rawItem.id)) {
 						//reseting the temorary new row
@@ -377,10 +379,10 @@ export default {
 				this.$store.commit('directory/setToStoreDirectory', directory)
 			}
 		},
-		//checks if the permissionId is in the permissions list and sends the permissionId to the checkPermissionId function
+		//checks if the permissionId is in the permissionIds list and sends the permissionId to the checkPermissionId function
 		checkPermissionIdsHere (arg) {
-			if (this.permissions) {
-				return checkPermissionId(this.permissions, arg)
+			if (this.permissionIds) {
+				return checkPermissionId(this.permissionIds, arg)
 			}
 			return false
 		}
@@ -429,7 +431,7 @@ export default {
     computed: {
         ...mapGetters({
             getDirectory: "directory/getDirectory",
-			permissions: 'authentication/getPermissionIds'
+			permissionIds: 'authentication/getPermissionIds'
         })
     },
 };

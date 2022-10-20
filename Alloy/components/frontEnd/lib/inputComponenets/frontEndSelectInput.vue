@@ -6,7 +6,7 @@
         </div>
         <div class="inputDiv">
             <!-- the selector loads the select options -->
-            <select class="myInput" v-model="inputValue" type="text">
+            <select class="myInput" v-model="inputValue" :disabled="setEditable(permissions.toEdit)" type="text">
                 <!-- writing out the optioins -->
                 <option
                 v-for="(item, index) in files"
@@ -15,11 +15,14 @@
             </select>
         </div>
         <!-- dropdown arrow -->
-        <v-icon class="mdi-chevron">mdi-chevron-down</v-icon>
+        <v-icon class="mdi-chevron" v-if="!setEditable(permissions.toEdit)">mdi-chevron-down</v-icon>
     </div>
 </template>
 <script>
+import { VariablesInAllowedPositionRule } from "graphql";
 import gql from "graphql-tag";
+import { mapGetters } from "vuex";
+import { checkPermissionId } from '~/assets/functions/permission'
 export default{
     props: {
         elementId: {
@@ -36,6 +39,9 @@ export default{
         },
         data:{
             type: Object
+        },
+        permissions:{
+            type: Object
         }
     },
     data(){
@@ -45,6 +51,24 @@ export default{
         }
     },
     methods:{
+         //checks if the permissionId is in the permissions list and sends the permissionId to the checkPermissionId function
+        checkPermissionIdsHere (arg) {
+			if (this.permissionIds) {
+				return checkPermissionId(this.permissionIds, arg)
+			}
+			return false
+		},
+         //check if the permissions.toEdit is a boolian or a permissionId
+        setEditable(value){
+            
+            if(typeof value === "boolean"){
+                return !value
+            } 
+            //if it is not a boolean, than use the checkPermissionIdsHere function to return a value
+            else{
+                return !this.checkPermissionIdsHere(value);
+            }
+        },
         setValue(){
             if(this.elementIdToSearch && this.elementId !=="75e96f94-0103-4804-abc0-5331ea980e9b" && this.data != undefined){
                 this.inputValue = (this.data.data.find(item => item.elementId === this.elementId).data.text)
@@ -100,6 +124,14 @@ export default{
             }
         }
     },
+    created(){
+        this.setEditable();
+    },
+    computed:{
+        ...mapGetters({
+            permissionIds: 'authentication/getPermissionIds'
+        })
+    },
     mounted(){
         this.getfile();
         this.setValue();
@@ -141,6 +173,13 @@ export default{
     outline-offset: 0px;
     outline: none;
 }
+.myInput:disabled{
+    color:gray;
+}
+.inputDiv:has(.myInput:disabled){
+    border-color:gray;
+}
+
 .label{
     position:absolute;
     left: 4px;
@@ -152,6 +191,7 @@ option{
     color: white;
 }
 .mdi-chevron{
+    color:white;
     position: absolute;
     right: 10px;
     top: 4px;

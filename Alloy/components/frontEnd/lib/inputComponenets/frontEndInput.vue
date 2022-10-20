@@ -10,7 +10,7 @@
             ref="inputX">
             <!-- the input becomes the parameters from the parameters prop -->
             <input
-                :disabled="setEditable(parameters.editable)"
+                :disabled="setEditable(permissions.toEdit)"
                 :style="'text-align:' + parameters.align"
                 v-model= "inputValue"
                 class="myInput"
@@ -37,6 +37,9 @@ export default{
         },
         data:{
             type: Object
+        },
+        permissions:{
+            type: Object
         }
     },
     data(){
@@ -47,14 +50,15 @@ export default{
         }
     },
     methods:{
-        //checks if the permissionId is in the permissions list and sends the permissionId to the checkPermissionId function
+        //checks if the permissionId is in the permissionIds list and sends the permissionId to the checkPermissionId function
         checkPermissionIdsHere (arg) {
-			if (this.permissions) {
-				return checkPermissionId(this.permissions, arg)
+			if (this.permissionIds) {
+				return checkPermissionId(this.permissionIds, arg)
+                
 			}
 			return false
 		},
-        //check if the parameters.editable is a boolian or a permissionId
+        //check if the permissions.toEdit is a boolian or a permissionId
         setEditable(value){ 
             if(typeof value === "boolean"){
                 return !value
@@ -102,7 +106,7 @@ export default{
                 } else{
                     inputValue = this.tempValue;
                 } 
-            }   
+            }
         },
         //sends the payload to the parent
         sendEvent(){
@@ -111,6 +115,9 @@ export default{
                 data:{
                     text : this.inputValue
                 }
+            }
+            if(this.parameters.required){
+                
             }
             this.$emit('update', payload);
         },
@@ -124,6 +131,12 @@ export default{
                 this.isInputOkValue = true
                 this.$refs.inputX.classList.remove("myInputError");
             }
+            let temp = {
+                elementId: this.elementId,
+                value: this.isInputOkValue
+            }
+            console.log(temp, "asd")
+            this.$store.commit('file/setIsInputOk', temp)
         }
     },
     created(){
@@ -133,7 +146,7 @@ export default{
     computed:{
         ...mapGetters({
             directory : "directory/getDirectory",
-            permissions: 'authentication/getPermissionIds'
+            permissionIds: 'authentication/getPermissionIds'
         })
     },
      watch: {

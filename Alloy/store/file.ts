@@ -5,7 +5,8 @@ export const state = () => ({
 	data: [],
 	valuesToSave: {},
 	dataToSave: [],
-	fileList: []
+	fileList: [],
+	isInputOk: []
 })
 
 export const mutations = {
@@ -63,6 +64,21 @@ export const mutations = {
 
 	setFileList (state: { fileList: object[] }, fileListToSet: object[]) {
 		Vue.set(state, 'fileList', fileListToSet)
+	},
+	setIsInputOk (state: { isInputOk : {elementId: string, value: boolean}[] }, payload: {elementId: string, value: boolean} ){
+		//state.isInputOk.map(element => payload.find(payloadelement => payloadelement.elementId === element.elementId) || payloadelement)
+
+		if(!state.isInputOk.find(item => item.elementId == payload.elementId)){
+			console.log("sdewewe", state.isInputOk)
+			state.isInputOk.push(payload)
+		}
+		else {
+			let inputElement = state.isInputOk.find(item => item.elementId === payload.elementId)!
+			inputElement.value = payload.value
+		}
+		console.log(state)
+		//console.log(state.isInputOk.every(element => element.value === true));
+		//return state.isInputOk.every(element => element.value === true);
 	}
 }
 

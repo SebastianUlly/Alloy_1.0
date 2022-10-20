@@ -1,11 +1,16 @@
 <template>
 	<v-app-bar id="navbar">
 		<!-- button to navigate to the startpage -->
-		<v-btn text to="/">
+		<v-btn
+			v-if="checkPermissionIdsHere('a78f9e4e-6915-4418-843c-7730a23873f2')"
+			text 
+			to="/"
+		>
 			Home
 		</v-btn>
 		<!-- button to navigate to the dataEditor, but only if the logged in user is allowed to -->
 		<v-btn
+		    v-if="checkPermissionIdsHere('109659e7-d2a0-412a-a7a8-1d0823341a8e')"
 			text
 			to="/dataEditor"
 		>
@@ -26,6 +31,7 @@
 			Front End
 		</v-btn>
 		<v-spacer />
+			{{userName}}
 		<v-btn
 			v-if="tokenExpirationTime && tokenExpirationTime*1000 > (new Date()).getTime()"
 			text
@@ -40,6 +46,7 @@
 		>
 			Login
 		</v-btn>
+		
 	</v-app-bar>
 </template>
 
@@ -53,7 +60,8 @@ export default {
 	computed: {
 		...mapGetters({
 			tokenExpirationTime: 'authentication/getExpirationTime',
-			permissions: 'authentication/getPermissionIds'
+			permissions: 'authentication/getPermissionIds',
+			userName: 'authentication/getUserName'
 		}),
 
 		
