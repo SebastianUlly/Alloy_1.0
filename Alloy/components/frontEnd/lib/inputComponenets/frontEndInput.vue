@@ -131,17 +131,20 @@ export default{
                 this.isInputOkValue = true
                 this.$refs.inputX.classList.remove("myInputError");
             }
-            let temp = {
+            let tempPayload = {
                 elementId: this.elementId,
                 value: this.isInputOkValue
             }
-            console.log(temp, "asd")
-            this.$store.commit('file/setIsInputOk', temp)
+            //sending the elementId and the value to the store
+            this.$store.commit('file/setIsInputOk', tempPayload)   
         }
     },
     created(){
         this.setDefaultValue();
         this.setEditable();
+    },
+    mounted() {
+        this.isInputOk();
     },
     computed:{
         ...mapGetters({

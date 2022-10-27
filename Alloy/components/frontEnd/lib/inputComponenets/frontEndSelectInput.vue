@@ -4,7 +4,7 @@
         <div class="label">
             {{label}}
         </div>
-        <div class="inputDiv">
+        <div class="inputDiv" ref="inputX">
             <!-- the selector loads the select options -->
             <select class="myInput" v-model="inputValue" :disabled="setEditable(permissions.toEdit)" type="text">
                 <!-- writing out the optioins -->
@@ -13,13 +13,13 @@
                 :value="item"
                 >{{item}}</option>
             </select>
+            <v-icon class="mdi-chevron" v-if="!setEditable(permissions.toEdit)">mdi-chevron-down</v-icon>
         </div>
         <!-- dropdown arrow -->
-        <v-icon class="mdi-chevron" v-if="!setEditable(permissions.toEdit)">mdi-chevron-down</v-icon>
+        
     </div>
 </template>
 <script>
-import { VariablesInAllowedPositionRule } from "graphql";
 import gql from "graphql-tag";
 import { mapGetters } from "vuex";
 import { checkPermissionId } from '~/assets/functions/permission'
@@ -47,7 +47,12 @@ export default{
     data(){
         return{
             files:[],
-            inputValue: ""
+            inputValue: "",
+            chevronStyle:{
+                color: 'white',
+                right: '10px',
+                top: '4px',
+            }
         }
     },
     methods:{
@@ -122,6 +127,22 @@ export default{
             {
                 this.files = this.parameters.options
             }
+        },
+        isInputok(){
+            let isInputOkValue = false;
+            if(this.inputValue === "" && this.parameters.required){
+                this.$refs.inputX.classList.add("myInputError");
+                isInputOkValue = false;
+            }
+            else {
+                isInputOkValue = true;
+                this.$refs.inputX.classList.remove("myInputError");
+            }
+            let tempPayload = {
+                elementId: this.elementId,
+                value: isInputOkValue
+            }
+            this.$store.commit('file/setIsInputOk', tempPayload)
         }
     },
     created(){
@@ -135,12 +156,14 @@ export default{
     mounted(){
         this.getfile();
         this.setValue();
+        this.isInputok();
     },
     watch:{
         //if the input value changes calls the sendEvent
         inputValue:{
             handler(){
                 this.sendEvent();
+                this.isInputok();
             }
         }
     }
@@ -165,13 +188,21 @@ export default{
     outline: none;
 }
 .myInput{
-    background-color: rgba(0, 0, 0, 0);
     width: 100%;
     padding-left: 10px;
     padding-top: 4px;
     color:white;
     outline-offset: 0px;
     outline: none;
+}
+.myInputError{
+    height:31px;
+    background-color: #282828;
+    border-style: solid;
+    border-color:rgb(153, 0, 0);
+    border-width: thin;
+    border-radius: 3px;
+    width: 100%;
 }
 .myInput:disabled{
     color:gray;
@@ -195,5 +226,6 @@ option{
     position: absolute;
     right: 10px;
     top: 4px;
+    pointer-events: none;
 }
 </style>

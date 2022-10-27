@@ -5,22 +5,17 @@
             <!-- icon -->
             <div class="infoIcon">
                 <v-icon v-if="icon">
-                    {{icon}}
+                   {{icon}}
                 </v-icon>
             </div>
             <!-- the label -->
-            <span class="label" v-if="popUpSchema.label">
+            <div class="label" v-if="popUpSchema.label">
                 {{popUpSchema.label}}
-            </span> 
+            </div>
             <!-- close button with white background closes the popUp window-->
-            <div  class="closeIcon">
-                <!-- the white background for the close button -->
-                <div class="whiteBackground"></div>
-                <button @click="closeNewProject()">
-                    <!-- the close box is transparent and not white in the middle -->
-                    <v-icon color="red" large>
-                        mdi-close-box
-                    </v-icon>
+            <div class="closeIcon">
+                <button  @click="closeNewProject()">
+                    <img :src="closeButtonImage" alt="">
                 </button>
             </div>
         </div>
@@ -49,6 +44,7 @@
                 class="addButton"
                 @click="selectFunction(popUpSchema.metadata.saveFunction)"
                 :loading="false"
+                :disabled="!readyToSave"
                 color="green"
                 large
                 style="min-width:0"> Speichern </v-btn>
@@ -63,7 +59,7 @@ import { v4 as uuidv4 } from "uuid";
 import { AddEntityToDirectory } from "~/assets/directoryClasses";
 import frontEndInput from "~/components/frontEnd/lib/inputComponenets/frontEndInput";
 import frontEndSelectInput from "~/components/frontEnd/lib/inputComponenets/frontEndSelectInput";
-
+import closeButtonImage from "~/assets/images/close-button.png"
 export default {
     props:{
         popUpSchema:{
@@ -81,7 +77,8 @@ export default {
         return{
             payload:"",
             icon: "",
-            sendDataToInputs: {}
+            sendDataToInputs: {},
+            closeButtonImage: closeButtonImage
         }
     },
 
@@ -90,7 +87,8 @@ export default {
             directory: "directory/getDirectory",
             getDataToSave: "file/getDataToSave",
             getValuesToSave: "file/getValuesToSave",
-            fileList : "file/getFileList"
+            fileList : "file/getFileList",
+            readyToSave: "file/getReadyToSave"
         })
     },
     created(){
@@ -143,6 +141,7 @@ export default {
             this[functionName]();
         },
         searchFile(){
+            this.icon = String(this.popUpSchema?.metadata?.icon);
             if(this.clickedFile){
                 for(let item of this.fileList){
                     if(item.id === this.clickedFile){
@@ -241,6 +240,7 @@ export default {
 			handler () {
                 //updating the icon if its available
                 this.icon = String(this.popUpSchema?.metadata?.icon);
+                
                 //this.createNewFile();
 			}
 		}
@@ -271,16 +271,16 @@ $columns: 12;
 } 
 .popUpTop{
     position: relative;
-    height: 41px;
+    height: 42px;
     width: 425px;
     background-color:#282828;
     border-start-start-radius: 3px;
-    text-align: center;
-    justify-content: center;
-    display: table-cell; 
-    vertical-align: middle;
-    padding: 0 10 0 10;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 5px 8px;
 }
+
 .popUpBody{
     padding: 34px 22px;
 }
@@ -288,16 +288,16 @@ $columns: 12;
     margin-bottom: 20px;
 }
 .label{
+    
     font-size: 20px;
 }
-.infoIcon{
-    float: left;
-    margin-top: 5px;
-    margin-left: 9px;
-}
 .closeIcon{
-    float: right;
-    margin-right: 3px;
+    height:24px;
+    width:24px;
+}
+.closeIcon img{
+    width: 100%;
+    height:auto;
 }
 .whiteBackground{
     position: absolute;
