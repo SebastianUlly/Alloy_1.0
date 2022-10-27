@@ -108,7 +108,36 @@ export function deepCopy (obj) {
 
 	throw new Error("Unable to copy obj! Its type isn't supported.");
 }
-
+import _ from 'lodash';
+//merging schemas with overwrite
+export function mergeSchemas (destination, source){
+	 let id =  source.id;
+	 let label = source.label;
+	 /* Merging the metadata of the destination and source. */
+	 let metadata =_.merge(destination.metadata, source.metadata);
+	 let elements = [];
+	 /* Merging two objects. */
+	 for(let destinationItem of destination.elements){
+		let foundPair = false;
+		for(let sourceItem of source.elements){
+			if(destinationItem.elementId == sourceItem.elementId){
+				foundPair = true;
+				elements.push(_.merge(destinationItem, sourceItem));
+				break;
+			}
+		}
+		if(!foundPair){
+			elements.push(destinationItem);
+		}
+	 }
+	//console.log(elements)
+	return {
+		id: id,
+		label: label,
+		metadata: metadata,
+		elements: elements
+	};
+}
 // export {
 // 	Cloneable
 // }

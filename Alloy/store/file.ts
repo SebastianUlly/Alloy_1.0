@@ -4,7 +4,9 @@ export const state = () => ({
 	values: {},
 	data: [],
 	valuesToSave: {},
-	dataToSave: []
+	dataToSave: [],
+	fileList: [],
+	isInputOk: []
 })
 
 export const mutations = {
@@ -46,7 +48,7 @@ export const mutations = {
 		state.valuesToSave.schemaId = schemaId
 	},
 
-	setEnteredData (state: { dataToSave: { elementId: string, data: any }[] }, payload: { elementId: string, data: any }) {
+	setEnteredData (state: { dataToSave: { elementId: string, data: any }[] }, payload: { elementId: string, data: any}) {
 		const arrayToSave = state.dataToSave
 		const element = arrayToSave.find(item => item.elementId === payload.elementId)
 		if (element) {
@@ -58,6 +60,24 @@ export const mutations = {
 
 	resetEnteredData (state: { dataToSave: object[] }) {
 		state.dataToSave = []
+	},
+
+	setFileList (state: { fileList: object[] }, fileListToSet: object[]) {
+		Vue.set(state, 'fileList', fileListToSet)
+	},
+	setIsInputOk (state: { isInputOk : {elementId: string, value: boolean}[] }, payload: {elementId: string, value: boolean} ){
+		//state.isInputOk.map(element => payload.find(payloadelement => payloadelement.elementId === element.elementId) || payloadelement)
+
+		if(!state.isInputOk.find(item => item.elementId == payload.elementId)){
+			//console.log("sdewewe", state.isInputOk)
+			state.isInputOk.push(payload)
+		}
+		else {
+			let inputElement = state.isInputOk.find(item => item.elementId === payload.elementId)!
+			inputElement.value = payload.value
+		}
+		//console.log(state)
+		
 	}
 }
 
@@ -76,5 +96,12 @@ export const getters = {
 
 	getValuesToSave (state: { valuesToSave: object[] }) {
 		return state.valuesToSave
+	},
+
+	getFileList (state: { fileList: object[] }) {
+		return state.fileList
+	},
+	getReadyToSave (state: { isInputOk: {elementId: string, value: boolean}[]}){
+		return state.isInputOk.every(element => element.value === true);
 	}
 }

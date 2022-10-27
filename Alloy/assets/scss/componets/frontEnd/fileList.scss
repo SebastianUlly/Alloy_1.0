@@ -1,0 +1,50 @@
+ .container{ 
+	display: flex; 
+}
+.table{
+	max-width: 100%;
+}
+.addProject{
+	width:49px;
+	height: 49px;
+}
+.selectYearComponent{
+	margin: 0 10px 0 0;
+}
+.searchContainer{
+	display:flex;
+}
+/*iconts under the actions */
+div.icons{
+	display: flex;
+	gap: 12px;
+}
+.body{
+	margin-top: 25px;
+}
+.topSection{
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+.table{
+   background-color: #1E1E1E !important;
+}
+/*set the color of line */
+ .v-data-table-header th, .v-data-table__wrapper td{
+    border-bottom: thin solid #ffffff73 !important; 
+}
+.copyIcon {
+    color: white;
+}
+.copyIcon.animated i {
+    animation: fadeOut 1s;
+}
+@keyframes fadeOut {
+  	0% {
+      	color: #5bc356;
+  	}
+    100% {
+		color: white;
+  	}
+}

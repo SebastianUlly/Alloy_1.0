@@ -23,7 +23,6 @@
 import { mapGetters } from "vuex";
 import { GetElementData } from "~/assets/classes/alloyClasses";
 import { deepCopy } from "~/assets/classes/objectClasses";
-import ZipCodeList from '~/zipCodeList.json';
 export default {
   props: {
     elementId: {
