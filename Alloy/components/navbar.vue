@@ -30,6 +30,13 @@
 		>
 			Front End
 		</v-btn>
+		<v-btn
+			v-if="checkPermissionIdsHere('3b998b2c-7095-47c3-9d95-3726cf892de5')"
+			text
+			to="/permissionEditor"
+		>
+			Permission Editor
+		</v-btn>
 		<v-spacer />
 			{{userName}}
 		<v-btn
