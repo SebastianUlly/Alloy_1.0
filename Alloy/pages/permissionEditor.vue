@@ -1,24 +1,27 @@
 <template>
 	<div>
 		<h1>Permission Editor</h1>
-		<hr>
-		<v-treeview :items="items"></v-treeview>
+		<PermissionDirectory />
 	</div>
 </template>
 <script>
 import Cookie from 'js-cookie'
-import permissionTree from '~/assets/classes/treeViewArray.js'
+import PermissionDirectory from '~/components/permissionEditor/permissionDirectory.vue'
 export default {
+	components: {
+		PermissionDirectory
+	},
+
 	data(){
 		return{
 			items:[],
 			selection: [],
 		}
 	},
-	async created() {
-		this.getToken()
-		this.items = await permissionTree(this.$apollo)
-	},
+	// async created() {
+	// 	this.getToken()
+	// 	this.items = await permissionTree(this.$apollo)
+	// },
 
 	methods: {
 		getToken () {
