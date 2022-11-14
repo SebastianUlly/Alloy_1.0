@@ -13,8 +13,6 @@
 
 <script>
 import gql from 'graphql-tag'
-import Cookie from 'js-cookie'
-
 import Container from '~/components/container'
 import InfoBox from '~/components/fileDisplay/infoBox'
 

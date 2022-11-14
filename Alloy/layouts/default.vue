@@ -17,6 +17,7 @@ export default {
 		Navbar
 	},
 	mounted () {
+		//on each page runs the getToken() function
 		this.getToken()
 	},
 	methods: {

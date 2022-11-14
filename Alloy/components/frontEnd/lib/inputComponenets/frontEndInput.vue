@@ -70,16 +70,19 @@ export default{
         },
         //checking the database default value
         setDefaultValue(){
-            //console.log(this.data)
+            //checking if the elementId is the id of Number
             if(this.elementIdToSearch && this.elementId !=="75e96f94-0103-4804-abc0-5331ea980e9b" && this.data != undefined){
                 this.inputValue = (this.data.data.find(item => item.elementId === this.elementId).data.text)
             }
             else if(this.elementIdToSearch && this.elementId =="75e96f94-0103-4804-abc0-5331ea980e9b" && this.data != undefined){
                 this.inputValue = this.data.label
             }
+            //if the default value is currentYear, set the defaultValue to the current year
             else if(this.parameters.default === "currentYear"){    
                 this.inputValue = new Date().getFullYear().toString();
-            }else if(this.parameters.default === "consecutiveNumber" &&  this.directory && !this.elementIdToSearch){
+            }
+            //if the defaultValue consecutiveNumber, find the previous largest number of projects and add one
+            else if(this.parameters.default === "consecutiveNumber" &&  this.directory && !this.elementIdToSearch){
                 let currentFolderId = "";
                 for(let item of this.directory){
                      if(item.name == new Date().getFullYear()){

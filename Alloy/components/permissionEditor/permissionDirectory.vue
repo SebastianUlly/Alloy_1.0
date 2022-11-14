@@ -10,9 +10,9 @@
 <script>
 import gql from 'graphql-tag'
 import { NestedDirectory } from '~/assets/directoryClasses'
-
 export default {
 	apollo: {
+		//querying the permission descriptions, id and hierarchy
 		getPermissionDirectory: gql`
             query {
                 getPermissionDirectory{
@@ -30,7 +30,6 @@ export default {
             }
         `
 	},
-
 	data () {
 		return {
 			items: []
@@ -58,7 +57,9 @@ export default {
 	},
 
 	methods: {
+		//creating the array for the TreeView component
 		getNamesToEntitiesInDirectory () {
+			//if both query exists call create the NestedDirectory
 			if (this.getPermissionDirectory && this.permissionFiles) {
 				for (const entity of this.getPermissionDirectory[0].hierarchy) {
 					entity.name = this.permissionFiles.find(item => item.permissionId === entity.permissionId).description
@@ -66,7 +67,6 @@ export default {
 				const directory = new NestedDirectory(this.getPermissionDirectory[0].hierarchy)
 				this.items = directory.unflattenTree(directory.directoryCopy)
 			}
-
 		}
 	}
 }

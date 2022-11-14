@@ -75,6 +75,7 @@ export default{
             }
         },
         setValue(){
+            //if elementIdToSearch and this element is not the Number, set the default value from the database
             if(this.elementIdToSearch && this.elementId !=="75e96f94-0103-4804-abc0-5331ea980e9b" && this.data != undefined){
                 this.inputValue = (this.data.data.find(item => item.elementId === this.elementId).data.text)
             }
@@ -128,6 +129,7 @@ export default{
                 this.files = this.parameters.options
             }
         },
+        //isInputOk a function that changes the color of an input and sets the save button available
         isInputok(){
             let isInputOkValue = false;
             if(this.inputValue === "" && this.parameters.required){

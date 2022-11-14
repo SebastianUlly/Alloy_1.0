@@ -1,18 +1,31 @@
 <template>
-	<div class="background">
+	<div>
+		<subMenu @sendComponentToFrontEnd="openComponent($event)" />
 		<div class="leftSection">
-			<projektListe />
+			<component
+			v-if="component"
+			:is="component"
+			/>
 		</div>
 	</div>
 </template>
 <script>
 import projektListe from "~/components/frontEnd/projektListe";
-import Cookie from 'js-cookie'
-import Vue from 'vue'
-Vue.prototype.$hostname = 'your variable name'
+import subMenu from "~/components/frontEnd/subMenu";
 export default {
+	data(){
+		return{
+			component: "projektListe"
+		}
+	},
     components: {
-      	projektListe
-    }
+      	projektListe,
+		subMenu
+    },
+	methods:{
+		openComponent(component){
+			this.component = component
+		}
+	}
 };
 </script>
