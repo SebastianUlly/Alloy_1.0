@@ -58,6 +58,8 @@ import { mapGetters } from "vuex";
 import { v4 as uuidv4 } from "uuid";
 import { AddEntityToDirectory } from "~/assets/directoryClasses";
 import frontEndInput from "~/components/frontEnd/lib/inputComponenets/frontEndInput";
+import frontEndTimeInput from "~/components/frontEnd/lib/inputComponenets/frontEndTimeInput";
+import frontEndDateInput from "~/components/frontEnd/lib/inputComponenets/frontEndDateInput";
 import frontEndSelectInput from "~/components/frontEnd/lib/inputComponenets/frontEndSelectInput";
 import closeButtonImage from "~/assets/images/close-button.png"
 export default {
@@ -71,7 +73,9 @@ export default {
     },
     components:{
         frontEndInput,
-        frontEndSelectInput
+        frontEndSelectInput,
+        frontEndTimeInput,
+        frontEndDateInput
     },
     data(){
         return{
@@ -312,6 +316,9 @@ $columns: 12;
   flex-wrap: wrap;
   width: 100%;
   gap: $gap-size;
+}
+.empty{
+    opacity: 0;
 }
 .inputAlignCenter{
     align-items: center;

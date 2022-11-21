@@ -1,20 +1,38 @@
 <template>
     <div class="body">
         <!-- the label of the input component -->
-        <div class="label">
-           {{label}}
-        </div>
         <!-- the inputDiv contains the inputfield --> 
-        <div
-            class="inputDiv"
-            ref="inputX">
+       
             <!-- the input becomes the parameters from the parameters prop -->
-            <input
+            <v-menu
+                v-model="menu"
+                :close-on-content-click="false"
+                :nudge-right="40"
+                transition="scale-transition"
+                offset-y
+                min-width="auto">
+            <template v-slot:activator="{ on, attrs }">
+            <v-text-field
+                class="inputDate"
+            
+                v-model="date"
+                :label="label"
+                readonly
+                v-bind="attrs"
+                v-on="on"
+            ></v-text-field>
+            </template>
+            <v-date-picker
+                v-model="date"
+                @input="menu = false"
+            ></v-date-picker>
+            </v-menu>
+            <!-- <input
                 :disabled="setEditable(permissions.toEdit)"
                 :style="'text-align:' + parameters.align"
                 v-model= "inputValue"
                 class="myInput"
-                type="text">
+                type="text"> -->
         </div>
     </div>
 </template>
@@ -46,7 +64,9 @@ export default{
         return{
             inputValue:"",
             isInputOkValue: false,
-            tempValue: ""
+            tempValue: "",
+            date: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
+            menu: false
         }
     },
     methods:{
@@ -54,7 +74,6 @@ export default{
         checkPermissionIdsHere (arg) {
 			if (this.permissionIds) {
 				return checkPermissionId(this.permissionIds, arg)
-                
 			}
 			return false
 		},
@@ -116,7 +135,7 @@ export default{
             const payload = {
                 elementId: this.elementId,
                 data:{
-                    text : this.inputValue
+                    text : this.date
                 }
             }
             if(this.parameters.required){
@@ -128,11 +147,11 @@ export default{
         //sending with an event to the parent componenet if the field  is filled or not
         isInputOk(){
             if(this.inputValue === "" && this.parameters.required){
-                this.$refs.inputX.classList.add("myInputError");
+                
                 this.isInputOkValue = false
             }else{
                 this.isInputOkValue = true
-                this.$refs.inputX.classList.remove("myInputError");
+                
             }
             let tempPayload = {
                 elementId: this.elementId,
@@ -175,7 +194,9 @@ export default{
 .body{
     margin-bottom: 10px;
     position: relative;
-    width:100%;
+}
+.inputDate{
+    height: 40px;
 }
 .inputDiv{
     height:31px;

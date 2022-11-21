@@ -12,6 +12,7 @@
 <script>
 import projektListe from "~/components/frontEnd/projektListe";
 import subMenu from "~/components/frontEnd/subMenu";
+import zeiterfassung from "~/components/frontEnd/zeiterfassung"
 export default {
 	data(){
 		return{
@@ -20,7 +21,8 @@ export default {
 	},
     components: {
       	projektListe,
-		subMenu
+		subMenu,
+		zeiterfassung
     },
 	methods:{
 		openComponent(component){

@@ -2,7 +2,7 @@
     <div class="body">
         <!-- the label of the input component -->
         <div class="label">
-           {{label}}
+           Std
         </div>
         <!-- the inputDiv contains the inputfield --> 
         <div
@@ -12,9 +12,27 @@
             <input
                 :disabled="setEditable(permissions.toEdit)"
                 :style="'text-align:' + parameters.align"
-                v-model= "inputValue"
+                v-model= "inputValueHour"
                 class="myInput"
-                type="text">
+                min="0"
+                type="number">
+        </div>
+        <div class="middle"> :  </div>
+        <div class="labelTwo">
+           Min
+        </div>
+        <div
+            class="inputDiv"
+            ref="inputX">
+            <input
+                :disabled="setEditable(permissions.toEdit)"
+                :style="'text-align:' + parameters.align"
+                v-model= "inputValueMinutes"
+                class="myInput"
+                min="0"
+                max="45"
+                step="15"
+                type="number">
         </div>
     </div>
 </template>
@@ -44,7 +62,8 @@ export default{
     },
     data(){
         return{
-            inputValue:"",
+            inputValueHour:"00",
+            inputValueMinutes:"00",
             isInputOkValue: false,
             tempValue: ""
         }
@@ -116,12 +135,13 @@ export default{
             const payload = {
                 elementId: this.elementId,
                 data:{
-                    text : this.inputValue
+                    text : this.inputValueHour + ":" + this.inputValueMinutes
                 }
             }
             if(this.parameters.required){
                 
             }
+            console.log(payload)
             this.$emit('update', payload);
         },
         //checks if the parameters.required are true and if so, makes the frame of the inputfield red
@@ -162,7 +182,13 @@ export default{
                 this.setDefaultValue();
             }
         },
-        inputValue:{
+        inputValueHour:{
+            handler(){
+                this.isInputOk();
+                this.sendEvent();
+            }
+        },
+        inputValueMinutes:{
             handler(){
                 this.isInputOk();
                 this.sendEvent();
@@ -175,7 +201,9 @@ export default{
 .body{
     margin-bottom: 10px;
     position: relative;
-    width:100%;
+}
+.middle{
+    margin: 3px 3px 0 3px;
 }
 .inputDiv{
     height:31px;
@@ -184,7 +212,7 @@ export default{
     border-color:white;
     border-width: thin;
     border-radius: 3px;
-    width: 100%;
+    width: 50%;
 }
 .inputDiv:has(.myInput:disabled){
     border-color:gray;
@@ -196,7 +224,7 @@ export default{
     border-color:rgb(153, 0, 0);
     border-width: thin;
     border-radius: 3px;
-    width: 100%;
+    width: 50%;
 }
 .myInput:focus-visible{
     outline: none;
@@ -215,6 +243,13 @@ export default{
     color: white;
     position:absolute;
     left: 4px;
+    top: -15px;
+    font-size: 11px;
+}
+.labelTwo{
+    color: white;
+    position:absolute;
+    left: 70px;
     top: -15px;
     font-size: 11px;
 }

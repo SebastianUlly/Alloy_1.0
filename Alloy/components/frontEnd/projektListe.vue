@@ -96,6 +96,7 @@
 				{{ text }}
 			</v-snackbar>
 		</ClientOnly>
+		<vue-json-pretty :data="items"/>
 	</div>	
 	
 </template>
@@ -344,7 +345,7 @@ export default {
 				}
 				for (const rawItem of this.fileBySchemaId) {
 					if (this.directory[0].hierarchy.some(e => e.fileId === rawItem.id)) {
-						//reseting the temorary new row
+						//reseting the temporary new row
 						let newRow = {};
 						//merge the elements and the metadata
 						for (const elementIdToFind of this.querySchemaById.metadata.metadata_elements[0].parameters.previewList) {
