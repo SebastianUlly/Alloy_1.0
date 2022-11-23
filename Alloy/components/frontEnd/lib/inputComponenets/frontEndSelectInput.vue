@@ -9,9 +9,20 @@
             <select class="myInput" v-model="inputValue" :disabled="setEditable(permissions.toEdit)" type="text">
                 <!-- writing out the optioins -->
                 <option
+                v-if="files"
                 v-for="(item, index) in files"
                 :value="item"
                 >{{item}}</option>
+                <option
+                v-if="filesFromMiscellaneous"
+                v-for="(item, index) in filesFromMiscellaneous"
+                :value="item.id"
+                >{{item.name}}</option>
+                <option
+                v-if="filesProject"
+                v-for="(item, index) in filesProject"
+                :value="item.id"
+                >{{item.data[0].data.text}}-{{item.label}}-{{item.data[3].data.text}}-{{item.data[1].data.text}}-{{item.data[2].data.text}}</option>
             </select>
             <v-icon class="mdi-chevron" v-if="!setEditable(permissions.toEdit)">mdi-chevron-down</v-icon>
         </div>
@@ -52,8 +63,20 @@ export default{
                 color: 'white',
                 right: '10px',
                 top: '4px',
-            }
+            },
+            filesFromMiscellaneous:[],
+            filesProject:[]
         }
+    },
+    apollo:{
+        directory: gql `
+			query egal{
+				directory{
+					id
+					hierarchy
+				} 
+			}
+		`
     },
     methods:{
          //checks if the permissionId is in the permissions list and sends the permissionId to the checkPermissionId function
@@ -98,35 +121,62 @@ export default{
             //querying the Apotheken of the selectable schema
             if(this.parameters?.selectableSchema){
                 this.$apollo.query({
-                variables: {
-                    schemaId: this.parameters?.selectableSchema,
-                },
-                query: gql`
-                    query ($schemaId: String) {
-                        fileBySchemaId(schemaId: $schemaId) {
-                            id
-                            label
-                            data
+                    variables: {
+                        schemaId: this.parameters?.selectableSchema,
+                    },
+                    query: gql`
+                        query ($schemaId: String) {
+                            fileBySchemaId(schemaId: $schemaId) {
+                                id
+                                label
+                                data
+                            }
+                        }
+                    `,
+                //filling the files array with the data of fileBySchemaId.data where elementData.elementId (name field of an apotheke) is the same
+                }).then((data) => {
+                    /* if(data.data.fileBySchemaId){
+                        for(const item of data?.data?.fileBySchemaId){
+                            if(this.directory[0].hierarchy.some(e => e.fileId === item.id)){
+                                this.filesProject.push(item)
+                            }
                         }
                     }
-                `,
-            //filling the files array with the data of fileBySchemaId.data where elementData.elementId (name field of an apotheke) is the same
-            }).then((data) => {
-                const temp = data.data.fileBySchemaId;
-                this.files = temp.map(
-                    function (item, index, array) {
-                        return item.data.find(
-                            (elementData) => elementData.elementId === "91f42e63-98b4-462b-bf65-58b416718cb0"
-                        )?.data?.text;
-                    }
-                )
-            }).catch((error) => {
-                console.log({ error });
-            });
+                    else{ */
+                        const temp = data.data.fileBySchemaId;
+                        console.log(temp)
+                        this.files = temp.map(
+                            function (item, index, array) {
+                                return item.data.find(
+                                    (elementData) => elementData.elementId === "91f42e63-98b4-462b-bf65-58b416718cb0"
+                                )?.data?.text;
+                            }
+                        )
+                    //}
+                }).catch((error) => {
+                    console.log({ error });
+                });
             //if its not an pharmacy than fills it with the parameters.options from the parent component
-            }else if(this.parameters.options)
-            {
+            }else if(this.parameters.options) {
                 this.files = this.parameters.options
+            }
+            else if(this.parameters?.optionSource){
+                this.$apollo.query({
+					variables:{
+						id: this.parameters.optionSource
+					},
+					query: gql`
+						query($id: String){
+							miscellaneousById( id: $id){
+								id
+								label
+								data
+							}
+						}
+					`
+				}).then((data) => {
+                  this.filesFromMiscellaneous = data.data.miscellaneousById.data
+                })
             }
         },
         //isInputOk a function that changes the color of an input and sets the save button available

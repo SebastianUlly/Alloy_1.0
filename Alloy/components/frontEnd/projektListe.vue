@@ -190,6 +190,27 @@ export default {
     },
 
     methods: {
+		getPharmacyAbb(pharmacyId){
+			let query =
+			this.$apollo.query({
+				variables: {
+						id: pharmacyId
+					},
+				query: gql`
+					query ($id: String){
+						queryFileData(id: $id){
+							id
+							label
+							data
+						}
+					}
+				`
+			}).then((data) => {
+				return data;
+				//console.log(data.data.queryFileData.data[0])
+			})
+			return query;
+		},
 		// function that is called when the project has been successfully saved
 		projectSaved () {
 			// refetching of all the files
@@ -355,7 +376,12 @@ export default {
 							let currentKey = this.headers.find(item => item.elementId === elementIdToFind)?.value;
 							//setting the currentValue default to undefined
 							let currentValue;
-							if (currentItem) {
+							if(currentKey === 'Apotheke'){
+								console.log(this.getPharmacyAbb(currentItem.data.text))
+								let temp = this.getPharmacyAbb(currentItem.data.text)
+								//currentValue = temp.data.find(item => item.elementId === "91f42e63-98b4-462b-bf65-58b416718cb0").text
+							}
+							else if (currentItem) {
 								//if the currentItem exists sets to the currentValue of currentItem.data.text or to an empty string
 								currentValue = currentItem.data.text ?? "";
 							}
@@ -363,6 +389,7 @@ export default {
 								//if the data was not in elements than it muss be the label of rawItem
 								currentValue = rawItem.label;
 							}
+							
 							//if the currentKey and the currentValue not undefined, than set the newRows value to currentValue
 							if (currentKey && currentValue) {
 								newRow[currentKey] = currentValue;

@@ -249,7 +249,7 @@ export default {
 </script>
 <style>
 .addProject{
-	width:49px;
+	width: 49px;
 	height: 49px;
 }
 </style>

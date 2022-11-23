@@ -61,6 +61,7 @@ import frontEndInput from "~/components/frontEnd/lib/inputComponenets/frontEndIn
 import frontEndTimeInput from "~/components/frontEnd/lib/inputComponenets/frontEndTimeInput";
 import frontEndDateInput from "~/components/frontEnd/lib/inputComponenets/frontEndDateInput";
 import frontEndSelectInput from "~/components/frontEnd/lib/inputComponenets/frontEndSelectInput";
+import frontEndTextArea from "~/components/frontEnd/lib/inputComponenets/frontEndTextArea";
 import closeButtonImage from "~/assets/images/close-button.png"
 export default {
     props:{
@@ -75,7 +76,8 @@ export default {
         frontEndInput,
         frontEndSelectInput,
         frontEndTimeInput,
-        frontEndDateInput
+        frontEndDateInput,
+        frontEndTextArea
     },
     data(){
         return{

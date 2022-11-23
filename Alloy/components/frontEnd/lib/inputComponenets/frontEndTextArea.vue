@@ -9,12 +9,13 @@
             class="inputDiv"
             ref="inputX">
             <!-- the input becomes the parameters from the parameters prop -->
-            <input
+            <textarea
                 :disabled="setEditable(permissions.toEdit)"
                 :style="'text-align:' + parameters.align"
                 v-model= "inputValue"
                 class="myInput"
                 type="text">
+            </textarea>
         </div>
     </div>
 </template>
@@ -76,9 +77,6 @@ export default{
             }
             else if(this.elementIdToSearch && this.elementId =="75e96f94-0103-4804-abc0-5331ea980e9b" && this.data != undefined){
                 this.inputValue = this.data.label
-            }
-            else if (this.parameters.default === "currentUser"){
-                this.inputValue = this.userName
             }
             //if the default value is currentYear, set the defaultValue to the current year
             else if(this.parameters.default === "currentYear"){    
@@ -155,8 +153,7 @@ export default{
     computed:{
         ...mapGetters({
             directory : "directory/getDirectory",
-            permissionIds: 'authentication/getPermissionIds',
-            userName: 'authentication/getUserName'
+            permissionIds: 'authentication/getPermissionIds'
         })
     },
      watch: {
@@ -179,10 +176,8 @@ export default{
 .body{
     margin-bottom: 10px;
     position: relative;
-    width:100%;
 }
 .inputDiv{
-    height:31px;
     background-color: #282828;
     border-style: solid;
     border-color:white;
@@ -194,7 +189,6 @@ export default{
     border-color:gray;
 }
 .myInputError{
-    height:31px;
     background-color: #282828;
     border-style: solid;
     border-color:rgb(153, 0, 0);
@@ -206,6 +200,7 @@ export default{
     outline: none;
 }
 .myInput{
+    min-height: 100px;
     padding: 3px 5px 0 5px;
     width: 100%;
     color:white;
