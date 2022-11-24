@@ -110,6 +110,7 @@ import popUp from "~/components/frontEnd/lib/popUp";
 import { MainDirectory } from '~/assets/directoryClasses'
 import { mergeSchemas } from '~/assets/classes/objectClasses'
 import { checkPermissionId } from '~/assets/functions/permission'
+import { data } from "browserslist";
 export default {
 	components: {
     search,
@@ -136,8 +137,9 @@ export default {
 			popUpSchema: null,
 			ids:["ca78b111-d1f0-4b4b-b82c-c7e727804b0b", "77ffa6dc-8676-4ee3-acae-d12697f608a1"],
 			clickedFile:"",
-			isActionAvailable: 0
-			
+			isActionAvailable: 0,
+			pharmacyAbb:{},
+			isFillingData: false
         };
     },
     apollo: {
@@ -190,26 +192,25 @@ export default {
     },
 
     methods: {
-		getPharmacyAbb(pharmacyId){
-			let query =
-			this.$apollo.query({
-				variables: {
-						id: pharmacyId
-					},
-				query: gql`
-					query ($id: String){
-						queryFileData(id: $id){
-							id
-							label
-							data
+		async getPharmacyAbb(pharmacyId){
+			if(!this.pharmacyAbb[pharmacyId]){
+				this.pharmacyAbb[pharmacyId]=(
+				await this.$apollo.query({
+					variables: {
+							id: pharmacyId
+						},
+					query: gql`
+						query ($id: String){
+							queryFileData(id: $id){
+								id
+								label
+								data
+							}
 						}
-					}
-				`
-			}).then((data) => {
-				return data;
-				//console.log(data.data.queryFileData.data[0])
-			})
-			return query;
+					`
+				}))
+			}
+			return this.pharmacyAbb[pharmacyId]
 		},
 		// function that is called when the project has been successfully saved
 		projectSaved () {
@@ -292,11 +293,11 @@ export default {
 		captureMyYear(myYear){
 			this.year = myYear;
 		},
-        dataFill() {
-			//console.log(this.$hostname)
-			this.headers = []
-			this.items = []
-			if (this.querySchemaById && this.directory && this.fileBySchemaId && this.files && this.schema) {
+        async dataFill() {
+			if (this.querySchemaById && this.directory && this.fileBySchemaId && this.files && this.schema && !this.isFillingData) {
+				this.headers = []
+				this.items = []
+				this.isFillingData = true;
 				//filling the headers based on previewList
 				for (const elementIdToFind of this.querySchemaById.metadata?.metadata_elements[0].parameters.previewList) {
 					//merge the elements and the metadata
@@ -377,9 +378,9 @@ export default {
 							//setting the currentValue default to undefined
 							let currentValue;
 							if(currentKey === 'Apotheke'){
-								console.log(this.getPharmacyAbb(currentItem.data.text))
-								let temp = this.getPharmacyAbb(currentItem.data.text)
-								//currentValue = temp.data.find(item => item.elementId === "91f42e63-98b4-462b-bf65-58b416718cb0").text
+								//console.log(await this.getPharmacyAbb(currentItem.data.text), "asdadasd")
+								let temp = await this.getPharmacyAbb(currentItem.data.text)
+								currentValue = temp.data.queryFileData.data[0].data.text
 							}
 							else if (currentItem) {
 								//if the currentItem exists sets to the currentValue of currentItem.data.text or to an empty string
@@ -401,6 +402,7 @@ export default {
 						this.items.push(newRow);
 					}
 				}
+				this.isFillingData = false;
 			}
         },
 		completeDirectory () {
@@ -424,40 +426,40 @@ export default {
 		// watcher to react to changes in the directory when it is called from the API
 		directory: {
 			deep: true,
-			handler () {
+			async handler () {
 				this.completeDirectory()
-				this.dataFill()
+				await this.dataFill()
 			}
 		},
 		// watcher to react to changes in the files when they are called from the API
 		files: {
 			deep: true,
-			handler () {
+			async handler () {
 				this.completeDirectory()
-				this.dataFill()
+				await this.dataFill()
 			}
 		},
 		// watcher to react to changes in the schema when they are called from the API
 		schema: {
 			deep: true,
-			handler () {
+			async handler () {
 				this.completeDirectory()
-				this.dataFill()
+				await this.dataFill()
 			}
 		},
 		// watcher to react to changes in the projectSchema when it is called from the API
         querySchemaById: {
             deep: true,
-            handler() {
-                this.dataFill();
+            async handler() {
+                await this.dataFill();
             }
         },
 		// watcher to react to changes in the project-files when they are called from the API
 		fileBySchemaId: {
 			deep: true,
-			handler () {
+			async handler () {
 				this.$store.commit('file/setFileList', this.fileBySchemaId)
-				this.dataFill()
+				await this.dataFill()
 			}
 		}
     },
