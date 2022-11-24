@@ -6,7 +6,7 @@
         </div>
         <div class="inputDiv" ref="inputX">
             <!-- the selector loads the select options -->
-            <select class="myInput" v-model="inputValue" :disabled="setEditable(permissions.toEdit)" type="text">
+            <select class="myInput" v-model="inputValue" :disabled="!editable" type="text">
                 <!-- writing out the optioins -->
                 <option
                 v-if="files"
@@ -65,7 +65,8 @@ export default{
                 top: '4px',
             },
             filesFromMiscellaneous:[],
-            filesProject:[]
+            filesProject:[],
+            editable: true
         }
     },
     apollo:{
@@ -88,19 +89,27 @@ export default{
 		},
          //check if the permissions.toEdit is a boolian or a permissionId
         setEditable(value){
-            
             if(typeof value === "boolean"){
-                return !value
+                this.editable = value
             } 
             //if it is not a boolean, than use the checkPermissionIdsHere function to return a value
             else{
-                return !this.checkPermissionIdsHere(value);
+                this.editable = this.checkPermissionIdsHere(value);
             }
         },
         setValue(){
             //if elementIdToSearch and this element is not the Number, set the default value from the database
             if(this.elementIdToSearch && this.elementId !=="75e96f94-0103-4804-abc0-5331ea980e9b" && this.data != undefined){
                 this.inputValue = (this.data.data.find(item => item.elementId === this.elementId).data.text)
+            }
+            if(this.getDataToSave){
+                for(let data of this.getDataToSave){
+                    console.log(data)
+                    if (data.elementId === "90bd2ecc-38e1-4bf4-bffa-cc7d15b8f323" && data.data.text){
+                        console.log("eee")
+                        this.editable = false
+                    }
+                }
             }
         },
         //sending the selected data to the store
@@ -118,7 +127,7 @@ export default{
             if(this.parameters.default){
                 this.inputValue = this.parameters.default;
             }
-            //querying the Apotheken of the selectable schema
+            //querying the pharmacies of the selectable schema
             if(this.parameters?.selectableSchema){
                 this.$apollo.query({
                     variables: {
@@ -135,24 +144,24 @@ export default{
                     `,
                 //filling the files array with the data of fileBySchemaId.data where elementData.elementId (name field of an apotheke) is the same
                 }).then((data) => {
-                    /* if(data.data.fileBySchemaId){
-                        for(const item of data?.data?.fileBySchemaId){
-                            if(this.directory[0].hierarchy.some(e => e.fileId === item.id)){
-                                this.filesProject.push(item)
+                        if (isNaN(parseFloat(data.data.fileBySchemaId[1].label)) && data.data.fileBySchemaId[1].label !== "BOCOM"){
+                            const temp = data.data.fileBySchemaId;
+                            this.files = temp.map(
+                                function (item, index, array) {
+                                    return item.data.find(
+                                        (elementData) => elementData.elementId === "91f42e63-98b4-462b-bf65-58b416718cb0"
+                                    )?.data?.text;
+                                }
+                            )
+                        } else {
+                            for(const item of data?.data?.fileBySchemaId){
+                                if(this.directory[0].hierarchy.some(e => e.fileId === item.id)){
+                                    this.filesProject.push(item)
+                                }
                             }
+
                         }
-                    }
-                    else{ */
-                        const temp = data.data.fileBySchemaId;
-                        console.log(temp)
-                        this.files = temp.map(
-                            function (item, index, array) {
-                                return item.data.find(
-                                    (elementData) => elementData.elementId === "91f42e63-98b4-462b-bf65-58b416718cb0"
-                                )?.data?.text;
-                            }
-                        )
-                    //}
+
                 }).catch((error) => {
                     console.log({ error });
                 });
@@ -202,13 +211,15 @@ export default{
     },
     computed:{
         ...mapGetters({
-            permissionIds: 'authentication/getPermissionIds'
+            permissionIds: 'authentication/getPermissionIds',
+            getDataToSave: "file/getDataToSave"
         })
     },
     mounted(){
         this.getfile();
         this.setValue();
         this.isInputok();
+        this.setEditable(this.permissions.toEdit)
     },
     watch:{
         //if the input value changes calls the sendEvent
@@ -216,6 +227,12 @@ export default{
             handler(){
                 this.sendEvent();
                 this.isInputok();
+            }
+        },
+        getDataToSave:{
+            deep: true,
+            handler(){
+                this.setValue();
             }
         }
     }

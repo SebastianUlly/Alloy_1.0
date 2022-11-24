@@ -204,9 +204,11 @@ export default {
                   //searching the file and the correct year
                   for(const file of this.fileBySchemaId){
                     for(const fileData of file.data){
-                      if(fileData.elementId == "577aa568-345a-47e5-9b71-848d5695bd5d" && currentValue == file.id)
+                      if(fileData.elementId == "577aa568-345a-47e5-9b71-848d5695bd5d" && currentValue == file.id){
                         //bind the two data with each other
                         currentValue = [fileData.data.text, file.label].join('-')
+                        
+                      }
                     }
                   }
                 }
