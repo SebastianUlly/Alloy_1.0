@@ -25,7 +25,7 @@
                 :value="item.id"
                 >{{item.data[0].data.text}}-{{item.label}}-{{item.data[3].data.text}}-{{item.data[1].data.text}}-{{item.data[2].data.text}}</option>
             </select>
-            <v-icon class="mdi-chevron" v-if="!editable">mdi-chevron-down</v-icon>
+            <v-icon class="mdi-chevron" v-if="editable">mdi-chevron-down</v-icon>
         </div>
         <!-- dropdown arrow -->
     </div>
