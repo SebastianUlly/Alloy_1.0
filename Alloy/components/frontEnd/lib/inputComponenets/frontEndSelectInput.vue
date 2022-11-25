@@ -6,6 +6,7 @@
         </div>
         <div class="inputDiv" ref="inputX">
             <!-- the selector loads the select options -->
+            
             <select class="myInput" v-model="inputValue" :disabled="!editable" type="text">
                 <!-- writing out the optioins -->
                 <option
@@ -24,10 +25,9 @@
                 :value="item.id"
                 >{{item.data[0].data.text}}-{{item.label}}-{{item.data[3].data.text}}-{{item.data[1].data.text}}-{{item.data[2].data.text}}</option>
             </select>
-            <v-icon class="mdi-chevron" v-if="!setEditable(permissions.toEdit)">mdi-chevron-down</v-icon>
+            <v-icon class="mdi-chevron" v-if="!editable">mdi-chevron-down</v-icon>
         </div>
         <!-- dropdown arrow -->
-        
     </div>
 </template>
 <script>
@@ -80,6 +80,33 @@ export default{
 		`
     },
     methods:{
+        setEditableByProject(value){
+             console.log("count");
+             this.$apollo.query({
+                variables:{
+                    fileId: value.data.text
+                },
+                query: gql`
+                    query ($fileId: String) {
+                        queryFileData(id: $fileId){
+                            id
+                            label
+                            data
+                            schemaId
+                        }
+                    }
+                
+                `
+             }).then(data => {
+                console.log(data.data.queryFileData)
+             })
+
+             if(value?.data?.text === "d86517b2-7b7b-43d6-aec2-577d1c81dd7b"){
+                this.editable = true
+                console.log(this.label)
+                console.log(value.data.text, this.elementId, this.editable, "inside");
+            }
+        },
          //checks if the permissionId is in the permissions list and sends the permissionId to the checkPermissionId function
         checkPermissionIdsHere (arg) {
 			if (this.permissionIds) {
@@ -93,7 +120,7 @@ export default{
                 this.editable = value
             } 
             //if it is not a boolean, than use the checkPermissionIdsHere function to return a value
-            else{
+            if(typeof value === "string"){
                 this.editable = this.checkPermissionIdsHere(value);
             }
         },
@@ -101,16 +128,7 @@ export default{
             //if elementIdToSearch and this element is not the Number, set the default value from the database
             if(this.elementIdToSearch && this.elementId !=="75e96f94-0103-4804-abc0-5331ea980e9b" && this.data != undefined){
                 this.inputValue = (this.data.data.find(item => item.elementId === this.elementId).data.text)
-            }
-            if(this.getDataToSave){
-                for(let data of this.getDataToSave){
-                    console.log(data)
-                    if (data.elementId === "90bd2ecc-38e1-4bf4-bffa-cc7d15b8f323" && data.data.text){
-                        console.log("eee")
-                        this.editable = false
-                    }
-                }
-            }
+            }   
         },
         //sending the selected data to the store
         sendEvent(){
@@ -119,6 +137,10 @@ export default{
                 data:{
                     text : this.inputValue
                 } 
+            }
+            if(payload.elementId === "90bd2ecc-38e1-4bf4-bffa-cc7d15b8f323"){
+                console.log("sended")
+                this.$root.$emit('sendSelectedProject', payload);
             }
             this.$emit('update', payload);
         },
@@ -144,6 +166,9 @@ export default{
                     `,
                 //filling the files array with the data of fileBySchemaId.data where elementData.elementId (name field of an apotheke) is the same
                 }).then((data) => {
+                        
+                           // 90bd2ecc-38e1-4bf4-bffa-cc7d15b8f323
+                        
                         if (isNaN(parseFloat(data.data.fileBySchemaId[1].label)) && data.data.fileBySchemaId[1].label !== "BOCOM"){
                             const temp = data.data.fileBySchemaId;
                             this.files = temp.map(
@@ -211,15 +236,16 @@ export default{
     },
     computed:{
         ...mapGetters({
-            permissionIds: 'authentication/getPermissionIds',
-            getDataToSave: "file/getDataToSave"
+            permissionIds: 'authentication/getPermissionIds'
         })
     },
     mounted(){
         this.getfile();
-        this.setValue();
         this.isInputok();
         this.setEditable(this.permissions.toEdit)
+        if(this.elementId === "0e2e7998-16ab-4262-9dfe-4137760b0460"){
+            this.$root.$on('sendSelectedProject', data => {this.setEditableByProject(data)})
+        }
     },
     watch:{
         //if the input value changes calls the sendEvent
@@ -227,12 +253,6 @@ export default{
             handler(){
                 this.sendEvent();
                 this.isInputok();
-            }
-        },
-        getDataToSave:{
-            deep: true,
-            handler(){
-                this.setValue();
             }
         }
     }
