@@ -6,24 +6,23 @@
         </div>
         <div class="inputDiv" ref="inputX">
             <!-- the selector loads the select options -->
-            
             <select class="myInput" v-model="inputValue" :disabled="!editable" type="text">
                 <!-- writing out the optioins -->
                 <option
-                v-if="files"
-                v-for="(item, index) in files"
-                :value="item"
+                    v-if="files"
+                    v-for="(item, index) in files"
+                    :value="item"
                 >{{item}}</option>
                 <option
-                v-if="filesFromMiscellaneous"
-                v-for="(item, index) in filesFromMiscellaneous"
-                :value="item.id"
+                    v-if="filesFromMiscellaneous"
+                    v-for="(item, index) in filesFromMiscellaneous"
+                    :value="item.id"
                 >{{item.name}}</option>
                 <option
-                v-if="filesProject"
-                v-for="(item, index) in filesProject"
-                :value="item.id"
-                >{{item.data[0].data.text}}-{{item.label}}-{{item.data[3].data.text}}-{{item.data[1].data.text}}-{{item.data[2].data.text}}</option>
+                    v-if="filesProject"
+                    v-for="(item, index) in filesProject"
+                    :value="item.id"
+                >{{item.year}}-{{item.projectNumber}}</option>
             </select>
             <v-icon class="mdi-chevron" v-if="editable">mdi-chevron-down</v-icon>
         </div>
@@ -81,7 +80,6 @@ export default{
     },
     methods:{
         setEditableByProject(value){
-             console.log("count");
              this.$apollo.query({
                 variables:{
                     fileId: value.data.text
@@ -98,14 +96,72 @@ export default{
                 
                 `
              }).then(data => {
-                console.log(data.data.queryFileData)
+                //console.log(data.data.queryFileData, "data?")
+                this.getPharmacyId(data.data.queryFileData.data.find(data => data.elementId === "09c5ba61-4e52-4a68-afde-bb7334b45b35").data.text)
              })
 
-             if(value?.data?.text === "d86517b2-7b7b-43d6-aec2-577d1c81dd7b"){
+             /* if(value?.data?.text === "d86517b2-7b7b-43d6-aec2-577d1c81dd7b"){
                 this.editable = true
-                console.log(this.label)
                 console.log(value.data.text, this.elementId, this.editable, "inside");
+
+            } */
+        },
+        getPharmacyId(pharmacyId){
+            this.$apollo.query({
+                variables:{
+                    fileId: pharmacyId
+                },
+                query: gql`
+                    query ($fileId: String) {
+                        queryFileData(id: $fileId){
+                            id
+                            label
+                            data
+                            schemaId
+                        }
+                    }
+                
+                `
+             }).then(data => {
+                this.filesFromMiscellaneous = []
+                if(data.data.queryFileData.schemaId == "961fe75d-2d0e-4ccb-8afd-cde072b37380"){
+                    this.editable = false;
+                    this.inputValue = pharmacyId
+                    this.filesFromMiscellaneous.push({name: data.data.queryFileData.data[0].data.text, id: pharmacyId})
+                    //this.getPharmacyNameById()
+                } else {
+                    if(data.data.queryFileData.schemaId == "7c70a676-ef00-432c-bce0-60f7c8b6fb0b"){
+                        this.filesFromMiscellaneous.push({name:data.data.queryFileData.data.find(item => item.elementId === "91f42e63-98b4-462b-bf65-58b416718cb0").data.text, id: pharmacyId})
+                        this.inputValue = pharmacyId
+                        this.getPharmacyNameById(data.data.queryFileData.data.find(data => data.elementId === "09c5ba61-4e52-4a68-afde-bb7334b45b35").data.values)
+                        this.editable = true;
+                    }
+                }
+             })
+        },
+        getPharmacyNameById(ids){
+            for(let id of ids){
+                this.$apollo.query({
+                variables:{
+                    fileId: id
+                },
+                query: gql`
+                    query ($fileId: String) {
+                        queryFileData(id: $fileId){
+                            id
+                            label
+                            data
+                            schemaId
+                        }
+                    }
+                
+                `
+             }).then(data => {
+                this.filesFromMiscellaneous.push({name: data.data.queryFileData.data.find(data => data.elementId === "91f42e63-98b4-462b-bf65-58b416718cb0").data.text, ids})
+             })
             }
+            
+
         },
          //checks if the permissionId is in the permissions list and sends the permissionId to the checkPermissionId function
         checkPermissionIdsHere (arg) {
@@ -139,7 +195,6 @@ export default{
                 } 
             }
             if(payload.elementId === "90bd2ecc-38e1-4bf4-bffa-cc7d15b8f323"){
-                console.log("sended")
                 this.$root.$emit('sendSelectedProject', payload);
             }
             this.$emit('update', payload);
@@ -181,7 +236,12 @@ export default{
                         } else {
                             for(const item of data?.data?.fileBySchemaId){
                                 if(this.directory[0].hierarchy.some(e => e.fileId === item.id)){
-                                    this.filesProject.push(item)
+                                    console.log(item)
+                                    this.filesProject.push({
+                                        id: item.id,
+                                        year: item.data.find(element => element.elementId === "577aa568-345a-47e5-9b71-848d5695bd5d").data.text,
+                                        projectNumber: item.label
+                                    })
                                 }
                             }
 
