@@ -1,34 +1,37 @@
 <template>
-    <div class="body">
+    <div class="timeInputMain">
         <!-- the label of the input component -->
         <div class="label">
            Std
         </div>
-        <!-- the inputDiv contains the inputfield --> 
+        <!-- the inputDiv contains the timeInputs and the ":" --> 
         <div
-            class="inputDiv"
-            ref="inputX">
-            <!-- the input becomes the parameters from the parameters prop -->
+            class="timeInputBackgroundDiv"
+            ref="timeInput">
+            <!-- the hours input -->
             <input
                 :disabled="setEditable(permissions.toEdit)"
                 :style="'text-align:' + parameters.align"
                 v-model= "inputValueHour"
-                class="myInput"
+                class="timeInput"
                 min="0"
                 type="number">
         </div>
-        <div class="middle"> :  </div>
+        <!-- ":" in the middle -->
+        <div class="middle"> : </div>
+        <!-- the minutes div -->
         <div class="labelTwo">
            Min
         </div>
         <div
-            class="inputDiv"
-            ref="inputX">
+            class="timeInputBackgroundDiv"
+            ref="timeInput">
+            <!-- the minutes input -->
             <input
                 :disabled="setEditable(permissions.toEdit)"
                 :style="'text-align:' + parameters.align"
                 v-model= "inputValueMinutes"
-                class="myInput"
+                class="timeInput"
                 min="0"
                 max="45"
                 step="15"
@@ -87,49 +90,6 @@ export default{
                 return !this.checkPermissionIdsHere(value);
             }
         },
-        //checking the database default value
-        setDefaultValue(){
-            //checking if the elementId is the id of Number
-            if(this.elementIdToSearch && this.elementId !=="75e96f94-0103-4804-abc0-5331ea980e9b" && this.data != undefined){
-                this.inputValue = (this.data.data.find(item => item.elementId === this.elementId).data.text)
-            }
-            else if(this.elementIdToSearch && this.elementId =="75e96f94-0103-4804-abc0-5331ea980e9b" && this.data != undefined){
-                this.inputValue = this.data.label
-            }
-            //if the default value is currentYear, set the defaultValue to the current year
-            else if(this.parameters.default === "currentYear"){    
-                this.inputValue = new Date().getFullYear().toString();
-            }
-            //if the defaultValue consecutiveNumber, find the previous largest number of projects and add one
-            else if(this.parameters.default === "consecutiveNumber" &&  this.directory && !this.elementIdToSearch){
-                let currentFolderId = "";
-                for(let item of this.directory){
-                     if(item.name == new Date().getFullYear()){
-                        currentFolderId = item.id;
-                        this.$emit('getCurrentFolderId', item.id)
-                    }
-                }
-                //tempArray is a filtered array that contains the projects with the actual year
-                const tempArray = this.directory.filter(item => item.parentId === currentFolderId)
-                let tempArrayInt = [];
-                //converting the strings to Int for the mathMax function
-                for(let i = 0; i < tempArray.length; i++){
-                    tempArrayInt.push(parseInt(tempArray[i].name))
-                }
-                //search for the biggest number
-                let tempValueInt = Math.max(...tempArrayInt)
-                //adding one to the biggest number and converts back to string
-                this.tempValue = (++tempValueInt).toString()
-                //adding the 0 and 00 to reach the desired format
-                if(this.tempValue.length == 2){
-                    this.inputValue = "0" + this.tempValue;
-                }else if(this.tempValue.length == 1){
-                    this.inputValue = "00" + this.tempValue;
-                } else{
-                    inputValue = this.tempValue;
-                } 
-            }
-        },
         //sends the payload to the parent
         sendEvent(){
             const payload = {
@@ -138,22 +98,23 @@ export default{
                     text : this.inputValueHour + ":" + this.inputValueMinutes
                 }
             }
-            if(this.parameters.required){
-                
-            }
-            console.log(payload)
             this.$emit('update', payload);
         },
         //checks if the parameters.required are true and if so, makes the frame of the inputfield red
         //sending with an event to the parent componenet if the field  is filled or not
         isInputOk(){
+            //if the input value is empty and the input is required
             if(this.inputValue === "" && this.parameters.required){
-                this.$refs.inputX.classList.add("myInputError");
+                //then add the selectError class on the input
+                this.$refs.timeInput.classList.add("timeInputError");
+                //and sets the isUnputOkValue flase
                 this.isInputOkValue = false
             }else{
+                //else delete the class from the input and set the isInputOkValue true
                 this.isInputOkValue = true
-                this.$refs.inputX.classList.remove("myInputError");
+                this.$refs.timeInput.classList.remove("timeInputError");
             }
+            //at the end create the temp payload with the elementId and with the isInputOkValue
             let tempPayload = {
                 elementId: this.elementId,
                 value: this.isInputOkValue
@@ -163,7 +124,6 @@ export default{
         }
     },
     created(){
-        this.setDefaultValue();
         this.setEditable();
     },
     mounted() {
@@ -171,17 +131,11 @@ export default{
     },
     computed:{
         ...mapGetters({
-            directory : "directory/getDirectory",
+            /* directory : "directory/getDirectory", */
             permissionIds: 'authentication/getPermissionIds'
         })
     },
      watch: {
-        direcotry:{
-            deep: true,
-            handler(){
-                this.setDefaultValue();
-            }
-        },
         inputValueHour:{
             handler(){
                 this.isInputOk();
@@ -198,14 +152,14 @@ export default{
 }
 </script>
 <style scoped>
-.body{
+.timeInputMain{
     margin-bottom: 10px;
     position: relative;
 }
 .middle{
     margin: 3px 3px 0 3px;
 }
-.inputDiv{
+.timeInputBackgroundDiv{
     height:31px;
     background-color: #282828;
     border-style: solid;
@@ -214,10 +168,10 @@ export default{
     border-radius: 3px;
     width: 50%;
 }
-.inputDiv:has(.myInput:disabled){
+.timeInputBackgroundDiv:has(.timeInput:disabled){
     border-color:gray;
 }
-.myInputError{
+.timeInputError{
     height:31px;
     background-color: #282828;
     border-style: solid;
@@ -226,17 +180,17 @@ export default{
     border-radius: 3px;
     width: 50%;
 }
-.myInput:focus-visible{
+.timeInputBackgroundDiv:focus-visible{
     outline: none;
 }
-.myInput{
+.timeInput{
     padding: 3px 5px 0 5px;
     width: 100%;
     color:white;
     outline-offset: 0px;
     outline: none;
 }
-.myInput:disabled{
+.timeInput:disabled{
     color:gray;
 }
 .label{
@@ -253,7 +207,4 @@ export default{
     top: -15px;
     font-size: 11px;
 }
-/* .body:has(.myInput:disabled) .label{
-    color: grey;
-} */
 </style>

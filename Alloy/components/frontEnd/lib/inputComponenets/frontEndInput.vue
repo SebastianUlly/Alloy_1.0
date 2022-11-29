@@ -1,19 +1,19 @@
 <template>
-    <div class="body">
+    <div class="inputMain">
         <!-- the label of the input component -->
         <div class="label">
            {{label}}
         </div>
-        <!-- the inputDiv contains the inputfield --> 
+        <!-- the inputDivBackground contains the inputfield --> 
         <div
-            class="inputDiv"
-            ref="inputX">
+            class="inputDivBackground"
+            ref="inputDiv">
             <!-- the input becomes the parameters from the parameters prop -->
             <input
                 :disabled="setEditable(permissions.toEdit)"
                 :style="'text-align:' + parameters.align"
                 v-model= "inputValue"
-                class="myInput"
+                class="input"
                 type="text">
         </div>
     </div>
@@ -131,11 +131,11 @@ export default{
         //sending with an event to the parent componenet if the field  is filled or not
         isInputOk(){
             if(this.inputValue === "" && this.parameters.required){
-                this.$refs.inputX.classList.add("myInputError");
+                this.$refs.inputDiv.classList.add("inputError");
                 this.isInputOkValue = false
             }else{
                 this.isInputOkValue = true
-                this.$refs.inputX.classList.remove("myInputError");
+                this.$refs.inputDiv.classList.remove("inputError");
             }
             let tempPayload = {
                 elementId: this.elementId,
@@ -176,12 +176,12 @@ export default{
 }
 </script>
 <style scoped>
-.body{
+.inputMain{
     margin-bottom: 10px;
     position: relative;
     width:100%;
 }
-.inputDiv{
+.inputDivBackground{
     height:31px;
     background-color: #282828;
     border-style: solid;
@@ -190,10 +190,10 @@ export default{
     border-radius: 3px;
     width: 100%;
 }
-.inputDiv:has(.myInput:disabled){
+.inputDivBackground:has(.input:disabled){
     border-color:gray;
 }
-.myInputError{
+.inputError{
     height:31px;
     background-color: #282828;
     border-style: solid;
@@ -202,17 +202,17 @@ export default{
     border-radius: 3px;
     width: 100%;
 }
-.myInput:focus-visible{
+.input:focus-visible{
     outline: none;
 }
-.myInput{
+.input{
     padding: 3px 5px 0 5px;
     width: 100%;
     color:white;
     outline-offset: 0px;
     outline: none;
 }
-.myInput:disabled{
+.input:disabled{
     color:gray;
 }
 .label{
@@ -222,7 +222,4 @@ export default{
     top: -15px;
     font-size: 11px;
 }
-/* .body:has(.myInput:disabled) .label{
-    color: grey;
-} */
 </style>

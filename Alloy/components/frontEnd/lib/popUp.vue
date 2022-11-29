@@ -146,6 +146,7 @@ export default {
         selectFunction(functionName){
             this[functionName]();
         },
+        //get the clicked file and send it to the components
         searchFile(){
             this.icon = String(this.popUpSchema?.metadata?.icon);
             if(this.clickedFile){
@@ -239,15 +240,12 @@ export default {
 			})
 		}
     },
-
     watch: {
         popUpSchema: {
 			deep: true,
 			handler () {
                 //updating the icon if its available
                 this.icon = String(this.popUpSchema?.metadata?.icon);
-                
-                //this.createNewFile();
 			}
 		}
 	}
@@ -258,9 +256,7 @@ export default {
 <style lang="scss" scoped>
 $gap-size: 15px;
 $columns: 12;
-.test{
-    width: auto;
-}
+
 .popUp{
     position: absolute;
     top: 300px;
@@ -294,7 +290,6 @@ $columns: 12;
     margin-bottom: 20px;
 }
 .label{
-    
     font-size: 20px;
 }
 .closeIcon{
@@ -304,14 +299,6 @@ $columns: 12;
 .closeIcon img{
     width: 100%;
     height:auto;
-}
-.whiteBackground{
-    position: absolute;
-    right: 10px;
-    top: 10px;
-    height: 20px;
-    width: 20px;
-    background-color: white;
 }
 .inputContainer{
   display: flex;
