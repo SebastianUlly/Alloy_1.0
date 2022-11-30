@@ -1,33 +1,34 @@
 <template>
-    <div class="body">
+    <div class="selectInputMain">
         <!-- the label of the select input componenet -->
         <div class="label">
             {{label}}
         </div>
-        <div class="inputDiv" ref="inputX">
+        <div class="selectInputDivBackground" ref="input">
             <!-- the selector loads the select options -->
-            <select class="myInput" v-model="inputValue" :disabled="!editable" type="text">
-                <!-- writing out the optioins -->
+            <select class="select" v-model="inputValue" :disabled="!editable" type="text">
+                <!-- writing options depending on which function is running -->
                 <option
-                v-if="files"
-                v-for="(item, index) in files"
-                :value="item"
+                    v-if="files"
+                    v-for="(item, index) in files"
+                    :value="item"
                 >{{item}}</option>
+                <!-- options from the miscellaneous or from getPharmacyByName() function -->
                 <option
-                v-if="filesFromMiscellaneous"
-                v-for="(item, index) in filesFromMiscellaneous"
-                :value="item.id"
+                    v-if="filesFromMiscellaneous"
+                    v-for="(item, index) in filesFromMiscellaneous"
+                    :value="item.id"
                 >{{item.name}}</option>
+                <!-- options for the select project comes from getFile function -->
                 <option
-                v-if="filesProject"
-                v-for="(item, index) in filesProject"
-                :value="item.id"
-                >{{item.data[0].data.text}}-{{item.label}}-{{item.data[3].data.text}}-{{item.data[1].data.text}}-{{item.data[2].data.text}}</option>
+                    v-if="filesProject"
+                    v-for="(item, index) in filesProject"
+                    :value="item.id"
+                >{{item.year}}-{{item.projectNumber}}</option>
             </select>
-            <v-icon class="mdi-chevron" v-if="!setEditable(permissions.toEdit)">mdi-chevron-down</v-icon>
+            <!-- dropdown arrow -->
+            <v-icon class="mdi-chevron" v-if="editable">mdi-chevron-down</v-icon>
         </div>
-        <!-- dropdown arrow -->
-        
     </div>
 </template>
 <script>
@@ -71,7 +72,7 @@ export default{
     },
     apollo:{
         directory: gql `
-			query egal{
+			query directory{
 				directory{
 					id
 					hierarchy
@@ -80,7 +81,91 @@ export default{
 		`
     },
     methods:{
-         //checks if the permissionId is in the permissions list and sends the permissionId to the checkPermissionId function
+        //function that call getPharmacyId with the pharmacyId of selected project
+        setEditableByProject(value){
+             this.$apollo.query({
+                variables:{
+                    fileId: value.data.text
+                },
+                query: gql`
+                    query ($fileId: String) {
+                        queryFileData(id: $fileId){
+                            id
+                            label
+                            data
+                            schemaId
+                        }
+                    }
+                
+                `
+             }).then(data => {
+                this.getPharmacyById(data.data.queryFileData.data.find(data => data.elementId === "09c5ba61-4e52-4a68-afde-bb7334b45b35").data.text)
+             })
+        },
+        //querying the pharmacy 
+        getPharmacyById(pharmacyId){
+            this.$apollo.query({
+                variables:{
+                    fileId: pharmacyId
+                },
+                query: gql`
+                    query ($fileId: String) {
+                        queryFileData(id: $fileId){
+                            id
+                            label
+                            data
+                            schemaId
+                        }
+                    }
+                
+                `
+             }).then(data => {
+                //reseting the filesFromMiscellaneous
+                this.filesFromMiscellaneous = []
+                //if the schemaId is 961fe75d-2d0e-4ccb-8afd-cde072b37380 (this is the schemaId of single pharmacy) set the editable false
+                if(data.data.queryFileData.schemaId == "961fe75d-2d0e-4ccb-8afd-cde072b37380"){
+                    this.editable = false;
+                    //sets the inputValue to this pharmacy
+                    this.inputValue = pharmacyId
+                    this.filesFromMiscellaneous.push({name: data.data.queryFileData.data[0].data.text, id: pharmacyId})
+                } else {
+                    //if the schemaId is an id of pharmacyGroup
+                    if(data.data.queryFileData.schemaId == "7c70a676-ef00-432c-bce0-60f7c8b6fb0b"){
+                        //set the edatable true and send the ids of pharmacies to the getPharmacyNameById function
+                        this.filesFromMiscellaneous.push({name:data.data.queryFileData.data.find(item => item.elementId === "91f42e63-98b4-462b-bf65-58b416718cb0").data.text, id: pharmacyId})
+                        this.inputValue = pharmacyId
+                        this.getPharmacyNameById(data.data.queryFileData.data.find(data => data.elementId === "09c5ba61-4e52-4a68-afde-bb7334b45b35").data.values)
+                        this.editable = true;
+                    }
+                }
+             })
+        },
+        //search the pharmacy name by id and push to the files from miscellaneous
+        getPharmacyNameById(ids){
+            for(let id of ids){
+                this.$apollo.query({
+                variables:{
+                    fileId: id
+                },
+                query: gql`
+                    query ($fileId: String) {
+                        queryFileData(id: $fileId){
+                            id
+                            label
+                            data
+                            schemaId
+                        }
+                    }
+                
+                `
+             }).then(data => {
+                this.filesFromMiscellaneous.push({name: data.data.queryFileData.data.find(data => data.elementId === "91f42e63-98b4-462b-bf65-58b416718cb0").data.text, ids})
+             })
+            }
+            
+
+        },
+        //checks if the permissionId is in the permissions list and sends the permissionId to the checkPermissionId function
         checkPermissionIdsHere (arg) {
 			if (this.permissionIds) {
 				return checkPermissionId(this.permissionIds, arg)
@@ -92,8 +177,8 @@ export default{
             if(typeof value === "boolean"){
                 this.editable = value
             } 
-            //if it is not a boolean, than use the checkPermissionIdsHere function to return a value
-            else{
+            //if it is not a boolean, then use the checkPermissionIdsHere function to return a value
+            if(typeof value === "string"){
                 this.editable = this.checkPermissionIdsHere(value);
             }
         },
@@ -101,16 +186,7 @@ export default{
             //if elementIdToSearch and this element is not the Number, set the default value from the database
             if(this.elementIdToSearch && this.elementId !=="75e96f94-0103-4804-abc0-5331ea980e9b" && this.data != undefined){
                 this.inputValue = (this.data.data.find(item => item.elementId === this.elementId).data.text)
-            }
-            if(this.getDataToSave){
-                for(let data of this.getDataToSave){
-                    console.log(data)
-                    if (data.elementId === "90bd2ecc-38e1-4bf4-bffa-cc7d15b8f323" && data.data.text){
-                        console.log("eee")
-                        this.editable = true
-                    }
-                }
-            }
+            }   
         },
         //sending the selected data to the store
         sendEvent(){
@@ -119,6 +195,10 @@ export default{
                 data:{
                     text : this.inputValue
                 } 
+            }
+            //if the elementId is from the project select then emitting the payloads data
+            if(payload.elementId === "90bd2ecc-38e1-4bf4-bffa-cc7d15b8f323"){
+                this.$root.$emit('sendSelectedProject', payload);
             }
             this.$emit('update', payload);
         },
@@ -144,6 +224,7 @@ export default{
                     `,
                 //filling the files array with the data of fileBySchemaId.data where elementData.elementId (name field of an apotheke) is the same
                 }).then((data) => {
+                        //if the first file from query has a label with number
                         if (isNaN(parseFloat(data.data.fileBySchemaId[1].label)) && data.data.fileBySchemaId[1].label !== "BOCOM"){
                             const temp = data.data.fileBySchemaId;
                             this.files = temp.map(
@@ -155,8 +236,13 @@ export default{
                             )
                         } else {
                             for(const item of data?.data?.fileBySchemaId){
+                                //if the project not deleted
                                 if(this.directory[0].hierarchy.some(e => e.fileId === item.id)){
-                                    this.filesProject.push(item)
+                                    this.filesProject.push({
+                                        id: item.id,
+                                        year: item.data.find(element => element.elementId === "577aa568-345a-47e5-9b71-848d5695bd5d").data.text,
+                                        projectNumber: item.label
+                                    })
                                 }
                             }
 
@@ -165,10 +251,11 @@ export default{
                 }).catch((error) => {
                     console.log({ error });
                 });
-            //if its not an pharmacy than fills it with the parameters.options from the parent component
+            //if its not an pharmacy then fills it with the parameters.options from the parent component
             }else if(this.parameters.options) {
                 this.files = this.parameters.options
             }
+            //if the parameters.optionSource exist query the miscellaneous by the option source id
             else if(this.parameters?.optionSource){
                 this.$apollo.query({
 					variables:{
@@ -191,18 +278,24 @@ export default{
         //isInputOk a function that changes the color of an input and sets the save button available
         isInputok(){
             let isInputOkValue = false;
+            //if the input value is empty and the input is required
             if(this.inputValue === "" && this.parameters.required){
-                this.$refs.inputX.classList.add("myInputError");
+                //then add the selectError class on the input
+                this.$refs.input.classList.add("selectError");
+                //and sets the isUnputOkValue flase
                 isInputOkValue = false;
             }
+            //else delete the class from the input and set the isInputOkValue true
             else {
                 isInputOkValue = true;
-                this.$refs.inputX.classList.remove("myInputError");
+                this.$refs.input.classList.remove("selectError");
             }
+            //at the end create the temp payload with the elementId and with the isInputOkValue
             let tempPayload = {
                 elementId: this.elementId,
                 value: isInputOkValue
             }
+            //emit the payload to the popUp component
             this.$store.commit('file/setIsInputOk', tempPayload)
         }
     },
@@ -211,15 +304,17 @@ export default{
     },
     computed:{
         ...mapGetters({
-            permissionIds: 'authentication/getPermissionIds',
-            getDataToSave: "file/getDataToSave"
+            permissionIds: 'authentication/getPermissionIds'
         })
     },
     mounted(){
         this.getfile();
-        this.setValue();
         this.isInputok();
         this.setEditable(this.permissions.toEdit)
+        //if the component is the company selector then listen to the emit and sends the payloads data to the function
+        if(this.elementId === "0e2e7998-16ab-4262-9dfe-4137760b0460"){
+            this.$root.$on('sendSelectedProject', data => {this.setEditableByProject(data)})
+        }
     },
     watch:{
         //if the input value changes calls the sendEvent
@@ -228,23 +323,17 @@ export default{
                 this.sendEvent();
                 this.isInputok();
             }
-        },
-        getDataToSave:{
-            deep: true,
-            handler(){
-                this.setValue();
-            }
         }
     }
 }
 </script>
 <style scoped>
-.body{
+.selectInputMain{
     margin-bottom: 10px;
     position: relative;
     width:100%;
 }
-.inputDiv{
+.selectInputDivBackground{
     height:31px;
     background-color: #282828;
     border-style: solid;
@@ -253,10 +342,10 @@ export default{
     border-radius: 3px;
     width: 100%;
 }
-.myInput:focus-visible{
+.select:focus-visible{
     outline: none;
 }
-.myInput{
+.select{
     width: 100%;
     padding-left: 10px;
     padding-top: 4px;
@@ -264,7 +353,7 @@ export default{
     outline-offset: 0px;
     outline: none;
 }
-.myInputError{
+.selectError{
     height:31px;
     background-color: #282828;
     border-style: solid;
@@ -273,13 +362,9 @@ export default{
     border-radius: 3px;
     width: 100%;
 }
-.myInput:disabled{
+.select:disabled{
     color:gray;
 }
-.inputDiv:has(.myInput:disabled){
-    border-color:gray;
-}
-
 .label{
     position:absolute;
     left: 4px;
