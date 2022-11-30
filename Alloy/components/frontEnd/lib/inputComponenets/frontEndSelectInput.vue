@@ -107,7 +107,7 @@ export default{
                     console.log(data)
                     if (data.elementId === "90bd2ecc-38e1-4bf4-bffa-cc7d15b8f323" && data.data.text){
                         console.log("eee")
-                        this.editable = false
+                        this.editable = true
                     }
                 }
             }

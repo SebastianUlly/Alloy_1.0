@@ -96,9 +96,7 @@
 				{{ text }}
 			</v-snackbar>
 		</ClientOnly>
-		<vue-json-pretty :data="items"/>
-	</div>	
-	
+	</div>
 </template>
 
 <script>

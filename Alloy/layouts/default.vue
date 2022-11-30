@@ -32,7 +32,7 @@ export default {
 				// decoding and parsing the payload into a JSON-object
 				const payload = JSON.parse(window.atob(base64))
 
-				console.log(payload)
+				// console.log(payload)
 
 				// coomiting the payload to the store
 				this.$store.commit('authentication/setTokenInfo', payload)

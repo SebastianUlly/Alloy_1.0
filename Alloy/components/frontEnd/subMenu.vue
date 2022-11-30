@@ -1,6 +1,6 @@
 <template>
 <div class="main">
-    <v-btn @click="openComponent('projektListe')">Projektliste</v-btn>
+    <!-- <v-btn @click="openComponent('projektListe')">Projektliste</v-btn> -->
     <v-btn @click="openComponent('zeiterfassung')">Zeiterfassung</v-btn>
 </div>
 

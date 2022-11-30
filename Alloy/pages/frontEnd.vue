@@ -12,11 +12,11 @@
 <script>
 import projektListe from "~/components/frontEnd/projektListe";
 import subMenu from "~/components/frontEnd/subMenu";
-import zeiterfassung from "~/components/frontEnd/zeiterfassung"
+import zeiterfassung from "~/components/frontEnd/KW"
 export default {
 	data(){
 		return{
-			component: "projektListe"
+			component: "zeiterfassung"
 		}
 	},
     components: {

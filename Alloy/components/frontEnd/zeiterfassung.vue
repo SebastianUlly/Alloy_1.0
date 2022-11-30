@@ -1,41 +1,24 @@
 <template>
-  <div>
-    <v-btn
-						style="min-width:0"
-						class="addProject"
-						color="green"
-						@click="openNewProject(true)"
-					>
-						<!-- the icon with the file and + -->
-						<v-icon>
-							mdi-timer-plus-outline
-						</v-icon>
-					</v-btn>
-          <popUp
-						v-if="popUp && popUpSchema"
-						@closeNewProject="openNewProject($event)"
-						:popUpSchema = "popUpSchema"
-						:clickedFile = "clickedFile"
-					/>
-    <v-data-table v-if="headers" :headers="headers" :items="items"> </v-data-table>
-    <!-- <vue-json-pretty :data="headers" /> -->
-    
-  </div>
+	<div>
+		<v-data-table v-if="headers" :headers="headers" :items="items"> </v-data-table>
+		<!-- <vue-json-pretty :data="headers" /> -->
+		
+	</div>
 </template>
 
 <script>
-import popUp from "~/components/frontEnd/lib/popUp";
 import gql from "graphql-tag";
 export default {
   name: "zeiterfassung",
-  components:{
-    popUp
+
+  props: {
+    points: {
+      type: Array,
+      required: true
+    }
   },
   data() {
     return {
-      popUp: false,
-      popUpSchema:{},
-      clickedFile: {},
       items: [],
       headers: [],
       miscellaneous:{},
@@ -59,14 +42,6 @@ export default {
           label
           metadata
           elements
-        }
-      }
-    `,
-    points: gql`
-      query points {
-        points {
-          id
-          data
         }
       }
     `
@@ -103,11 +78,6 @@ export default {
 				})
 			}
 		},
-    openNewProject(value){
-      this.clickedFile = null;
-			this.popUp = value;
-      this.getDataForPopUp(["c519459a-5624-4311-bffb-838d43e7f0d0"]);
-    },
     async getDataFromMiscellaneous(id){ 
       //optimizing the query, when the desired miscellaneous exists, break and returns it
       if(this.miscellaneous[id]){
