@@ -1,6 +1,12 @@
 <template>
 	<div>
-		<v-data-table v-if="headers" :headers="headers" :items="items"> </v-data-table>
+		<v-data-table 
+      v-if="headers"
+      :headers="headers"
+      :items="items"
+      
+    >
+    </v-data-table>
 		<!-- <vue-json-pretty :data="headers" /> -->
 		
 	</div>

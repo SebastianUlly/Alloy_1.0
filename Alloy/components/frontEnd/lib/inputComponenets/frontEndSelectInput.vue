@@ -197,7 +197,7 @@ export default{
                 } 
             }
             //if the elementId is from the project select then emitting the payloads data
-            if(payload.elementId === "90bd2ecc-38e1-4bf4-bffa-cc7d15b8f323"){
+            if(payload.elementId === "30a1d57d-ac51-4a54-9f83-2c493253b944"){
                 this.$root.$emit('sendSelectedProject', payload);
             }
             this.$emit('update', payload);
@@ -224,29 +224,29 @@ export default{
                     `,
                 //filling the files array with the data of fileBySchemaId.data where elementData.elementId (name field of an apotheke) is the same
                 }).then((data) => {
-                        //if the first file from query has a label with number
-                        if (isNaN(parseFloat(data.data.fileBySchemaId[1].label)) && data.data.fileBySchemaId[1].label !== "BOCOM"){
-                            const temp = data.data.fileBySchemaId;
-                            this.files = temp.map(
-                                function (item, index, array) {
-                                    return item.data.find(
-                                        (elementData) => elementData.elementId === "91f42e63-98b4-462b-bf65-58b416718cb0"
-                                    )?.data?.text;
-                                }
-                            )
-                        } else {
-                            for(const item of data?.data?.fileBySchemaId){
-                                //if the project not deleted
-                                if(this.directory[0].hierarchy.some(e => e.fileId === item.id)){
-                                    this.filesProject.push({
-                                        id: item.id,
-                                        year: item.data.find(element => element.elementId === "577aa568-345a-47e5-9b71-848d5695bd5d").data.text,
-                                        projectNumber: item.label
-                                    })
-                                }
+                    //if the first file from query has a label with number
+                    if (isNaN(parseFloat(data.data.fileBySchemaId[1].label)) && data.data.fileBySchemaId[1].label !== "BOCOM"){
+                        const temp = data.data.fileBySchemaId;
+                        this.files = temp.map(
+                            function (item, index, array) {
+                                return item.data.find(
+                                    (elementData) => elementData.elementId === "91f42e63-98b4-462b-bf65-58b416718cb0"
+                                )?.data?.text;
                             }
-
+                        )
+                    } else {
+                        for(const item of data?.data?.fileBySchemaId){
+                            //if the project not deleted
+                            if(this.directory[0].hierarchy.some(e => e.fileId === item.id)){
+                                this.filesProject.push({
+                                    id: item.id,
+                                    year: item.data.find(element => element.elementId === "577aa568-345a-47e5-9b71-848d5695bd5d").data.text,
+                                    projectNumber: item.label
+                                })
+                            }
                         }
+
+                    }
 
                 }).catch((error) => {
                     console.log({ error });
@@ -308,11 +308,12 @@ export default{
         })
     },
     mounted(){
+        //console.log(this.elementId)
         this.getfile();
         this.isInputok();
         this.setEditable(this.permissions.toEdit)
         //if the component is the company selector then listen to the emit and sends the payloads data to the function
-        if(this.elementId === "0e2e7998-16ab-4262-9dfe-4137760b0460"){
+        if(this.elementId === "0c9cf456-edc3-4779-b00c-14237863fa16"){
             this.$root.$on('sendSelectedProject', data => {this.setEditableByProject(data)})
         }
     },

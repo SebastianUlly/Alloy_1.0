@@ -49,6 +49,7 @@
                 large
                 style="min-width:0"> Speichern </v-btn>
         </div>
+        <vue-json-pretty :data="popUpSchema"/>
     </div>
 </template>
 
@@ -104,28 +105,57 @@ export default {
         this.createNewFile()
     },
     methods:{
+        createPoint(){
+            console.log(this.getDataToSave)
+            this.$apollo.mutate({
+                variables: {
+                    id: this.getValuesToSave.fileId,
+                    data: this.getDataToSave,
+                    schemaId:this.getValuesToSave.schemaId
+                },
+                mutation: gql`
+                    mutation (
+                        $id: String
+                        $data: JSON
+                        $schemaId: String
+                    ) {
+                        createPoint (
+                            id: $id
+                            data: $data
+                            schemaId: $schemaId
+                        ){
+                            id
+                        }
+                    }
+                `
+            }).then(data =>{
+                console.log(data)
+                this.$emit("saveSuccess")
+            })
+
+        },
         createFile(){
             this.$apollo.mutate({
-            variables: {
-                metadata: this.getValuesToSave,
-                elementsData: this.getDataToSave
-            },
+                variables: {
+                    metadata: this.getValuesToSave,
+                    elementsData: this.getDataToSave
+                },
 
-            mutation: gql`
-                mutation (
-                    $metadata: JSON
-                    $elementsData: JSON
-                ) {
-                    createFile (
-                        metadata: $metadata
-                        elementsData: $elementsData
+                mutation: gql`
+                    mutation (
+                        $metadata: JSON
+                        $elementsData: JSON
                     ) {
-                        id
+                        createFile (
+                            metadata: $metadata
+                            elementsData: $elementsData
+                        ) {
+                            id
+                        }
                     }
-                }
-            `
+                `
             }).then((data) => {
-                // create a new instance to add the file to the directory on every reqired location
+                // create a new instance to add the file to the directory on every required location
                 const directoryWithAddedEntity = new AddEntityToDirectory(
                     this.directory,
                     {

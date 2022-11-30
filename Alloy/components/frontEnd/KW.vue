@@ -15,6 +15,7 @@
 			@closeNewProject="openNewProject($event)"
 			:popUpSchema = "popUpSchema"
 			:clickedFile = "clickedFile"
+			@saveSuccess="pointSaved"
 		/>
 		<div v-for="(kw, index) of kwListWithPoints.slice().reverse()" :key="index">
 			<TableHeader
@@ -104,8 +105,18 @@ export default {
 			return this.KalenderWoche()
 		}
 	},
-
+	watch:{
+		points:{
+			handler(){
+				this.sortPoints()
+			}
+		}
+	},
 	methods: {
+		pointSaved(){
+      		console.log("emit success")
+			this.$apollo.queries.points.refetch()
+		},
 		sortPoints () {
 			let tempList = new Array(53)
 			for (const point of this.points) {
