@@ -4,8 +4,21 @@
       v-if="headers"
       :headers="headers"
       :items="items"
-      
     >
+      <template #item.actions="{item}" v-slot:item="props">
+        <div class="icons">
+									<button @click="$emit('getClickedItem', item)">
+										<v-icon>
+											mdi-timer-edit-outline
+										</v-icon>
+									</button>
+									<button>
+										<v-icon> 
+											mdi-delete-outline
+										</v-icon>
+									</button>
+								</div>
+      </template>
     </v-data-table>
 		<!-- <vue-json-pretty :data="headers" /> -->
 		
@@ -53,37 +66,6 @@ export default {
     `
   },
   methods: {
-    async getDataForPopUp(id){
-			let schemas = [];
-			// this.popUpSchema has to empty every time a new schema has to be loaded
-			this.popUpSchema = null;
-			//query the both schema
-			for(const item of id){
-				await this.$apollo.query({
-					variables:{
-						id: item
-					},
-					query: gql`
-						query($id: String){
-							querySchemaById( id: $id){
-								id
-								label
-								metadata
-								elements
-							}
-						}
-					`
-				}).then((data) => {
-					//if both schemas are loaded, sending them to the mergeSchemas function to merge
-					schemas.push(data.data.querySchemaById)
-					if(id.length === schemas.length && id.length !== 1){
-						this.popUpSchema = mergeSchemas(schemas[0], schemas[1]);
-					}else if(id.length === 1){
-						this.popUpSchema = data.data.querySchemaById;
-					}
-				})
-			}
-		},
     async getDataFromMiscellaneous(id){ 
       //optimizing the query, when the desired miscellaneous exists, break and returns it
       if(this.miscellaneous[id]){
@@ -220,6 +202,12 @@ export default {
       deep: true,
       handler() {
         this.dataFill();
+      }
+    },
+    points:{
+      deep:true,
+      handler(){
+        this.dataFill()
       }
     }
   } 

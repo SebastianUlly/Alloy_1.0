@@ -72,6 +72,13 @@ export default{
         }
     },
     methods:{
+        setDefaultValue(){
+            if(this.elementIdToSearch && this.data != undefined){
+                const [hour, minute] = this.data.data.find(item => item.elementId === this.elementId).data.text.split(':')
+                this.inputValueHour = hour,
+                this.inputValueMinutes = minute
+            }   
+        },
         //checks if the permissionId is in the permissionIds list and sends the permissionId to the checkPermissionId function
         checkPermissionIdsHere (arg) {
 			if (this.permissionIds) {
@@ -124,6 +131,7 @@ export default{
         }
     },
     created(){
+        this.setDefaultValue();
         this.setEditable();
     },
     mounted() {

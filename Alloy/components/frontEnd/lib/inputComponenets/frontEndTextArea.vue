@@ -50,6 +50,11 @@ export default{
         }
     },
     methods:{
+        setDefaultValue(){
+            if(this.elementIdToSearch && this.data != undefined){
+                this.textAreaValue = (this.data.data.find(item => item.elementId === this.elementId).data.text)
+            }   
+        },
         //checks if the permissionId is in the permissionIds list and sends the permissionId to the checkPermissionId function
         checkPermissionIdsHere (arg) {
 			if (this.permissionIds) {
@@ -103,6 +108,7 @@ export default{
     },
     created(){
         this.setEditable();
+        this.setDefaultValue();
     },
     mounted() {
         this.isInputOk();

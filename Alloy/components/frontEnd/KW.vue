@@ -43,6 +43,7 @@
 			<zeiterfassung
 				v-if="kw"
 				:points="kw"
+				@getClickedItem="openEditTime"
 			/>
 		</div>
 	</div>
@@ -52,7 +53,8 @@
 import gql from "graphql-tag";
 import zeiterfassung from "./zeiterfassung.vue";
 import popUp from "~/components/frontEnd/lib/popUp";
-import TableHeader from '~/components/frontEnd/lib/tableHeader'
+import TableHeader from '~/components/frontEnd/lib/tableHeader';
+import { mergeSchemas } from '~/assets/classes/objectClasses'
 
 export default {
 	components: {
@@ -83,7 +85,8 @@ export default {
 				holiday: 20,
 				sickdays: 3
 			},
-			currentKW: 0
+			currentKW: 0,
+			clickedFile:""
 		}
 	},
 
@@ -107,14 +110,21 @@ export default {
 	},
 	watch:{
 		points:{
+			deep: true,
 			handler(){
 				this.sortPoints()
+				this.$store.commit('point/setPointList', this.points)
 			}
 		}
 	},
 	methods: {
+		openEditTime(item){
+			this.getDataForPopUp(["c519459a-5624-4311-bffb-838d43e7f0d0", "50dd57aa-b759-42e7-9bae-3830cd605f02"])
+			this.popUp = true;
+			this.clickedFile = item.id;
+		},
 		pointSaved(){
-      		console.log("emit success")
+			this.popUp = false
 			this.$apollo.queries.points.refetch()
 		},
 		sortPoints () {

@@ -49,7 +49,6 @@
                 large
                 style="min-width:0"> Speichern </v-btn>
         </div>
-        <vue-json-pretty :data="popUpSchema"/>
     </div>
 </template>
 
@@ -95,7 +94,8 @@ export default {
             getDataToSave: "file/getDataToSave",
             getValuesToSave: "file/getValuesToSave",
             fileList : "file/getFileList",
-            readyToSave: "file/getReadyToSave"
+            readyToSave: "file/getReadyToSave",
+            pointList: "point/getPointList"
         })
     },
     created(){
@@ -106,7 +106,6 @@ export default {
     },
     methods:{
         createPoint(){
-            console.log(this.getDataToSave)
             this.$apollo.mutate({
                 variables: {
                     id: this.getValuesToSave.fileId,
@@ -129,7 +128,6 @@ export default {
                     }
                 `
             }).then(data =>{
-                console.log(data)
                 this.$emit("saveSuccess")
             })
 
@@ -180,7 +178,7 @@ export default {
         searchFile(){
             this.icon = String(this.popUpSchema?.metadata?.icon);
             if(this.clickedFile){
-                for(let item of this.fileList){
+                for(let item of [...this.fileList, ...this.pointList]){
                     if(item.id === this.clickedFile){
                         this.sendDataToInputs = item
                     }

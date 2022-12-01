@@ -182,9 +182,9 @@ export default{
                 this.editable = this.checkPermissionIdsHere(value);
             }
         },
-        setValue(){
+        setDefaultValue(){
             //if elementIdToSearch and this element is not the Number, set the default value from the database
-            if(this.elementIdToSearch && this.elementId !=="75e96f94-0103-4804-abc0-5331ea980e9b" && this.data != undefined){
+            if(this.elementIdToSearch && this.data != undefined){
                 this.inputValue = (this.data.data.find(item => item.elementId === this.elementId).data.text)
             }   
         },
@@ -282,7 +282,7 @@ export default{
             if(this.inputValue === "" && this.parameters.required){
                 //then add the selectError class on the input
                 this.$refs.input.classList.add("selectError");
-                //and sets the isUnputOkValue flase
+                //and sets the isInputOkValue false
                 isInputOkValue = false;
             }
             //else delete the class from the input and set the isInputOkValue true
@@ -301,6 +301,7 @@ export default{
     },
     created(){
         this.setEditable();
+        this.setDefaultValue();
     },
     computed:{
         ...mapGetters({
