@@ -139,7 +139,6 @@ export default{
     },
     computed:{
         ...mapGetters({
-            /* directory : "directory/getDirectory", */
             permissionIds: 'authentication/getPermissionIds'
         })
     },

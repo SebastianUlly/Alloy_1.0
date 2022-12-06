@@ -20,9 +20,8 @@
                 ></v-text-field>
             </template>
             <v-date-picker
-                change
                 no-title
-                :value="dateEN"
+                v-model="dateEN"
                 @input="menu = false"
             ></v-date-picker>
         </v-menu>
@@ -55,23 +54,24 @@ export default{
     data(){
         return{
             dateText:"",
-            date: "",
+            //two variables are needed, one for the component and one for the German format
+            dateEN: "",
+            dateDE: "",
             formattedDate:"",
             menu: false
         }
     },
     methods:{
+        //set the default value for the input if elementIdToSearch not exists
         setDefaultValue(){
             this.dateEN = (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10)
             this.dateDE = this.convertDateEngToDe(this.dateEN)
             if(this.elementIdToSearch && this.data != undefined){
                 this.dateEN = this.convertDateDeToEng(this.data.data.find(item => item.elementId === this.elementId).data.text)
                 this.dateDE = this.data.data.find(item => item.elementId === this.elementId).data.text
-                console.log(this.dateEN , "EN")
-                console.log(this.dateDE , "DE")
-
             }
         },
+        //converting the dateEn to dateDe
         convertDateEngToDe(date){
             const [year, month, day] = date.split('-')
             return (day + "." + month + "." + year)
@@ -128,7 +128,6 @@ export default{
         //when the value of the data changes call the send event function and send the value to the store
         dateEN:{
             handler(){
-                console.log("dateEN changed")
                 this.sendEvent();
                 this.dateDE = this.convertDateEngToDe(this.dateEN);
             }

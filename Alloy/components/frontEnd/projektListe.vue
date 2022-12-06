@@ -457,7 +457,6 @@ export default {
 			deep: true,
 			async handler () {
 				this.$store.commit('file/setFileList', this.fileBySchemaId)
-				console.log(this.fileBySchemaId)
 				await this.dataFill()
 			}
 		}

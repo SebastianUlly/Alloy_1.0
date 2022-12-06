@@ -105,6 +105,35 @@ export default {
         this.createNewFile()
     },
     methods:{
+        updatePoint(){
+            this.$apollo.mutate({
+				variables: {
+					id: this.clickedFile,
+					data: this.getDataToSave,
+                    schemaId: "3c20a10b-e836-494b-b010-e2a124735ea3"
+				},
+
+				mutation: gql`
+					mutation (
+						$id: String
+						$data: JSON
+                        $schemaId: String
+					) {
+						updatePoint (
+							id: $id
+							data: $data
+                            schemaId: $schemaId
+						) {
+							id
+						}
+					}
+				`
+                }).then(() => {
+                    this.$emit("saveSuccess")
+                }).catch((error) => {
+                    console.log({ error })
+                })
+        },
         createPoint(){
             this.$apollo.mutate({
                 variables: {

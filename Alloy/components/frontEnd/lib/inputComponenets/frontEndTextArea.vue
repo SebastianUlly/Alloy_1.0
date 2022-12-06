@@ -50,6 +50,7 @@ export default{
         }
     },
     methods:{
+        //if the elementIdToSearch exist so we clicked one item it will search for the value
         setDefaultValue(){
             if(this.elementIdToSearch && this.data != undefined){
                 this.textAreaValue = (this.data.data.find(item => item.elementId === this.elementId).data.text)

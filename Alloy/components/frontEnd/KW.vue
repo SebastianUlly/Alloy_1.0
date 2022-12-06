@@ -17,6 +17,12 @@
 			:clickedFile = "clickedFile"
 			@saveSuccess="pointSaved"
 		/>
+		<confirmPopUp
+			v-if="confirmPopUp"
+			:clickedFile = "clickedFile"
+			@closePopUp = "setConfirmPopUp"
+			@sendAnswer="deletePointFromList"
+		/>
 		<div v-for="(kw, index) of kwListWithPoints.slice().reverse()" :key="index">
 			<TableHeader
 				v-if="(52 - index) === getCurrentKW"
@@ -44,6 +50,7 @@
 				v-if="kw"
 				:points="kw"
 				@getClickedItem="openEditTime"
+				@getClickedItemForDelete="getClickedItemForDelete"
 			/>
 		</div>
 	</div>
@@ -55,12 +62,13 @@ import zeiterfassung from "./zeiterfassung.vue";
 import popUp from "~/components/frontEnd/lib/popUp";
 import TableHeader from '~/components/frontEnd/lib/tableHeader';
 import { mergeSchemas } from '~/assets/classes/objectClasses'
-
+import confirmPopUp from "~/components/frontEnd/lib/confirmPopUp";
 export default {
 	components: {
 		zeiterfassung,
 		popUp,
-		TableHeader
+		TableHeader,
+		confirmPopUp
 	},
 
 	apollo: {
@@ -78,6 +86,7 @@ export default {
 		return {
 			kwListWithPoints: [],
 			popUp: false,
+			confirmPopUp: false,
 			popUpSchema:{},
 			clickedFile: {},
 			userSummary: {
@@ -118,6 +127,42 @@ export default {
 		}
 	},
 	methods: {
+		//open the confirm popUp and send the clicked element to it
+		getClickedItemForDelete(clickedFileValue){
+			this.clickedFile = clickedFileValue
+			this.confirmPopUp = true;
+		},
+		setConfirmPopUp(value){
+			this.confirmPopUp = value
+		},
+		//if the answer from the confirm popUp is true, delete the clicked file
+		deletePointFromList(value){
+			if(value){
+				this.$apollo.mutate({
+					variables:{
+						id: this.clickedFile.id
+					},
+					mutation: gql`
+						mutation (
+							$id: String
+						) {
+							deletePoint (
+								id: $id
+							)
+						}
+					`
+				}).then(() => {
+					this.$apollo.queries.points.refetch()
+					this.confirmPopUp = false;
+				}).catch((error) => {
+					console.log({ error })
+				})
+			}
+			//closing the popUP
+			this.confirmPopUp = false;
+				
+		},
+		//open the edit time popUp with the merge method
 		openEditTime(item){
 			this.getDataForPopUp(["c519459a-5624-4311-bffb-838d43e7f0d0", "50dd57aa-b759-42e7-9bae-3830cd605f02"])
 			this.popUp = true;
@@ -162,7 +207,7 @@ export default {
 			}
 			return kw;
 		},
-
+		
 		openNewProject(value){
 			this.clickedFile = null;
 			this.popUp = value;
