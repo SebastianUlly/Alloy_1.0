@@ -24,7 +24,7 @@
 					workhours: 40,
 					holiday: 25
 				}"
-				:weekly-summary="getWeeklySummary"
+				:weekly-summary="getWeeklySummary(index)"
 				:button="'sign'"
 			/>
 			<TableHeader
@@ -34,9 +34,7 @@
 					workhours: 40,
 					holiday: 25
 				}"
-				:weekly-summary="{
-					weekhours: '12/33'
-				}"
+				:weekly-summary="getWeeklySummary(index)"
 				:button="'pdf'"
 			/>
 			<zeiterfassung
@@ -91,21 +89,32 @@ export default {
 	},
 
 	computed: {
-		getWeeklySummary () {
-			return {
-				weekhours: '12/33',
-				hoursaldo: '2:15',
-				holiday: 21,
-				sickdays: 4
-			}
-		},
-
 		getCurrentKW () {
 			return this.KalenderWoche()
 		}
 	},
 
 	methods: {
+		getWeeklySummary (kw) {
+			let hours = 0
+			let minutes = 0
+			if (this.kwListWithPoints.slice().reverse()[kw]) {
+				for (const item of this.kwListWithPoints.slice().reverse()[kw]) {
+					const time = item.data.find(element => element.elementId === '83f4737a-0d63-407d-bdff-4ff576f97a13')
+					hours += parseInt(time.data.text.split(':')[0])
+					minutes += parseInt(time.data.text.split(':')[1])
+				}
+			}
+			const test = (hours + Math.floor(minutes/60)).toString() + ':' + (minutes%60).toString()
+			console.log(test)
+			return {
+				weekhours: test + '/33',
+				hoursaldo: '2:15',
+				holiday: 21,
+				sickdays: 4
+			}
+		},
+
 		sortPoints () {
 			let tempList = new Array(53)
 			for (const point of this.points) {

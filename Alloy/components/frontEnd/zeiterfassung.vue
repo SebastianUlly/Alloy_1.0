@@ -71,7 +71,7 @@ export default {
 					//if both schemas are loaded, sending them to the mergeSchemas function to merge
 					schemas.push(data.data.querySchemaById)
 					if(id.length === schemas.length && id.length !== 1){
-						this.popUpSchema = mergeSchemas(schemas[0], schemas[1]);
+						this.popUpSchema =  (schemas[0], schemas[1]);
 					}else if(id.length === 1){
 						this.popUpSchema = data.data.querySchemaById;
 					}
