@@ -13,10 +13,21 @@
 		<popUp
 			v-if="popUp && popUpSchema"
 			@closeNewProject="openNewProject($event)"
-			:popUpSchema = "popUpSchema"
-			:clickedFile = "clickedFile"
+			:popUpSchema="popUpSchema"
+			:clickedFile="clickedFile"
+			@saveSuccess="pointSaved"
 		/>
-		<div v-for="(kw, index) of kwListWithPoints.slice().reverse()" :key="index">
+		<confirmPopUp
+			v-if="confirmPopUp"
+			:clickedFile = "clickedFile"
+			@closePopUp = "setConfirmPopUp"
+			@sendAnswer="deletePointFromList"
+		/>
+		<div
+			v-for="(kw, index) of kwListWithPoints.slice().reverse()"
+			:key="index"
+			class="kw"
+		>
 			<TableHeader
 				v-if="(52 - index) === getCurrentKW"
 				:headline="(52 - index).toString() + '. KW'"
@@ -24,7 +35,7 @@
 					workhours: 40,
 					holiday: 25
 				}"
-				:weekly-summary="getWeeklySummary(index)"
+				:weekly-summary="userSummary"
 				:button="'sign'"
 			/>
 			<TableHeader
@@ -34,12 +45,14 @@
 					workhours: 40,
 					holiday: 25
 				}"
-				:weekly-summary="getWeeklySummary(index)"
+				:weekly-summary="userSummary"
 				:button="'pdf'"
 			/>
 			<zeiterfassung
 				v-if="kw"
 				:points="kw"
+				@getClickedItem="openEditTime"
+				@getClickedItemForDelete="getClickedItemForDelete"
 			/>
 		</div>
 	</div>
@@ -49,22 +62,34 @@
 import gql from "graphql-tag";
 import zeiterfassung from "./zeiterfassung.vue";
 import popUp from "~/components/frontEnd/lib/popUp";
-import TableHeader from '~/components/frontEnd/lib/tableHeader'
+import TableHeader from '~/components/frontEnd/lib/tableHeader';
+import { mergeSchemas } from '~/assets/classes/objectClasses'
+import confirmPopUp from "~/components/frontEnd/lib/confirmPopUp";
 
 export default {
 	components: {
 		zeiterfassung,
 		popUp,
-		TableHeader
+		TableHeader,
+		confirmPopUp
 	},
 
 	apollo: {
-		points: gql`
-			query points {
-				points {
+		pointsByUser: gql`
+			query pointsByUser {
+				pointsByUser {
 					id
 					data
 				}
+			}
+		`,
+
+		directory: gql `
+			query directory{
+				directory{
+					id
+					hierarchy
+				} 
 			}
 		`
 	},
@@ -73,6 +98,7 @@ export default {
 		return {
 			kwListWithPoints: [],
 			popUp: false,
+			confirmPopUp: false,
 			popUpSchema:{},
 			clickedFile: {},
 			userSummary: {
@@ -80,7 +106,8 @@ export default {
 				holiday: 20,
 				sickdays: 3
 			},
-			currentKW: 0
+			currentKW: 0,
+			clickedFile:""
 		}
 	},
 
@@ -91,6 +118,24 @@ export default {
 	computed: {
 		getCurrentKW () {
 			return this.KalenderWoche()
+		}
+	},
+
+	watch:{
+		directory: {
+			deep: true,
+			handler () {
+				console.log('aslkdj')
+				this.$store.commit('directory/setDirectoryFromDatabase', this.directory)
+			}
+		},
+
+		pointsByUser:{
+			deep: true,
+			handler(){
+				this.sortPoints()
+				this.$store.commit('point/setPointList', this.pointsByUser)
+			}
 		}
 	},
 
@@ -115,16 +160,63 @@ export default {
 			}
 		},
 
+		//open the confirm popUp and send the clicked element to it
+		getClickedItemForDelete(clickedFileValue){
+			this.clickedFile = clickedFileValue
+			this.confirmPopUp = true;
+		},
+		setConfirmPopUp(value){
+			this.confirmPopUp = value
+		},
+		//if the answer from the confirm popUp is true, delete the clicked file
+		deletePointFromList(value){
+			if(value){
+				this.$apollo.mutate({
+					variables:{
+						id: this.clickedFile.id
+					},
+					mutation: gql`
+						mutation (
+							$id: String
+						) {
+							deletePoint (
+								id: $id
+							)
+						}
+					`
+				}).then(() => {
+					this.$apollo.queries.pointsByUser.refetch()
+					this.confirmPopUp = false;
+				}).catch((error) => {
+					console.log({ error })
+				})
+			}
+			//closing the popUP
+			this.confirmPopUp = false;
+				
+		},
+		//open the edit time popUp with the merge method
+		openEditTime(item){
+			this.getDataForPopUp(["c519459a-5624-4311-bffb-838d43e7f0d0", "50dd57aa-b759-42e7-9bae-3830cd605f02"])
+			this.popUp = true;
+			this.clickedFile = item.id;
+		},
+		pointSaved(){
+			this.popUp = false
+			this.$apollo.queries.pointsByUser.refetch()
+		},
 		sortPoints () {
 			let tempList = new Array(53)
-			for (const point of this.points) {
-				const date = point.data.find(item => item.elementId === 'd43d0fd0-172d-4b7a-a942-990597d3cb42').data.text.split('.')
-				const KWNumber = this.KalenderWoche(date[2], date[1], date[0])
-				if (!tempList[KWNumber]) {
-					tempList[KWNumber] = []
+			if (this.pointsByUser) {
+				for (const point of this.pointsByUser) {
+					const date = point.data.find(item => item.elementId === 'd43d0fd0-172d-4b7a-a942-990597d3cb42').data.text.split('.')
+					const KWNumber = this.KalenderWoche(date[2], date[1], date[0])
+					if (!tempList[KWNumber]) {
+						tempList[KWNumber] = []
+					}
+					tempList[KWNumber].push(point)
+					this.kwListWithPoints = tempList
 				}
-				tempList[KWNumber].push(point)
-				this.kwListWithPoints = tempList
 			}
 		},
 
@@ -150,7 +242,7 @@ export default {
 			}
 			return kw;
 		},
-
+		
 		openNewProject(value){
 			this.clickedFile = null;
 			this.popUp = value;
@@ -191,3 +283,9 @@ export default {
 	}
 }
 </script>
+
+<style lang="scss" scoped>
+.kw {
+	margin: 50px 0;
+}
+</style>

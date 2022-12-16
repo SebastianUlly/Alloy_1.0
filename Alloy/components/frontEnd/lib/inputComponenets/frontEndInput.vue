@@ -7,14 +7,26 @@
         <!-- the inputDivBackground contains the inputfield --> 
         <div
             class="inputDivBackground"
-            ref="inputDiv">
+            ref="inputDiv"
+        >
             <!-- the input becomes the parameters from the parameters prop -->
             <input
+                v-if="displayValue"
                 :disabled="setEditable(permissions.toEdit)"
                 :style="'text-align:' + parameters.align"
-                v-model= "inputValue"
+                :value="displayValue"
                 class="input"
-                type="text">
+                type="text"
+            >
+            <!-- the input becomes the parameters from the parameters prop -->
+            <input
+                v-else
+                :disabled="setEditable(permissions.toEdit)"
+                :style="'text-align:' + parameters.align"
+                v-model="inputValue"
+                class="input"
+                type="text"
+            >
         </div>
     </div>
 </template>
@@ -44,9 +56,10 @@ export default{
     },
     data(){
         return{
-            inputValue:"",
+            inputValue: '',
+            displayValue: '',
             isInputOkValue: false,
-            tempValue: ""
+            tempValue: ''
         }
     },
     methods:{
@@ -70,15 +83,21 @@ export default{
         },
         //checking the database default value
         setDefaultValue(){
-            //checking if the elementId is the id of Number
+            //checking if the elementId is not the id of Number
             if(this.elementIdToSearch && this.elementId !=="75e96f94-0103-4804-abc0-5331ea980e9b" && this.data != undefined){
-                this.inputValue = (this.data.data.find(item => item.elementId === this.elementId).data.text)
+                for(let item of this.data.data){
+                    if(item.elementId == this.elementId){
+                        this.inputValue = item.data.text
+                    }
+                } 
+                //this.inputValue = (this.data.data.find(item => item.elementId === this.elementId).data.text)
             }
             else if(this.elementIdToSearch && this.elementId =="75e96f94-0103-4804-abc0-5331ea980e9b" && this.data != undefined){
                 this.inputValue = this.data.label
             }
             else if (this.parameters.default === "currentUser"){
-                this.inputValue = this.userName
+                this.displayValue = this.userName
+                this.inputValue = this.userId
             }
             //if the default value is currentYear, set the defaultValue to the current year
             else if(this.parameters.default === "currentYear"){    
@@ -156,6 +175,7 @@ export default{
         ...mapGetters({
             directory : "directory/getDirectory",
             permissionIds: 'authentication/getPermissionIds',
+            userId: 'authentication/getUserId',
             userName: 'authentication/getUserName'
         })
     },

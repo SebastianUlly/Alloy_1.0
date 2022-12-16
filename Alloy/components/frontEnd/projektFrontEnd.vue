@@ -53,6 +53,7 @@ export default {
 					`
 				}).then((data) => {
 					//if both schemas are loaded, sending them to the mergeSchemas function to merge
+					console.log(data)
 					schemas.push(data.data.querySchemaById)
 					if(id.length === schemas.length && id.length !== 1){
 						this.popUpSchema = mergeSchemas(schemas[0], schemas[1]);

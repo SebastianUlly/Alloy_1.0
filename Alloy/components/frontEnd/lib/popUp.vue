@@ -94,7 +94,8 @@ export default {
             getDataToSave: "file/getDataToSave",
             getValuesToSave: "file/getValuesToSave",
             fileList : "file/getFileList",
-            readyToSave: "file/getReadyToSave"
+            readyToSave: "file/getReadyToSave",
+            pointList: "point/getPointList"
         })
     },
     created(){
@@ -104,28 +105,84 @@ export default {
         this.createNewFile()
     },
     methods:{
+        updatePoint(){
+            this.$apollo.mutate({
+				variables: {
+					id: this.clickedFile,
+					data: this.getDataToSave,
+                    schemaId: "3c20a10b-e836-494b-b010-e2a124735ea3"
+				},
+
+				mutation: gql`
+					mutation (
+						$id: String
+						$data: JSON
+                        $schemaId: String
+					) {
+						updatePoint (
+							id: $id
+							data: $data
+                            schemaId: $schemaId
+						) {
+							id
+						}
+					}
+				`
+                }).then(() => {
+                    this.$emit("saveSuccess")
+                }).catch((error) => {
+                    console.log({ error })
+                })
+        },
+        createPoint(){
+            this.$apollo.mutate({
+                variables: {
+                    id: this.getValuesToSave.fileId,
+                    data: this.getDataToSave,
+                    schemaId: this.getValuesToSave.schemaId
+                },
+                mutation: gql`
+                    mutation (
+                        $id: String
+                        $data: JSON
+                        $schemaId: String
+                    ) {
+                        createPoint (
+                            id: $id
+                            data: $data
+                            schemaId: $schemaId
+                        ){
+                            id
+                        }
+                    }
+                `
+            }).then(data =>{
+                this.$emit("saveSuccess")
+            })
+
+        },
         createFile(){
             this.$apollo.mutate({
-            variables: {
-                metadata: this.getValuesToSave,
-                elementsData: this.getDataToSave
-            },
+                variables: {
+                    metadata: this.getValuesToSave,
+                    elementsData: this.getDataToSave
+                },
 
-            mutation: gql`
-                mutation (
-                    $metadata: JSON
-                    $elementsData: JSON
-                ) {
-                    createFile (
-                        metadata: $metadata
-                        elementsData: $elementsData
+                mutation: gql`
+                    mutation (
+                        $metadata: JSON
+                        $elementsData: JSON
                     ) {
-                        id
+                        createFile (
+                            metadata: $metadata
+                            elementsData: $elementsData
+                        ) {
+                            id
+                        }
                     }
-                }
-            `
+                `
             }).then((data) => {
-                // create a new instance to add the file to the directory on every reqired location
+                // create a new instance to add the file to the directory on every required location
                 const directoryWithAddedEntity = new AddEntityToDirectory(
                     this.directory,
                     {
@@ -150,7 +207,7 @@ export default {
         searchFile(){
             this.icon = String(this.popUpSchema?.metadata?.icon);
             if(this.clickedFile){
-                for(let item of this.fileList){
+                for(let item of [...this.fileList, ...this.pointList]){
                     if(item.id === this.clickedFile){
                         this.sendDataToInputs = item
                     }

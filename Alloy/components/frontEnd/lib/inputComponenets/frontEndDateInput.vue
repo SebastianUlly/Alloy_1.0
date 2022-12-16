@@ -12,7 +12,7 @@
             <template v-slot:activator="{ on, attrs }">
                 <v-text-field
                     class="inputDate"
-                    v-model="date"
+                    v-model="dateDE"
                     :label="label"
                     readonly
                     v-bind="attrs"
@@ -20,7 +20,8 @@
                 ></v-text-field>
             </template>
             <v-date-picker
-                v-model="date"
+                no-title
+                v-model="dateEN"
                 @input="menu = false"
             ></v-date-picker>
         </v-menu>
@@ -52,12 +53,33 @@ export default{
     },
     data(){
         return{
-            inputValue:"",
-            date: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
+            dateText:"",
+            //two variables are needed, one for the component and one for the German format
+            dateEN: "",
+            dateDE: "",
+            formattedDate:"",
             menu: false
         }
     },
     methods:{
+        //set the default value for the input if elementIdToSearch not exists
+        setDefaultValue(){
+            this.dateEN = (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10)
+            this.dateDE = this.convertDateEngToDe(this.dateEN)
+            if(this.elementIdToSearch && this.data != undefined){
+                this.dateEN = this.convertDateDeToEng(this.data.data.find(item => item.elementId === this.elementId).data.text)
+                this.dateDE = this.data.data.find(item => item.elementId === this.elementId).data.text
+            }
+        },
+        //converting the dateEn to dateDe
+        convertDateEngToDe(date){
+            const [year, month, day] = date.split('-')
+            return (day + "." + month + "." + year)
+        },
+        convertDateDeToEng(date){
+            const [day, month, year] = date.split('.')
+            return (year + "-" + month + "-" + day)
+        },
         //checks if the permissionId is in the permissionIds list and sends the permissionId to the checkPermissionId function
         checkPermissionIdsHere (arg) {
 			if (this.permissionIds) {
@@ -78,7 +100,7 @@ export default{
         //sends the payload to the parent
         sendEvent(){
             //formatting the date data and emitting it
-            const [year, month, day] = this.date.split('-')
+            const [year, month, day] = this.dateEN.split('-')
             const temp = day + '.' + month + '.' + year
             const payload = {
                 elementId: this.elementId,
@@ -94,6 +116,7 @@ export default{
         this.sendEvent();
     },
     created(){
+        this.setDefaultValue();
         this.setEditable();
     },
     computed:{
@@ -103,9 +126,10 @@ export default{
     },
     watch: {
         //when the value of the data changes call the send event function and send the value to the store
-        date:{
+        dateEN:{
             handler(){
                 this.sendEvent();
+                this.dateDE = this.convertDateEngToDe(this.dateEN);
             }
         }
     } 
@@ -119,45 +143,4 @@ export default{
 .inputDate{
     height: 40px;
 }
-/* .inputDiv{
-    height:31px;
-    background-color: #282828;
-    border-style: solid;
-    border-color:white;
-    border-width: thin;
-    border-radius: 3px;
-    width: 100%;
-}
-.inputDiv:has(.myInput:disabled){
-    border-color:gray;
-}
-.myInputError{
-    height:31px;
-    background-color: #282828;
-    border-style: solid;
-    border-color:rgb(153, 0, 0);
-    border-width: thin;
-    border-radius: 3px;
-    width: 100%;
-}
-.myInput:focus-visible{
-    outline: none;
-}
-.myInput{
-    padding: 3px 5px 0 5px;
-    width: 100%;
-    color:white;
-    outline-offset: 0px;
-    outline: none;
-}
-.myInput:disabled{
-    color:gray;
-}
-.label{
-    color: white;
-    position:absolute;
-    left: 4px;
-    top: -15px;
-    font-size: 11px;
-} */
 </style>

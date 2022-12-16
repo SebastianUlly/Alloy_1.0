@@ -70,16 +70,43 @@ export default{
             editable: true
         }
     },
-    apollo:{
-        directory: gql `
-			query directory{
-				directory{
-					id
-					hierarchy
-				} 
-			}
-		`
+
+    created(){
+        this.setEditable();
+        this.setDefaultValue();
     },
+
+    mounted(){
+        //console.log(this.elementId)
+        this.getfile();
+        this.isInputok();
+        this.setEditable(this.permissions.toEdit)
+        //if the component is the company selector then listen to the emit and sends the payloads data to the function
+        if(this.elementId === "0c9cf456-edc3-4779-b00c-14237863fa16"){
+            this.$root.$on('sendSelectedProject', data => {this.setEditableByProject(data)})
+        }
+    },
+
+    
+    computed:{
+        ...mapGetters({
+            permissionIds: 'authentication/getPermissionIds',
+            directory: 'directory/getDatabaseDirectory'
+        })
+    },
+
+    watch:{
+        //if the input value changes calls the sendEvent
+        inputValue:{
+            handler(){
+                this.sendEvent();
+                this.isInputok();
+            }
+        },
+
+
+    },
+    
     methods:{
         //function that call getPharmacyId with the pharmacyId of selected project
         setEditableByProject(value){
@@ -182,9 +209,9 @@ export default{
                 this.editable = this.checkPermissionIdsHere(value);
             }
         },
-        setValue(){
+        setDefaultValue(){
             //if elementIdToSearch and this element is not the Number, set the default value from the database
-            if(this.elementIdToSearch && this.elementId !=="75e96f94-0103-4804-abc0-5331ea980e9b" && this.data != undefined){
+            if(this.elementIdToSearch && this.data != undefined){
                 this.inputValue = (this.data.data.find(item => item.elementId === this.elementId).data.text)
             }   
         },
@@ -197,7 +224,7 @@ export default{
                 } 
             }
             //if the elementId is from the project select then emitting the payloads data
-            if(payload.elementId === "90bd2ecc-38e1-4bf4-bffa-cc7d15b8f323"){
+            if(payload.elementId === "30a1d57d-ac51-4a54-9f83-2c493253b944"){
                 this.$root.$emit('sendSelectedProject', payload);
             }
             this.$emit('update', payload);
@@ -209,6 +236,7 @@ export default{
             }
             //querying the pharmacies of the selectable schema
             if(this.parameters?.selectableSchema){
+                console.log(this.parameters.selectableSchema)
                 this.$apollo.query({
                     variables: {
                         schemaId: this.parameters?.selectableSchema,
@@ -224,29 +252,41 @@ export default{
                     `,
                 //filling the files array with the data of fileBySchemaId.data where elementData.elementId (name field of an apotheke) is the same
                 }).then((data) => {
-                        //if the first file from query has a label with number
-                        if (isNaN(parseFloat(data.data.fileBySchemaId[1].label)) && data.data.fileBySchemaId[1].label !== "BOCOM"){
-                            const temp = data.data.fileBySchemaId;
-                            this.files = temp.map(
-                                function (item, index, array) {
-                                    return item.data.find(
-                                        (elementData) => elementData.elementId === "91f42e63-98b4-462b-bf65-58b416718cb0"
-                                    )?.data?.text;
-                                }
-                            )
-                        } else {
-                            for(const item of data?.data?.fileBySchemaId){
-                                //if the project not deleted
-                                if(this.directory[0].hierarchy.some(e => e.fileId === item.id)){
-                                    this.filesProject.push({
-                                        id: item.id,
-                                        year: item.data.find(element => element.elementId === "577aa568-345a-47e5-9b71-848d5695bd5d").data.text,
-                                        projectNumber: item.label
-                                    })
-                                }
-                            }
-
+                    console.log(data, this.directory)
+                    for (const file of data.data.fileBySchemaId) {
+                        if(this.directory[0]?.hierarchy.some(e => e.fileId === file.id)){
+                            console.log('ödalskd')
+                            this.filesProject.push({
+                                id: file.id,
+                                year: file.data.find(element => element.elementId === "577aa568-345a-47e5-9b71-848d5695bd5d").data.text,
+                                projectNumber: file.label
+                            })
                         }
+                    }
+                    // //if the first file from query has a label with number
+                    // if (isNaN(parseFloat(data.data.fileBySchemaId[1].label)) && data.data.fileBySchemaId[1].label !== "BOCOM"){
+                    //     const temp = data.data.fileBySchemaId;
+                    //     console.log('kjalsd')
+                    //     this.files = temp.map(
+                    //         function (item, index, array) {
+                    //             return item.data.find(
+                    //                 (elementData) => elementData.elementId === "91f42e63-98b4-462b-bf65-58b416718cb0"
+                    //             )?.data?.text;
+                    //         }
+                    //     )
+                    // } else {
+                    //     for(const item of data?.data?.fileBySchemaId){
+                    //         //if the project not deleted
+                    //         if(this.directory[0].hierarchy.some(e => e.fileId === item.id)){
+                    //             this.filesProject.push({
+                    //                 id: item.id,
+                    //                 year: item.data.find(element => element.elementId === "577aa568-345a-47e5-9b71-848d5695bd5d").data.text,
+                    //                 projectNumber: item.label
+                    //             })
+                    //         }
+                    //     }
+
+                    // // }
 
                 }).catch((error) => {
                     console.log({ error });
@@ -282,7 +322,7 @@ export default{
             if(this.inputValue === "" && this.parameters.required){
                 //then add the selectError class on the input
                 this.$refs.input.classList.add("selectError");
-                //and sets the isUnputOkValue flase
+                //and sets the isInputOkValue false
                 isInputOkValue = false;
             }
             //else delete the class from the input and set the isInputOkValue true
@@ -297,32 +337,6 @@ export default{
             }
             //emit the payload to the popUp component
             this.$store.commit('file/setIsInputOk', tempPayload)
-        }
-    },
-    created(){
-        this.setEditable();
-    },
-    computed:{
-        ...mapGetters({
-            permissionIds: 'authentication/getPermissionIds'
-        })
-    },
-    mounted(){
-        this.getfile();
-        this.isInputok();
-        this.setEditable(this.permissions.toEdit)
-        //if the component is the company selector then listen to the emit and sends the payloads data to the function
-        if(this.elementId === "0e2e7998-16ab-4262-9dfe-4137760b0460"){
-            this.$root.$on('sendSelectedProject', data => {this.setEditableByProject(data)})
-        }
-    },
-    watch:{
-        //if the input value changes calls the sendEvent
-        inputValue:{
-            handler(){
-                this.sendEvent();
-                this.isInputok();
-            }
         }
     }
 }

@@ -1,8 +1,33 @@
 <template>
 	<div>
-		<v-data-table v-if="headers" :headers="headers" :items="items"> </v-data-table>
-		<!-- <vue-json-pretty :data="headers" /> -->
-		
+		<v-data-table 
+      v-if="headers"
+      :headers="headers"
+      :items="items"
+      :single-expand="singleExpand"
+      :expanded.sync="expanded"
+      show-expand
+    >
+      <template #item.actions="{item}" v-slot:item="props">
+        <div class="icons">
+			    <button @click="$emit('getClickedItem', item)">
+            <v-icon>
+              mdi-timer-edit-outline
+            </v-icon>
+			    </button>
+			    <button @click="$emit('getClickedItemForDelete', item)">
+            <v-icon> 
+              mdi-delete-outline
+            </v-icon>
+			    </button>
+		    </div>
+      </template>
+      <template v-slot:expanded-item="{ headers, item }">
+        <td :colspan="headers.length">
+          {{item.Beschreibung}}
+        </td>
+      </template>
+    </v-data-table>
 	</div>
 </template>
 
@@ -22,8 +47,11 @@ export default {
       items: [],
       headers: [],
       miscellaneous:{},
+      pharmacyById: {},
       weekday : ["So","Mo","Di","Mi","Do","Fr","Sa"],
       ids:["c519459a-5624-4311-bffb-838d43e7f0d0"],
+      expanded: [],
+      singleExpand: true,
     };
   },
   apollo: {
@@ -47,37 +75,32 @@ export default {
     `
   },
   methods: {
-    async getDataForPopUp(id){
-			let schemas = [];
-			// this.popUpSchema has to empty every time a new schema has to be loaded
-			this.popUpSchema = null;
-			//query the both schema
-			for(const item of id){
-				await this.$apollo.query({
-					variables:{
-						id: item
-					},
-					query: gql`
-						query($id: String){
-							querySchemaById( id: $id){
-								id
-								label
-								metadata
-								elements
-							}
-						}
-					`
-				}).then((data) => {
-					//if both schemas are loaded, sending them to the mergeSchemas function to merge
-					schemas.push(data.data.querySchemaById)
-					if(id.length === schemas.length && id.length !== 1){
-						this.popUpSchema =  (schemas[0], schemas[1]);
-					}else if(id.length === 1){
-						this.popUpSchema = data.data.querySchemaById;
-					}
-				})
-			}
-		},
+    async getPharmacyById(id){
+      if(this.pharmacyById[id]){
+        return this.pharmacyById[id]
+      } else {
+        this.pharmacyById[id] = (
+          await this.$apollo.query({
+            variables: {
+              pharmacyId : id
+            },
+            query: gql `
+              query (
+                $pharmacyId: String
+              ) {
+                queryFileData(
+                  id: $pharmacyId) {
+                    id
+                    label
+                    data
+                }
+              }
+            `
+          })
+        ).data.queryFileData
+        return this.pharmacyById[id]
+      }
+    },
     async getDataFromMiscellaneous(id){ 
       //optimizing the query, when the desired miscellaneous exists, break and returns it
       if(this.miscellaneous[id]){
@@ -138,6 +161,10 @@ export default {
             sortable: false,
             value: "actions"
         });
+        this.headers.push({
+            text: "",
+            value: "data-table-expand"
+        });
         //filling the table
         if(this.points){
           for (const rawItem of this.points) {
@@ -169,6 +196,12 @@ export default {
                   //if the currentItem exists sets to the currentValue of currentItem.data.text or to an empty string
                   currentValue = currentItem.data.text ?? "";
                 }
+                //console.log(currentItem)
+                if(currentItem.elementId == "0c9cf456-edc3-4779-b00c-14237863fa16"){
+                  if(currentItem.data.text){
+                    currentValue = (await this.getPharmacyById(currentItem.data.text)).data[0].data.text ?? "";
+                  }
+                }
                 //if the elementIdToFind (from headers) is the project (projectId)
                 if(elementIdToFind == "30a1d57d-ac51-4a54-9f83-2c493253b944"){
                   //searching the file and the correct year
@@ -177,7 +210,6 @@ export default {
                       if(fileData.elementId == "577aa568-345a-47e5-9b71-848d5695bd5d" && currentValue == file.id){
                         //bind the two data with each other
                         currentValue = [fileData.data.text, file.label].join('-')
-                        
                       }
                     }
                   }
@@ -215,7 +247,13 @@ export default {
       handler() {
         this.dataFill();
       }
-    }
+    },
+    points:{
+      deep:true,
+      handler(){
+        this.dataFill()
+      }
+    },
   } 
 };
 </script>
@@ -223,5 +261,11 @@ export default {
 .addProject{
 	width: 49px;
 	height: 49px;
+}
+tbody > tr > td:nth-of-type(8){
+  text-overflow: ellipsis;
+  max-width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
 }
 </style>
