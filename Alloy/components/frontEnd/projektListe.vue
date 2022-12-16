@@ -208,6 +208,7 @@ export default {
 					`
 				}))
 			}
+
 			return this.pharmacyAbb[pharmacyId]
 		},
 		// function that is called when the project has been successfully saved
@@ -364,6 +365,7 @@ export default {
 					});
 				}
 				for (const rawItem of this.fileBySchemaId) {
+				try {
 					if (this.directory[0].hierarchy.some(e => e.fileId === rawItem.id)) {
 						//reseting the temporary new row
 						let newRow = {};
@@ -376,9 +378,10 @@ export default {
 							//setting the currentValue default to undefined
 							let currentValue;
 							if(currentKey === 'Apotheke'){
-								//console.log(await this.getPharmacyAbb(currentItem.data.text), "asdadasd")
 								let temp = await this.getPharmacyAbb(currentItem.data.text)
-								currentValue = temp.data.queryFileData.data[0].data.text
+								if(temp.data.queryFileData.data[0].data.text !== "BOCOM"){
+									currentValue = temp.data.queryFileData.data[0].data.text
+								}
 							}
 							else if (currentItem) {
 								//if the currentItem exists sets to the currentValue of currentItem.data.text or to an empty string
@@ -398,6 +401,9 @@ export default {
 						newRow["id"] = rawItem.id;
 						//pushing the newRow to the items Array 
 						this.items.push(newRow);
+					}
+					} catch (error) {
+						console.log(error, rawItem)
 					}
 				}
 				this.isFillingData = false;
