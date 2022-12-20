@@ -47,7 +47,7 @@ export default {
     watch:{
         year:{
             handler(){
-                this.$emit('sendYear', this.year)
+                this.$emit('sendYear', this.year.toString())
                 /* this.searchAvailableYears(); */
             }
         }

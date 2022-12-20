@@ -290,26 +290,23 @@ export default {
 		},
 		//capturing the selected year from the component
 		captureMyYear(myYear){
-			this.year = myYear;
+			this.year = myYear.toString();
 		},
-        async dataFill() {
-			if (this.querySchemaById && this.directory && this.fileBySchemaId && this.files && this.schema && !this.isFillingData) {
-				this.headers = []
-				this.items = []
-				this.isFillingData = true;
-				//filling the headers based on previewList
+		headersFill(){
+			this.headers = []
+			if (this.querySchemaById) {
 				for (const elementIdToFind of this.querySchemaById.metadata?.metadata_elements[0].parameters.previewList) {
 					//merge the elements and the metadata
 					for (const item of [...this.querySchemaById.elements, ...this.querySchemaById.metadata?.metadata_elements]) {
 						//if the element ID is the same as we need, it will push the label and add the elementIdToFind to the label
 						if (item.elementId === elementIdToFind) {
 							//checking if the row permissioinId needed or the user the permission has
-							if(item.permissionId && !this.checkPermissionIdsHere(item.permissionId)){
+							if (item.permissionId && !this.checkPermissionIdsHere(item.permissionId)) {
 								//if the permissinId exists but the user has no permission to see this row the continue will exacute
 								//it means that the for loop will jump to the next element
 								continue;
 							}
-							if(item.label === "Jahr"){
+							if (item.label === "Jahr") {
 								//pushing the row (object) with the following settings to the headers (array)
 								this.headers.push({
 									//the header name is the label of the item
@@ -323,15 +320,15 @@ export default {
 									value: item.label.replace(/[^a-zA-Z ]/g, ""),
 									//giving the elementId to the headers object too
 									elementId: elementIdToFind,
-									// filtering the projects to get just the list with the desired year (value comes from the selectYear component)
-									filter: value => {
+									// filtering the projects to get just the list with the desired year (yar comes from the selectYear component)
+									 filter: value => {
 										if (!this.year) return true
-										return value.toString().includes(this.year.toString())
+										return value.includes(this.year) 
 									}
 								})	
 							}
 							// the number is a special case where the width and the align must be set
-							else if(item.label === "Nummer"){
+							else if (item.label === "Nummer") {
 								this.headers.push({
 									text: item.label,
 									width:"5%",
@@ -349,7 +346,7 @@ export default {
 									sortable: true,
 									value: item.label.replace(/[^a-zA-Z ]/g, ""),
 									elementId: elementIdToFind
-							});
+								});
 							}
 							
 						}
@@ -364,6 +361,16 @@ export default {
 						value: "actions"
 					});
 				}
+			}
+			if(this.fileBySchemaId){
+				this.itemsFill();
+			}
+		},
+        async itemsFill() {
+			if (this.querySchemaById && this.directory && this.fileBySchemaId && this.files && this.schema) {
+				let tempItems = [];
+				//filling the headers based on previewList
+				
 				for (const rawItem of this.fileBySchemaId) {
 				try {
 					if (this.directory[0].hierarchy.some(e => e.fileId === rawItem.id)) {
@@ -400,13 +407,13 @@ export default {
 						//adding the elementId to the items array
 						newRow["id"] = rawItem.id;
 						//pushing the newRow to the items Array 
-						this.items.push(newRow);
+						tempItems.push(newRow);
 					}
 					} catch (error) {
 						console.log(error, rawItem)
 					}
 				}
-				this.isFillingData = false;
+				this.items = tempItems
 			}
         },
 		completeDirectory () {
@@ -430,40 +437,37 @@ export default {
 		// watcher to react to changes in the directory when it is called from the API
 		directory: {
 			deep: true,
-			async handler () {
-				this.completeDirectory()
-				await this.dataFill()
+			handler () {
+				this.completeDirectory();
 			}
 		},
 		// watcher to react to changes in the files when they are called from the API
 		files: {
 			deep: true,
-			async handler () {
-				this.completeDirectory()
-				await this.dataFill()
+			handler () {
+				this.completeDirectory();
 			}
 		},
 		// watcher to react to changes in the schema when they are called from the API
 		schema: {
 			deep: true,
-			async handler () {
-				this.completeDirectory()
-				await this.dataFill()
+			handler(){
+				this.completeDirectory();
 			}
 		},
 		// watcher to react to changes in the projectSchema when it is called from the API
         querySchemaById: {
             deep: true,
-            async handler() {
-                await this.dataFill();
+            handler() {
+				this.headersFill();
             }
         },
 		// watcher to react to changes in the project-files when they are called from the API
 		fileBySchemaId: {
 			deep: true,
-			async handler () {
+			handler () {
 				this.$store.commit('file/setFileList', this.fileBySchemaId)
-				await this.dataFill()
+				this.itemsFill();
 			}
 		}
     },

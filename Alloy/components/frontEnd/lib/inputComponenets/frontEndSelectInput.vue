@@ -21,8 +21,8 @@
                 >{{item.name}}</option>
                 <!-- options for the select project comes from getFile function -->
                 <option
-                    v-if="filesProject"
-                    v-for="(item, index) in filesProject"
+                    v-if="options"
+                    v-for="(item, index) in options"
                     :value="item.id"
                 >{{item.year}}-{{item.projectNumber}}</option>
             </select>
@@ -67,7 +67,8 @@ export default{
             },
             filesFromMiscellaneous:[],
             filesProject:[],
-            editable: true
+            editable: true,
+            options:[]
         }
     },
 
@@ -102,12 +103,23 @@ export default{
                 this.sendEvent();
                 this.isInputok();
             }
-        },
-
-
+        }
     },
     
     methods:{
+        //sort and get the youngest 10 element of the projects
+        sortFilesProject(){
+            let temp = this.filesProject
+            temp.sort(function(a, b){
+                if(a.projectNumber < b.projectNumber){
+                    return 1
+                } if(a.projectNumber > b.projectNumber){
+                    return -1
+                }
+                return 0
+            })
+            this.options = temp;
+        },
         //function that call getPharmacyId with the pharmacyId of selected project
         setEditableByProject(value){
              this.$apollo.query({
@@ -252,10 +264,8 @@ export default{
                     `,
                 //filling the files array with the data of fileBySchemaId.data where elementData.elementId (name field of an apotheke) is the same
                 }).then((data) => {
-                    console.log(data, this.directory)
                     for (const file of data.data.fileBySchemaId) {
                         if(this.directory[0]?.hierarchy.some(e => e.fileId === file.id)){
-                            console.log('ödalskd')
                             this.filesProject.push({
                                 id: file.id,
                                 year: file.data.find(element => element.elementId === "577aa568-345a-47e5-9b71-848d5695bd5d").data.text,
@@ -263,6 +273,7 @@ export default{
                             })
                         }
                     }
+                    this.sortFilesProject()
                     // //if the first file from query has a label with number
                     // if (isNaN(parseFloat(data.data.fileBySchemaId[1].label)) && data.data.fileBySchemaId[1].label !== "BOCOM"){
                     //     const temp = data.data.fileBySchemaId;
@@ -388,6 +399,7 @@ export default{
 option{
     background-color:#282828;
     color: white;
+    max-height: 50px;
 }
 .mdi-chevron{
     color:white;

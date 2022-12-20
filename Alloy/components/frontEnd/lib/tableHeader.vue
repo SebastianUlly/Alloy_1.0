@@ -28,7 +28,7 @@
 			>
 				{{ weeklySummary.hoursaldo }}
 			</span>
-			<v-icon>
+			<v-icon class="icon">
 				mdi-clock-outline
 			</v-icon>
 		</p>
@@ -42,7 +42,7 @@
 			<span>
 				({{ userInfo.holiday }})
 			</span>
-			<v-icon>
+			<v-icon class="icon">
 				mdi-calendar-blank
 			</v-icon>
 		</p>
@@ -56,9 +56,10 @@
 		</p>
 		<v-btn
 			v-if="button === 'sign'"
-			class="button"
+			class="sign-button"
+			color="green"
 		>
-			KW Freigeben
+			Freigeben
 		</v-btn>
 		<v-btn
 			v-if="button === 'pdf'"
@@ -96,16 +97,20 @@ export default {
 
 <style lang="scss" scoped>
 .header {
+	max-width: 60%;
 	display: flex;
 	background-color: #272727;
     height: 50px;
     align-items: center;
-    padding: 0 15px;
+	justify-content: space-around;
+	padding: 0 15px;
 	position: relative;
+	white-space: nowrap;
 }
 
 h1 {
 	margin: 0 30px 0 0;
+	font-size: x-large;
 }
 
 p {
@@ -118,5 +123,9 @@ p:first-of-type {
 
 .button {
 	position: relative;
+}
+
+span{
+	font-size: medium;
 }
 </style>

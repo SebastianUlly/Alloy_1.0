@@ -53,7 +53,6 @@ export default {
     color: white;
     padding-left: 5px;
     padding-right: 10%;
-    
 }
 .searchIcon{
     float: right;

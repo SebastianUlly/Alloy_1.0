@@ -1,15 +1,20 @@
 <template>
 	<div>
-		<v-btn
-			style="min-width:0"
-			class="addProject"
-			color="green"
-			@click="openNewProject(true)"
-		>
-			<v-icon>
-				mdi-timer-plus-outline
-			</v-icon>
-		</v-btn>
+		<div class="top-section">
+			<v-btn
+				style="min-width:0"
+				class="addProject"
+				color="green"
+				@click="openNewProject(true)"
+			>
+				<v-icon>
+					mdi-timer-plus-outline
+				</v-icon>
+			</v-btn>
+			<dropDown/>
+			<selectYear @sendYear="captureMyYear" class="selectYearComponent"/>
+			<search @sendValue="captureMySearchValue" />
+		</div>
 		<popUp
 			v-if="popUp && popUpSchema"
 			@closeNewProject="openNewProject($event)"
@@ -37,6 +42,7 @@
 				}"
 				:weekly-summary="userSummary"
 				:button="'sign'"
+				class="tableHeader"
 			/>
 			<TableHeader
 				v-else-if="kw"
@@ -47,12 +53,16 @@
 				}"
 				:weekly-summary="userSummary"
 				:button="'pdf'"
+				class="tableHeader"
 			/>
 			<zeiterfassung
 				v-if="kw"
 				:points="kw"
+				:year="yearForZeiterfassung"
+				:searchValue="searchValueForZeiterfassung"
 				@getClickedItem="openEditTime"
 				@getClickedItemForDelete="getClickedItemForDelete"
+				class="zeiterfassung" 
 			/>
 		</div>
 	</div>
@@ -65,13 +75,19 @@ import popUp from "~/components/frontEnd/lib/popUp";
 import TableHeader from '~/components/frontEnd/lib/tableHeader';
 import { mergeSchemas } from '~/assets/classes/objectClasses'
 import confirmPopUp from "~/components/frontEnd/lib/confirmPopUp";
+import selectYear from "~/components/frontEnd/selectYear";
+import search from "~/components/frontEnd/search";
+import dropDown from "~/components/frontEnd/dropDown"
 
 export default {
 	components: {
 		zeiterfassung,
 		popUp,
 		TableHeader,
-		confirmPopUp
+		confirmPopUp,
+		selectYear,
+		search,
+		dropDown
 	},
 
 	apollo: {
@@ -107,7 +123,9 @@ export default {
 				sickdays: 3
 			},
 			currentKW: 0,
-			clickedFile:""
+			clickedFile:"",
+			yearForZeiterfassung: "",
+			searchValueForZeiterfassung: ""
 		}
 	},
 
@@ -125,7 +143,6 @@ export default {
 		directory: {
 			deep: true,
 			handler () {
-				console.log('aslkdj')
 				this.$store.commit('directory/setDirectoryFromDatabase', this.directory)
 			}
 		},
@@ -140,6 +157,12 @@ export default {
 	},
 
 	methods: {
+		captureMySearchValue(value){
+			this.searchValueForZeiterfassung = value
+		},
+		captureMyYear (year) {
+			this.yearForZeiterfassung = year;
+		},
 		getWeeklySummary (kw) {
 			let hours = 0
 			let minutes = 0
@@ -286,6 +309,16 @@ export default {
 
 <style lang="scss" scoped>
 .kw {
-	margin: 50px 0;
+	margin-bottom: 30px;
+}
+.zeiterfassung {
+	max-width: 60%
+}
+.top-section{
+	margin-top: 30px;
+	max-width: 60%;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
 }
 </style>
