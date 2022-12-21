@@ -105,7 +105,7 @@ export default {
 	justify-content: space-around;
 	padding: 0 15px;
 	position: relative;
-	white-space: nowrap;
+	
 }
 
 h1 {

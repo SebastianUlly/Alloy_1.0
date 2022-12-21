@@ -1,6 +1,7 @@
 <template>
     <!-- vuetify datePicker component -->
     <div class="dateInputMain">
+        <span class="label">{{ label }}</span>
         <v-menu
             v-model="menu"
             :close-on-content-click="false"
@@ -13,10 +14,9 @@
                 <v-text-field
                     class="inputDate"
                     v-model="dateDE"
-                    :label="label"
                     readonly
                     v-bind="attrs"
-                    v-on="on"
+                    v-on="on"  
                 ></v-text-field>
             </template>
             <v-date-picker
@@ -137,10 +137,33 @@ export default{
 </script>
 <style scoped>
 .dateInputMain{
-    margin-bottom: 10px;
     position: relative;
 }
 .inputDate{
-    height: 40px;
+    padding-left:10px;
+    margin-top:0;
+    height:31px;
+    background-color: #282828;
+    border-style: solid;
+    border-color:white;
+    border-width: thin;
+    border-radius: 3px;
+    width: 100%;
+}
+.label{
+    color: white;
+    position:absolute;
+    left: 4px;
+    top: -15px;
+    font-size: 11px;
+}
+.v-text-field {
+    padding-top: 0 !important;
+}
+.v-text-field > .v-input__control > .v-input__slot:before, .v-text-field > .v-input__control > .v-input__slot:after{
+    border-style:none
+}
+.v-text-field > .v-input__control > .v-input__slot:after {
+    border-style: none;
 }
 </style>
