@@ -83,6 +83,7 @@ export default{
         },
         //checking the database default value
         setDefaultValue(){
+            console.log(this.userMeta)
             //checking if the elementId is not the id of Number
             if(this.elementIdToSearch && this.elementId !=="75e96f94-0103-4804-abc0-5331ea980e9b" && this.data != undefined){
                 for(let item of this.data.data){
@@ -176,7 +177,8 @@ export default{
             directory : "directory/getDirectory",
             permissionIds: 'authentication/getPermissionIds',
             userId: 'authentication/getUserId',
-            userName: 'authentication/getUserName'
+            userName: 'authentication/getUserName',
+            userMeta: 'authentication/getUserMeta'
         })
     },
      watch: {

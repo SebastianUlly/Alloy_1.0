@@ -12,17 +12,20 @@
         >
             <template v-slot:activator="{ on, attrs }">
                 <v-text-field
+                    style=""
                     class="inputDate"
                     v-model="dateDE"
                     readonly
                     v-bind="attrs"
-                    v-on="on"  
+                    v-on="on"
                 ></v-text-field>
             </template>
             <v-date-picker
                 no-title
                 v-model="dateEN"
                 @input="menu = false"
+                :max="maxDate"
+                :first-day-of-week="1"
             ></v-date-picker>
         </v-menu>
     </div>
@@ -58,12 +61,20 @@ export default{
             dateEN: "",
             dateDE: "",
             formattedDate:"",
-            menu: false
+            menu: false,
+            isInputOkValue: false,
+            maxDate: new Date()
         }
     },
     methods:{
         //set the default value for the input if elementIdToSearch not exists
         setDefaultValue(){
+            //set the max value. The value comes from the database
+            let temp = new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)
+            temp.setDate(temp.getDate() - temp.getDay() + 1) 
+            temp.setDate(temp.getDate() + this.parameters.maxDayRange -1)
+            this.maxDate = temp.toISOString()
+            
             this.dateEN = (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10)
             this.dateDE = this.convertDateEngToDe(this.dateEN)
             if(this.elementIdToSearch && this.data != undefined){
@@ -110,6 +121,21 @@ export default{
             }
             this.$emit('update', payload);
         },
+        isInputOk(){
+            if(this.inputValue === "" && this.parameters.required){
+                this.$refs.inputDiv.classList.add("inputError");
+                this.isInputOkValue = false
+            }else{
+                this.isInputOkValue = true
+                this.$refs.inputDiv.classList.remove("inputError");
+            }
+            let tempPayload = {
+                elementId: this.elementId,
+                value: this.isInputOkValue
+            }
+            //sending the elementId and the value to the store
+            this.$store.commit('file/setIsInputOk', tempPayload)   
+        }
     },
     mounted(){
         //send the default date to the store
@@ -157,13 +183,5 @@ export default{
     top: -15px;
     font-size: 11px;
 }
-.v-text-field {
-    padding-top: 0 !important;
-}
-.v-text-field > .v-input__control > .v-input__slot:before, .v-text-field > .v-input__control > .v-input__slot:after{
-    border-style:none
-}
-.v-text-field > .v-input__control > .v-input__slot:after {
-    border-style: none;
-}
+
 </style>

@@ -9,7 +9,7 @@
                 </v-icon>
             </div>
             <!-- the label -->
-            <div class="label" v-if="popUpSchema.label">
+            <div class="popUpLabellabel" v-if="popUpSchema.label">
                 {{popUpSchema.label}}
             </div>
             <!-- close button with white background closes the popUp window-->
@@ -346,7 +346,7 @@ $columns: 12;
 .addButtonDiv{
     margin-bottom: 20px;
 }
-.label{
+.popUpLabellabel{
     font-size: 20px;
 }
 .closeIcon{

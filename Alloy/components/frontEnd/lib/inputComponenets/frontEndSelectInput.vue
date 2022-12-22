@@ -260,7 +260,6 @@ export default{
             }
             //querying the pharmacies of the selectable schema
             if(this.parameters?.selectableSchema){
-                console.log(this.parameters.selectableSchema)
                 this.$apollo.query({
                     variables: {
                         schemaId: this.parameters?.selectableSchema,
