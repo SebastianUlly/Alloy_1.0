@@ -386,7 +386,7 @@ export default {
 							let currentValue;
 							if(currentKey === 'Apotheke'){
 								let temp = await this.getPharmacyAbb(currentItem.data.text)
-								if(temp.data.queryFileData.data[0].data.text !== "BOCOM"){
+								 if(temp.data.queryFileData.data[0].data.text !== "BOCOM"){
 									currentValue = temp.data.queryFileData.data[0].data.text
 								}
 							}

@@ -104,6 +104,13 @@ export default{
                 this.sendEvent();
                 this.isInputok();
             }
+        },
+        permissions:{
+            deep: true,
+            handler(){
+                this.setEditable(this.permissions.toEdit);
+                this.getfile(this.parameters.default);
+            }
         }
     },
     
@@ -233,7 +240,8 @@ export default{
                 this.editable = this.checkPermissionIdsHere(value);
             }
         },
-        setDefaultValue(){
+        setDefaultValue(value){
+
             //if elementIdToSearch and this element is not the Number, set the default value from the database
             if(this.elementIdToSearch && this.data != undefined){
                 this.inputValue = (this.data.data.find(item => item.elementId === this.elementId).data.text)
@@ -241,7 +249,7 @@ export default{
         },
         //sending the selected data to the store
         sendEvent(){
-            const payload = {
+            let payload = {
                 elementId: this.elementId,
                 data:{
                     text : this.inputValue

@@ -104,7 +104,35 @@ export default {
     mounted () {
         this.createNewFile()
     },
+
     methods:{
+        isDayTypeHoliday(){
+            
+            //reset the props if we set Urlaub to Arbeit
+            //reset the project field
+            this.popUpSchema.elements.find(element => element.elementId == "30a1d57d-ac51-4a54-9f83-2c493253b944").permissions.toEdit = true;
+            delete this.popUpSchema.elements?.find(element => element.elementId == "30a1d57d-ac51-4a54-9f83-2c493253b944").parameters["default"]
+            //reset the activity type
+            this.popUpSchema.elements.find(element => element.elementId == "9a8284f2-5615-4cb5-893b-56cc3476b169").permissions.toEdit = true;
+            delete this.popUpSchema.elements.find(element => element.elementId == "9a8284f2-5615-4cb5-893b-56cc3476b169").parameters["default"]
+            //reset beschreibung
+            this.popUpSchema.elements.find(element => element.elementId == "65138254-8e1f-4b0b-91ae-70540e468459").permissions.toEdit = true;
+            this.popUpSchema.elements.find(element => element.elementId == "65138254-8e1f-4b0b-91ae-70540e468459").parameters.required = true;
+
+            //if Urlaub clicked change the props for child components
+            if(this.getDataToSave.find(item => item.elementId == "f951c3cf-1594-435e-85be-e951be00bb44")?.data?.text == "95aa87dc-9f80-4c33-8ccd-f59f543bec8e"){
+                (this.popUpSchema.elements?.find(element => element.elementId == "30a1d57d-ac51-4a54-9f83-2c493253b944")).parameters["default"] = "83c2e854-1d18-49e6-85ba-29335e02f466";
+                (this.popUpSchema.elements?.find(element => element.elementId == "30a1d57d-ac51-4a54-9f83-2c493253b944")).permissions.toEdit = false;
+                //set the activity type
+                (this.popUpSchema.elements?.find(element => element.elementId == "9a8284f2-5615-4cb5-893b-56cc3476b169")).permissions.toEdit = false;
+                (this.popUpSchema.elements?.find(element => element.elementId == "9a8284f2-5615-4cb5-893b-56cc3476b169")).parameters["default"] = "bfe1e26b-0801-4bd1-86c0-563d8118b609";
+                //set the beschreibung not required
+                (this.popUpSchema.elements?.find(element => element.elementId == "65138254-8e1f-4b0b-91ae-70540e468459")).permissions.toEdit = false;
+                (this.popUpSchema.elements?.find(element => element.elementId == "65138254-8e1f-4b0b-91ae-70540e468459")).parameters.required = false;
+
+                console.log(this.popUpSchema)
+            }
+        },
         updatePoint(){
             this.$apollo.mutate({
 				variables: {
@@ -304,7 +332,13 @@ export default {
                 //updating the icon if its available
                 this.icon = String(this.popUpSchema?.metadata?.icon);
 			}
-		}
+		},
+        getDataToSave:{
+            deep: true,
+            handler (){
+                this.isDayTypeHoliday();
+            }
+        }
 	}
 }
 

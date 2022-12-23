@@ -83,9 +83,12 @@ export default{
         },
         //checking the database default value
         setDefaultValue(){
-            console.log(this.userMeta)
             //checking if the elementId is not the id of Number
             if(this.elementIdToSearch && this.elementId !=="75e96f94-0103-4804-abc0-5331ea980e9b" && this.data != undefined){
+                //clicking on the time edit icon will not display the data from the database but the full name of the logged in user
+                if(this.parameters.default == "currentUser" && this.elementIdToSearch){
+                    this.displayValue = this.userMeta.firstName + " " + this.userMeta.lastName
+                }
                 for(let item of this.data.data){
                     if(item.elementId == this.elementId){
                         this.inputValue = item.data.text
@@ -97,7 +100,7 @@ export default{
                 this.inputValue = this.data.label
             }
             else if (this.parameters.default === "currentUser"){
-                this.displayValue = this.userName
+                this.displayValue = this.userMeta.firstName + " " + this.userMeta.lastName
                 this.inputValue = this.userId
             }
             //if the default value is currentYear, set the defaultValue to the current year

@@ -69,7 +69,7 @@ export default{
     methods:{
         //set the default value for the input if elementIdToSearch not exists
         setDefaultValue(){
-            //set the max value. The value comes from the database
+            //set the max value. The range value comes from the database
             let temp = new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)
             temp.setDate(temp.getDate() - temp.getDay() + 1) 
             temp.setDate(temp.getDate() + this.parameters.maxDayRange -1)
