@@ -107,7 +107,6 @@ export default {
 
     methods:{
         isDayTypeHoliday(){
-            
             //reset the props if we set Urlaub to Arbeit
             //reset the project field
             this.popUpSchema.elements.find(element => element.elementId == "30a1d57d-ac51-4a54-9f83-2c493253b944").permissions.toEdit = true;
@@ -130,7 +129,7 @@ export default {
                 (this.popUpSchema.elements?.find(element => element.elementId == "65138254-8e1f-4b0b-91ae-70540e468459")).permissions.toEdit = false;
                 (this.popUpSchema.elements?.find(element => element.elementId == "65138254-8e1f-4b0b-91ae-70540e468459")).parameters.required = false;
 
-                console.log(this.popUpSchema)
+                //console.log(this.popUpSchema)
             }
         },
         updatePoint(){
@@ -336,7 +335,10 @@ export default {
         getDataToSave:{
             deep: true,
             handler (){
-                this.isDayTypeHoliday();
+                //run thisfunction if the popUp is Arbeitszeit hinzufügen oder Arbeitstzeit bearbeiten
+                if(this.popUpSchema.id == "c519459a-5624-4311-bffb-838d43e7f0d0" || this.popUpSchema.id == "50dd57aa-b759-42e7-9bae-3830cd605f02"){
+                    this.isDayTypeHoliday();
+                }
             }
         }
 	}
