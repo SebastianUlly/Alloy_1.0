@@ -45,6 +45,7 @@
 						:header-props="{ sortIcon: null }"
 						:sort-by="'Nummer'"
 						:sort-desc="true"
+						:loading="isFillingData"
 					>
 						<!-- this template contains the last column with the action buttons -->
 						<template 
@@ -368,6 +369,7 @@ export default {
 		},
         async itemsFill() {
 			if (this.querySchemaById && this.directory && this.fileBySchemaId && this.files && this.schema) {
+				this.isFillingData = true;
 				let tempItems = [];
 				//filling the headers based on previewList
 				
@@ -417,6 +419,7 @@ export default {
 					}
 				}
 				this.items = tempItems
+				this.isFillingData = false;
 			}
         },
 		completeDirectory () {

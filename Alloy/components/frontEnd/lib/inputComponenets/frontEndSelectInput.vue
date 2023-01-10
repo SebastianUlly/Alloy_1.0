@@ -275,71 +275,73 @@ export default{
             }
             //querying the pharmacies of the selectable schema
             if(this.parameters?.selectableSchema){
-                this.$apollo.query({
-                    variables: {
-                        schemaId: this.parameters?.selectableSchema,
-                    },
-                    query: gql`
-                        query ($schemaId: String) {
-                            fileBySchemaId(schemaId: $schemaId) {
-                                id
-                                label
-                                data
+                for(let selectableSchema of this.parameters?.selectableSchema){
+                    this.$apollo.query({
+                        variables: {
+                            schemaId: selectableSchema
+                        },
+                        query: gql`
+                            query ($schemaId: String) {
+                                fileBySchemaId(schemaId: $schemaId) {
+                                    id
+                                    label
+                                    data
+                                }
                             }
-                        }
-                    `,
-                //filling the files array with the data of fileBySchemaId.data where elementData.elementId (name field of an apotheke) is the same
-                }).then((data) => {
-                    //if the current selectInput is not the pharmacy selector
-                    if(this.elementId !== "09c5ba61-4e52-4a68-afde-bb7334b45b35"){
-                        for (const file of data.data.fileBySchemaId) {
-                            if(this.directory[0]?.hierarchy.some(e => e.fileId === file.id)){
-                                this.filesProject.push({
-                                    id: file.id,
-                                    year: file.data.find(element => element.elementId === "577aa568-345a-47e5-9b71-848d5695bd5d").data.text,
-                                    projectNumber: file.label
+                        `,
+                    //filling the files array with the data of fileBySchemaId.data where elementData.elementId (name field of an apotheke) is the same
+                    }).then((data) => {
+                        //if the current selectInput is not the pharmacy selector
+                        if(this.elementId !== "09c5ba61-4e52-4a68-afde-bb7334b45b35"){
+                            for (const file of data.data.fileBySchemaId) {
+                                if(this.directory[0]?.hierarchy.some(e => e.fileId === file.id)){
+                                    this.filesProject.push({
+                                        id: file.id,
+                                        year: file.data.find(element => element.elementId === "577aa568-345a-47e5-9b71-848d5695bd5d").data.text,
+                                        projectNumber: file.label
+                                    })
+                                }
+                            }
+                            //if the current selectInput is the pharmacy selector
+                        } else if (this.elementId == "09c5ba61-4e52-4a68-afde-bb7334b45b35") {
+                            for(const pharmacy of data.data.fileBySchemaId){
+                                this.files.push({
+                                    id: pharmacy.id,
+                                    label: pharmacy.data.find(element => element.elementId === "91f42e63-98b4-462b-bf65-58b416718cb0").data.text
                                 })
                             }
                         }
-                        //if the current selectInput is the pharmacy selector
-                    } else if (this.elementId == "09c5ba61-4e52-4a68-afde-bb7334b45b35") {
-                        for(const pharmacy of data.data.fileBySchemaId){
-                            this.files.push({
-                                id: pharmacy.id,
-                                label: pharmacy.data[0].data.text
-                            })
-                        }
-                    }
-                    //run the sort files function that sort the filesProject array
-                    this.sortFilesProject()
-                    // //if the first file from query has a label with number
-                    /* if (isNaN(parseFloat(data.data.fileBySchemaId[1].label)){
-                         const temp = data.data.fileBySchemaId;
-                         console.log('kjalsd')
-                         this.files = temp.map(
-                             function (item, index, array) {
-                                 return item.data.find(
-                                    (elementData) => elementData.elementId === "91f42e63-98b4-462b-bf65-58b416718cb0"
-                                 )?.data?.text;
-                             }
-                         )
-                     } else {
-                         for(const item of data?.data?.fileBySchemaId){
-                             //if the project not deleted
-                             if(this.directory[0].hierarchy.some(e => e.fileId === item.id)){
-                                 this.filesProject.push({
-                                     id: item.id,
-                                     year: item.data.find(element => element.elementId === "577aa568-345a-47e5-9b71-848d5695bd5d").data.text,
-                                     projectNumber: item.label
-                                 })
-                             }
-                         }
+                        //run the sort files function that sort the filesProject array
+                        this.sortFilesProject()
+                        // //if the first file from query has a label with number
+                        /* if (isNaN(parseFloat(data.data.fileBySchemaId[1].label)){
+                            const temp = data.data.fileBySchemaId;
+                            console.log('kjalsd')
+                            this.files = temp.map(
+                                function (item, index, array) {
+                                    return item.data.find(
+                                        (elementData) => elementData.elementId === "91f42e63-98b4-462b-bf65-58b416718cb0"
+                                    )?.data?.text;
+                                }
+                            )
+                        } else {
+                            for(const item of data?.data?.fileBySchemaId){
+                                //if the project not deleted
+                                if(this.directory[0].hierarchy.some(e => e.fileId === item.id)){
+                                    this.filesProject.push({
+                                        id: item.id,
+                                        year: item.data.find(element => element.elementId === "577aa568-345a-47e5-9b71-848d5695bd5d").data.text,
+                                        projectNumber: item.label
+                                    })
+                                }
+                            }
 
-                     } */
+                        } */
 
-                }).catch((error) => {
-                    console.log({ error } );
-                });
+                    }).catch((error) => {
+                        console.log({ error } );
+                    });
+                }
             //if its not an pharmacy then fills it with the parameters.options from the parent component
             }else if(this.parameters.options) {
                 this.optionsFromDatabase = this.parameters.options
@@ -347,20 +349,20 @@ export default{
             //if the parameters.optionSource exist query the miscellaneous by the option source id
             else if(this.parameters?.optionSource){
                 this.$apollo.query({
-					variables:{
-						id: this.parameters.optionSource
-					},
-					query: gql`
-						query($id: String){
-							miscellaneousById( id: $id){
-								id
-								label
-								data
-							}
-						}
-					`
-				}).then((data) => {
-                  this.filesFromMiscellaneous = data.data.miscellaneousById.data
+                    variables:{
+                        id: this.parameters.optionSource
+                    },
+                    query: gql`
+                        query($id: String){
+                            miscellaneousById( id: $id){
+                                id
+                                label
+                                data
+                            }
+                        }
+                    `
+                }).then((data) => {
+                this.filesFromMiscellaneous = data.data.miscellaneousById.data
                 })
             }
         },

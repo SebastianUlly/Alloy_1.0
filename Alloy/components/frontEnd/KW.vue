@@ -153,6 +153,9 @@ export default {
 				this.sortPoints()
 				this.$store.commit('point/setPointList', this.pointsByUser)
 			}
+		},
+		yearForZeiterfassung(){
+			this.sortPoints()
 		}
 	},
 
@@ -229,10 +232,16 @@ export default {
 			this.$apollo.queries.pointsByUser.refetch()
 		},
 		sortPoints () {
+			this.kwListWithPoints = []
 			let tempList = new Array(53)
 			if (this.pointsByUser) {
 				for (const point of this.pointsByUser) {
 					const date = point.data.find(item => item.elementId === 'd43d0fd0-172d-4b7a-a942-990597d3cb42').data.text.split('.')
+					console.log(date)
+					if(date[2] !== this.yearForZeiterfassung){
+						console.log(date[2], this.yearForZeiterfassung)
+						continue
+					}
 					const KWNumber = this.KalenderWoche(date[2], date[1], date[0])
 					if (!tempList[KWNumber]) {
 						tempList[KWNumber] = []
