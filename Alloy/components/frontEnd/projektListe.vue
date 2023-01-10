@@ -372,45 +372,44 @@ export default {
 				//filling the headers based on previewList
 				
 				for (const rawItem of this.fileBySchemaId) {
-				try {
-					if (this.directory[0].hierarchy.some(e => e.fileId === rawItem.id)) {
-						//reseting the temporary new row
-						let newRow = {};
-						//merge the elements and the metadata
-						for (const elementIdToFind of this.querySchemaById.metadata.metadata_elements[0].parameters.previewList) {
-							//creating the currentItem variable that contains the elementId of the currentItem
-							let currentItem = rawItem.data.find(item => item.elementId === elementIdToFind);
-							//creating the currentKey variable that contains the elementId of the headers
-							let currentKey = this.headers.find(item => item.elementId === elementIdToFind)?.value;
-							//setting the currentValue default to undefined
-							let currentValue;
-							if(currentKey === 'Apotheke'){
-								let temp = await this.getPharmacyAbb(currentItem.data.text)
-								 if(temp.data.queryFileData.data[0].data.text !== "BOCOM"){
-									currentValue = temp.data.queryFileData.data[0].data.text
+					try {
+						if (this.directory[0].hierarchy.some(e => e.fileId === rawItem.id)) {
+							//reseting the temporary new row
+							let newRow = {};
+							//merge the elements and the metadata
+							for (const elementIdToFind of this.querySchemaById.metadata.metadata_elements[0].parameters.previewList) {
+								//creating the currentItem variable that contains the elementId of the currentItem
+								let currentItem = rawItem.data.find(item => item.elementId === elementIdToFind);
+								//creating the currentKey variable that contains the elementId of the headers
+								let currentKey = this.headers.find(item => item.elementId === elementIdToFind)?.value;
+								//setting the currentValue default to undefined
+								let currentValue;
+								if(currentKey === 'Apotheke'){
+									let temp = await this.getPharmacyAbb(currentItem.data.text)
+									// if(temp.data.queryFileData.data[0].data.text !== "BOCOM"){
+										currentValue = temp.data.queryFileData.data[0].data.text
+									// }
+									
+								} else if (currentItem) {
+									//if the currentItem exists sets to the currentValue of currentItem.data.text or to an empty string
+									currentValue = currentItem.data.text ?? "";
+								} else if (rawItem.label && (currentKey === 'Nummer')) {
+									//if the data was not in elements than it muss be the label of rawItem
+									currentValue = rawItem.label;
+								}
+								
+								//if the currentKey and the currentValue not undefined, than set the newRows value to currentValue
+								if (currentKey && currentValue) {
+									newRow[currentKey] = currentValue;
 								}
 							}
-							else if (currentItem) {
-								//if the currentItem exists sets to the currentValue of currentItem.data.text or to an empty string
-								currentValue = currentItem.data.text ?? "";
-							}
-							else if (rawItem.label && (currentKey === 'Nummer')) {
-								//if the data was not in elements than it muss be the label of rawItem
-								currentValue = rawItem.label;
-							}
-							
-							//if the currentKey and the currentValue not undefined, than set the newRows value to currentValue
-							if (currentKey && currentValue) {
-								newRow[currentKey] = currentValue;
-							}
+							//adding the elementId to the items array
+							newRow["id"] = rawItem.id;
+							//pushing the newRow to the items Array 
+							tempItems.push(newRow);
 						}
-						//adding the elementId to the items array
-						newRow["id"] = rawItem.id;
-						//pushing the newRow to the items Array 
-						tempItems.push(newRow);
-					}
 					} catch (error) {
-						console.log(error, rawItem)
+						console.log({error}, rawItem)
 					}
 				}
 				this.items = tempItems

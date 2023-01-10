@@ -12,8 +12,8 @@
                 <option
                     v-if="files"
                     v-for="(item, index) in files"
-                    :value="item"
-                >{{item}}</option>
+                    :value="item.id"
+                >{{item.label}}</option>
                 <!-- options from the miscellaneous or from getPharmacyByName() function -->
                 <option
                     v-if="filesFromMiscellaneous"
@@ -26,6 +26,12 @@
                     v-for="(item, index) in options"
                     :value="item.id"
                 >{{item.year}}-{{item.projectNumber}}</option>
+                <!-- options if the source comes from the database -->
+                <option
+                    v-if="optionsFromDatabase"
+                    v-for="(item, index) in optionsFromDatabase"
+                    :value="item"
+                >{{item}}</option>
             </select>
             <!-- dropdown arrow -->
             <v-icon class="mdi-chevron" v-if="editable">mdi-chevron-down</v-icon>
@@ -70,7 +76,8 @@ export default{
             filesFromMiscellaneous:[],
             filesProject:[],
             editable: true,
-            options:[]
+            options:[],
+            optionsFromDatabase:[]
         }
     },
 
@@ -283,49 +290,59 @@ export default{
                     `,
                 //filling the files array with the data of fileBySchemaId.data where elementData.elementId (name field of an apotheke) is the same
                 }).then((data) => {
-                    //console.log(data)
-                    for (const file of data.data.fileBySchemaId) {
-                        if(this.directory[0]?.hierarchy.some(e => e.fileId === file.id)){
-                            this.filesProject.push({
-                                id: file.id,
-                                year: file.data.find(element => element.elementId === "577aa568-345a-47e5-9b71-848d5695bd5d").data.text,
-                                projectNumber: file.label
+                    //if the current selectInput is not the pharmacy selector
+                    if(this.elementId !== "09c5ba61-4e52-4a68-afde-bb7334b45b35"){
+                        for (const file of data.data.fileBySchemaId) {
+                            if(this.directory[0]?.hierarchy.some(e => e.fileId === file.id)){
+                                this.filesProject.push({
+                                    id: file.id,
+                                    year: file.data.find(element => element.elementId === "577aa568-345a-47e5-9b71-848d5695bd5d").data.text,
+                                    projectNumber: file.label
+                                })
+                            }
+                        }
+                        //if the current selectInput is the pharmacy selector
+                    } else if (this.elementId == "09c5ba61-4e52-4a68-afde-bb7334b45b35") {
+                        for(const pharmacy of data.data.fileBySchemaId){
+                            this.files.push({
+                                id: pharmacy.id,
+                                label: pharmacy.data[0].data.text
                             })
                         }
                     }
                     //run the sort files function that sort the filesProject array
                     this.sortFilesProject()
                     // //if the first file from query has a label with number
-                    // if (isNaN(parseFloat(data.data.fileBySchemaId[1].label)) && data.data.fileBySchemaId[1].label !== "BOCOM"){
-                    //     const temp = data.data.fileBySchemaId;
-                    //     console.log('kjalsd')
-                    //     this.files = temp.map(
-                    //         function (item, index, array) {
-                    //             return item.data.find(
-                    //                 (elementData) => elementData.elementId === "91f42e63-98b4-462b-bf65-58b416718cb0"
-                    //             )?.data?.text;
-                    //         }
-                    //     )
-                    // } else {
-                    //     for(const item of data?.data?.fileBySchemaId){
-                    //         //if the project not deleted
-                    //         if(this.directory[0].hierarchy.some(e => e.fileId === item.id)){
-                    //             this.filesProject.push({
-                    //                 id: item.id,
-                    //                 year: item.data.find(element => element.elementId === "577aa568-345a-47e5-9b71-848d5695bd5d").data.text,
-                    //                 projectNumber: item.label
-                    //             })
-                    //         }
-                    //     }
+                    /* if (isNaN(parseFloat(data.data.fileBySchemaId[1].label)){
+                         const temp = data.data.fileBySchemaId;
+                         console.log('kjalsd')
+                         this.files = temp.map(
+                             function (item, index, array) {
+                                 return item.data.find(
+                                    (elementData) => elementData.elementId === "91f42e63-98b4-462b-bf65-58b416718cb0"
+                                 )?.data?.text;
+                             }
+                         )
+                     } else {
+                         for(const item of data?.data?.fileBySchemaId){
+                             //if the project not deleted
+                             if(this.directory[0].hierarchy.some(e => e.fileId === item.id)){
+                                 this.filesProject.push({
+                                     id: item.id,
+                                     year: item.data.find(element => element.elementId === "577aa568-345a-47e5-9b71-848d5695bd5d").data.text,
+                                     projectNumber: item.label
+                                 })
+                             }
+                         }
 
-                    // // }
+                     } */
 
                 }).catch((error) => {
-                    console.log({ error });
+                    console.log({ error } );
                 });
             //if its not an pharmacy then fills it with the parameters.options from the parent component
             }else if(this.parameters.options) {
-                this.files = this.parameters.options
+                this.optionsFromDatabase = this.parameters.options
             }
             //if the parameters.optionSource exist query the miscellaneous by the option source id
             else if(this.parameters?.optionSource){
