@@ -74,9 +74,10 @@ export const mutations = {
 		else {
 			let inputElement = state.isInputOk.find(item => item.elementId === payload.elementId)!
 			inputElement.value = payload.value
-		}
-		//console.log(state)
-		
+		}	
+	},
+	resetIsInputOk(state: { isInputOk : {elementId: string, value: boolean}[] }){
+		Vue.set(state, 'isInputOk', [])
 	}
 }
 

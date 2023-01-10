@@ -99,6 +99,7 @@ export default {
         })
     },
     created(){
+        this.$store.commit("file/resetIsInputOk")
         this.searchFile()
     },
     mounted () {

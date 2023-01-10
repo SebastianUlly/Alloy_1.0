@@ -386,10 +386,14 @@ export default {
 								let currentValue;
 								if(currentKey === 'Apotheke'){
 									let temp = await this.getPharmacyAbb(currentItem.data.text)
-									// if(temp.data.queryFileData.data[0].data.text !== "BOCOM"){
+									//at the single pharmacies the name is under data.text 
+									if(temp.data.queryFileData.data[0].data.text){
 										currentValue = temp.data.queryFileData.data[0].data.text
-									// }
-									
+									} 
+									//but at the group under the queryFileData.label
+									else if(temp.data.queryFileData.data[0].data.values){
+										currentValue = temp.data.queryFileData.label
+									}
 								} else if (currentItem) {
 									//if the currentItem exists sets to the currentValue of currentItem.data.text or to an empty string
 									currentValue = currentItem.data.text ?? "";
