@@ -312,11 +312,11 @@ export default {
 	margin-bottom: 30px;
 }
 .zeiterfassung {
-	max-width: 60%
+	max-width: 900px
 }
 .top-section{
 	margin-top: 30px;
-	max-width: 60%;
+	max-width: 900px;
 	display: flex;
 	align-items: center;
 	justify-content: space-between;

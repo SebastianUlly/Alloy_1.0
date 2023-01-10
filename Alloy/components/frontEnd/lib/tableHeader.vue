@@ -54,7 +54,7 @@
 				{{ weeklySummary.sickdays }}
 			</span>
 		</p>
-		<v-btn
+		<!-- <v-btn
 			v-if="button === 'sign'"
 			class="sign-button"
 			color="green"
@@ -69,7 +69,7 @@
 			<v-icon>
 				mdi-file-download-outline
 			</v-icon>
-		</v-btn>
+		</v-btn> -->
 	</div>
 </template>
 
@@ -97,7 +97,7 @@ export default {
 
 <style lang="scss" scoped>
 .header {
-	max-width: 60%;
+	max-width: 900px;
 	display: flex;
 	background-color: #272727;
     height: 50px;

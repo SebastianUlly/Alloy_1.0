@@ -329,6 +329,7 @@ export default {
 
 		// function to save the changed directory (SUL)
 		saveDirectory () {
+			console.log(this.$store.getters['directory/getDirectory'])
 			this.$apollo.mutate({
 				variables: {
 					directory: this.$store.getters['directory/getDirectory']
