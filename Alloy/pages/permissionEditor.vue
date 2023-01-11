@@ -1,13 +1,16 @@
 <template>
-	<div>
+	<!-- <div>
 		<h1>Permission Editor</h1>
 		<PermissionDirectory />
-	</div>
+	</div> -->
 </template>
 <script>
 import PermissionDirectory from '~/components/permissionEditor/permissionDirectory.vue'
 export default {
-	components: {
+	created(){
+		this.$router.push("/")
+	}
+	/* components: {
 		PermissionDirectory
 	},
 
@@ -16,7 +19,7 @@ export default {
 			items:[],
 			selection: [],
 		}
-	}
+	} */
 };
 </script>
 <style>

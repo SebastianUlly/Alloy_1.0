@@ -95,7 +95,8 @@ export default {
             getValuesToSave: "file/getValuesToSave",
             fileList : "file/getFileList",
             readyToSave: "file/getReadyToSave",
-            pointList: "point/getPointList"
+            pointList: "point/getPointList",
+            userMeta: 'authentication/getUserMeta'
         })
     },
     created(){
@@ -108,29 +109,56 @@ export default {
 
     methods:{
         isDayTypeHoliday(){
-            //reset the props if we set Urlaub to Arbeit
-            //reset the project field
-            this.popUpSchema.elements.find(element => element.elementId == "30a1d57d-ac51-4a54-9f83-2c493253b944").permissions.toEdit = true;
-            delete this.popUpSchema.elements?.find(element => element.elementId == "30a1d57d-ac51-4a54-9f83-2c493253b944").parameters["default"]
-            //reset the activity type
-            this.popUpSchema.elements.find(element => element.elementId == "9a8284f2-5615-4cb5-893b-56cc3476b169").permissions.toEdit = true;
-            delete this.popUpSchema.elements.find(element => element.elementId == "9a8284f2-5615-4cb5-893b-56cc3476b169").parameters["default"]
-            //reset beschreibung
-            this.popUpSchema.elements.find(element => element.elementId == "65138254-8e1f-4b0b-91ae-70540e468459").permissions.toEdit = true;
-            this.popUpSchema.elements.find(element => element.elementId == "65138254-8e1f-4b0b-91ae-70540e468459").parameters.required = true;
-
-            //if Urlaub clicked change the props for child components
-            if(this.getDataToSave.find(item => item.elementId == "f951c3cf-1594-435e-85be-e951be00bb44")?.data?.text == "95aa87dc-9f80-4c33-8ccd-f59f543bec8e"){
-                (this.popUpSchema.elements?.find(element => element.elementId == "30a1d57d-ac51-4a54-9f83-2c493253b944")).parameters["default"] = "83c2e854-1d18-49e6-85ba-29335e02f466";
+            //if Urlaub || Krankentag || Zeitausgleich clicked change the props for child components
+            if(this.getDataToSave.find(item => item.elementId == "f951c3cf-1594-435e-85be-e951be00bb44")?.data?.text == "95aa87dc-9f80-4c33-8ccd-f59f543bec8e" ||
+               this.getDataToSave.find(item => item.elementId == "f951c3cf-1594-435e-85be-e951be00bb44")?.data?.text == "33d8cd4d-4684-4408-aa39-9f513b2a186c" ||
+               this.getDataToSave.find(item => item.elementId == "f951c3cf-1594-435e-85be-e951be00bb44")?.data?.text == "344e3d17-b014-4fb3-a365-883258b31e54"
+            ){
+                //set the 000-BOCOM project to the default when holiday clicked
+                (this.popUpSchema.elements?.find(element => element.elementId == "30a1d57d-ac51-4a54-9f83-2c493253b944")).parameters["default"] = "4e5f968b-5314-46e3-85a5-95d22db27047";
                 (this.popUpSchema.elements?.find(element => element.elementId == "30a1d57d-ac51-4a54-9f83-2c493253b944")).permissions.toEdit = false;
                 //set the activity type
                 (this.popUpSchema.elements?.find(element => element.elementId == "9a8284f2-5615-4cb5-893b-56cc3476b169")).permissions.toEdit = false;
                 (this.popUpSchema.elements?.find(element => element.elementId == "9a8284f2-5615-4cb5-893b-56cc3476b169")).parameters["default"] = "bfe1e26b-0801-4bd1-86c0-563d8118b609";
-                //set the beschreibung not required
+                //set the beschreibung not required and disabled
                 (this.popUpSchema.elements?.find(element => element.elementId == "65138254-8e1f-4b0b-91ae-70540e468459")).permissions.toEdit = false;
                 (this.popUpSchema.elements?.find(element => element.elementId == "65138254-8e1f-4b0b-91ae-70540e468459")).parameters.required = false;
-
+                //set the time field not required and disabled
+                (this.popUpSchema.elements?.find(element => element.elementId == "83f4737a-0d63-407d-bdff-4ff576f97a13")).permissions.toEdit = false;
+                (this.popUpSchema.elements?.find(element => element.elementId == "83f4737a-0d63-407d-bdff-4ff576f97a13")).parameters.required = false;
+                //when the Urlaub is selected
+                if(this.getDataToSave.find(item => item.elementId == "f951c3cf-1594-435e-85be-e951be00bb44")?.data?.text == "95aa87dc-9f80-4c33-8ccd-f59f543bec8e"){
+                    //create a date object by the selected date
+                    let [day, month, year] = this.getDataToSave.find(item => item.elementId == "d43d0fd0-172d-4b7a-a942-990597d3cb42")?.data?.text.split(".")
+                    const tempDate = new Date(year, month - 1, day);
+                    //set the default value to the time selecotr
+                    (this.popUpSchema.elements?.find(element => element.elementId == "83f4737a-0d63-407d-bdff-4ff576f97a13")).parameters.default = this.userMeta.weeklyHours[0].distribution[tempDate.getDay() - 1];
+                }
+                //if the Krankentag selected set the time field editable 
+                if(this.getDataToSave.find(item => item.elementId == "f951c3cf-1594-435e-85be-e951be00bb44")?.data?.text == "33d8cd4d-4684-4408-aa39-9f513b2a186c"){
+                    (this.popUpSchema.elements?.find(element => element.elementId == "83f4737a-0d63-407d-bdff-4ff576f97a13")).permissions.toEdit = true;
+                    (this.popUpSchema.elements?.find(element => element.elementId == "83f4737a-0d63-407d-bdff-4ff576f97a13")).parameters.default = "0";
+                }
+                //if the Zeitausgleich selected reset the time field
+                if(this.getDataToSave.find(item => item.elementId == "f951c3cf-1594-435e-85be-e951be00bb44")?.data?.text == "344e3d17-b014-4fb3-a365-883258b31e54"){
+                    (this.popUpSchema.elements?.find(element => element.elementId == "83f4737a-0d63-407d-bdff-4ff576f97a13")).parameters.default = "reset"
+                }
                 //console.log(this.popUpSchema)
+            } else {
+                //reset the props if we set Urlaub to Arbeit
+                //reset the project field
+                this.popUpSchema.elements.find(element => element.elementId == "30a1d57d-ac51-4a54-9f83-2c493253b944").permissions.toEdit = true;
+                delete this.popUpSchema.elements?.find(element => element.elementId == "30a1d57d-ac51-4a54-9f83-2c493253b944").parameters["default"]
+                //reset the activity type
+                this.popUpSchema.elements.find(element => element.elementId == "9a8284f2-5615-4cb5-893b-56cc3476b169").permissions.toEdit = true;
+                delete this.popUpSchema.elements.find(element => element.elementId == "9a8284f2-5615-4cb5-893b-56cc3476b169").parameters["default"]
+                //reset beschreibung
+                this.popUpSchema.elements.find(element => element.elementId == "65138254-8e1f-4b0b-91ae-70540e468459").permissions.toEdit = true;
+                this.popUpSchema.elements.find(element => element.elementId == "65138254-8e1f-4b0b-91ae-70540e468459").parameters.required = true;
+                //reset time field
+                (this.popUpSchema.elements?.find(element => element.elementId == "83f4737a-0d63-407d-bdff-4ff576f97a13")).permissions.toEdit = true;
+                (this.popUpSchema.elements?.find(element => element.elementId == "83f4737a-0d63-407d-bdff-4ff576f97a13")).parameters.required = true;
+                (this.popUpSchema.elements?.find(element => element.elementId == "83f4737a-0d63-407d-bdff-4ff576f97a13")).parameters.default = "0";
             }
         },
         updatePoint(){

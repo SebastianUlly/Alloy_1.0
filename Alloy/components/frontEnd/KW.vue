@@ -37,8 +37,8 @@
 				v-if="(52 - index) === getCurrentKW"
 				:headline="(52 - index).toString() + '. KW'"
 				:user-info="{
-					workhours: 40,
-					holiday: 25
+					workhours: allWorkHoursPerWeek,
+					holiday: userMeta.holidays
 				}"
 				:weekly-summary="getWeeklySummary(index, kw)"
 				:button="'sign'"
@@ -48,8 +48,8 @@
 				v-else-if="kw"
 				:headline="(52 - index).toString() + '. KW'"
 				:user-info="{
-					workhours: 40,
-					holiday: 25
+					workhours: allWorkHoursPerWeek,
+					holiday: userMeta.holidays
 				}"
 				:weekly-summary="getWeeklySummary(index, kw)"
 				:button="'pdf'"
@@ -78,6 +78,7 @@ import confirmPopUp from "~/components/frontEnd/lib/confirmPopUp";
 import selectYear from "~/components/frontEnd/selectYear";
 import search from "~/components/frontEnd/search";
 import dropDown from "~/components/frontEnd/dropDown"
+import { mapGetters } from "vuex";
 
 export default {
 	components: {
@@ -134,8 +135,18 @@ export default {
 	},
 
 	computed: {
+		...mapGetters({
+			userMeta: 'authentication/getUserMeta'
+		}),
 		getCurrentKW () {
 			return this.KalenderWoche()
+		},
+		allWorkHoursPerWeek(){
+			let temp = 0
+			for(let day of this.userMeta.weeklyHours[0].distribution){
+				temp += day
+			} 
+			return temp
 		}
 	},
 
@@ -167,7 +178,7 @@ export default {
 			this.yearForZeiterfassung = year;
 		},
 		getWeeklySummary (kwNumber, kw) {
-			console.log(52 - kwNumber, kw, this.getCurrentKW)
+			//console.log(52 - kwNumber, kw, this.getCurrentKW)
 			let hours = 0
 			let minutes = 0
 			if (kw) {
@@ -178,7 +189,7 @@ export default {
 				}
 			}
 			const test = (hours + Math.floor(minutes/60)).toString() + ':' + (minutes%60).toString()
-			console.log(test)
+			
 			if ((52 - kwNumber) === this.getCurrentKW) {
 				return {
 					weekhours: test,

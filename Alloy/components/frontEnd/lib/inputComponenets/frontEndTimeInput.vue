@@ -32,7 +32,7 @@
                 :style="'text-align:' + parameters.align"
                 v-model= "inputValueMinutes"
                 class="timeInput"
-                min="0"
+                min="00"
                 max="45"
                 step="15"
                 type="number">
@@ -65,7 +65,7 @@ export default{
     },
     data(){
         return{
-            inputValueHour:"00",
+            inputValueHour:"0",
             inputValueMinutes:"00",
             isInputOkValue: false,
             tempValue: ""
@@ -77,7 +77,13 @@ export default{
                 const [hour, minute] = this.data.data.find(item => item.elementId === this.elementId).data.text.split(':')
                 this.inputValueHour = hour,
                 this.inputValueMinutes = minute
-            }   
+            } else if (this.parameters.default == "reset"){
+                this.inputValueMinutes = "00"
+                this.inputValueHour = "0"
+            } else if (this.parameters.default) {   
+                this.inputValueMinutes = "00"
+                this.inputValueHour = this.parameters.default
+            }
         },
         //checks if the permissionId is in the permissionIds list and sends the permissionId to the checkPermissionId function
         checkPermissionIdsHere (arg) {
@@ -111,7 +117,11 @@ export default{
         //sending with an event to the parent componenet if the field  is filled or not
         isInputOk(){
             //if the input value is empty and the input is required
-            if(this.inputValue === "" && this.parameters.required){
+            if(parseInt(this.inputValueMinutes) === 0 && parseInt(this.inputValueHour) === 0 && this.parameters.required){
+                if(this.inputValueMinutes !== "00"){
+                    this.inputValueMinutes = "00"
+                    this.inputValueHour = "00"
+                } 
                 //then add the selectError class on the input
                 this.$refs.timeInput.classList.add("timeInputError");
                 //and sets the isUnputOkValue flase
@@ -128,11 +138,13 @@ export default{
             }
             //sending the elementId and the value to the store
             this.$store.commit('file/setIsInputOk', tempPayload)   
+            this.sendEvent()
         }
     },
     created(){
         this.setDefaultValue();
         this.setEditable();
+        
     },
     mounted() {
         this.isInputOk();
@@ -146,13 +158,18 @@ export default{
         inputValueHour:{
             handler(){
                 this.isInputOk();
-                this.sendEvent();
             }
         },
         inputValueMinutes:{
             handler(){
                 this.isInputOk();
-                this.sendEvent();
+            }
+        },
+        parameters:{
+            deep: true,
+            handler(){
+                this.isInputOk();
+                this.setDefaultValue();
             }
         }
     } 

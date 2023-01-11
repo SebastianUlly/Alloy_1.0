@@ -218,10 +218,10 @@ export default {
 								//if the currentItem exists sets to the currentValue of currentItem.data.text or to an empty string
 								currentValue = currentItem.data.text ?? "";
 							}
-							//console.log(currentItem)
+							//get the pharmacy
 							if(currentItem.elementId == "0c9cf456-edc3-4779-b00c-14237863fa16"){
 								if(currentItem.data.text){
-									currentValue = (await this.getPharmacyById(currentItem.data.text)).data[0].data.text ?? "";
+									currentValue = (await this.getPharmacyById(currentItem.data.text)).data.find(e => e.elementId == "91f42e63-98b4-462b-bf65-58b416718cb0").data.text ?? "";
 								}
 							}
 							//if the elementIdToFind (from headers) is the project (projectId)
@@ -230,7 +230,6 @@ export default {
 								for(const file of this.fileBySchemaId){
 									for(const fileData of file.data){
 										if(fileData.elementId == "577aa568-345a-47e5-9b71-848d5695bd5d" && currentValue == file.id){
-											console.log(fileData, file.id)
 											//bind the two data with each other
 											currentValue = [fileData.data.text, file.label].join('-')
 										}

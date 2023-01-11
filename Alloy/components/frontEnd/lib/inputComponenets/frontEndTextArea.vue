@@ -50,6 +50,9 @@ export default{
         }
     },
     methods:{
+        resetInputValue(){
+            this.textAreaValue = "";
+        },
         //if the elementIdToSearch exist so we clicked one item it will search for the value
         setDefaultValue(){
             if(this.elementIdToSearch && this.data != undefined){
@@ -85,7 +88,7 @@ export default{
             this.$emit('update', payload);
         },
         //checks if the parameters.required are true and if so, makes the frame of the inputfield red
-        //sending with an event to the parent componenet if the field  is filled or not
+        //sends with an event to the parent componenet if the field is filled or not
         isInputOk(){
             //if the input value is empty and the input is required
             if(this.textAreaValue === "" && this.parameters.required){
@@ -124,6 +127,13 @@ export default{
             handler(){
                 this.isInputOk();
                 this.sendEvent();
+            }
+        },
+        parameters: {
+            deep: true,
+            handler(){
+                this.isInputOk();
+                this.resetInputValue()
             }
         }
     } 
