@@ -11,7 +11,7 @@
 					mdi-timer-plus-outline
 				</v-icon>
 			</v-btn>
-			<dropDown/>
+			<!-- <dropDown/> -->
 			<selectYear @sendYear="captureMyYear" class="selectYearComponent"/>
 			<search @sendValue="captureMySearchValue" />
 		</div>
@@ -40,7 +40,7 @@
 					workhours: 40,
 					holiday: 25
 				}"
-				:weekly-summary="userSummary"
+				:weekly-summary="getWeeklySummary(index, kw)"
 				:button="'sign'"
 				class="tableHeader"
 			/>
@@ -51,7 +51,7 @@
 					workhours: 40,
 					holiday: 25
 				}"
-				:weekly-summary="userSummary"
+				:weekly-summary="getWeeklySummary(index, kw)"
 				:button="'pdf'"
 				class="tableHeader"
 			/>
@@ -118,11 +118,11 @@ export default {
 			popUpSchema:{},
 			clickedFile: {},
 			userSummary: {
+				weekhours: '0:00',
 				hoursaldo: '2:10',
 				holiday: 20,
 				sickdays: 3
 			},
-			currentKW: 0,
 			clickedFile:"",
 			yearForZeiterfassung: "",
 			searchValueForZeiterfassung: ""
@@ -166,11 +166,12 @@ export default {
 		captureMyYear (year) {
 			this.yearForZeiterfassung = year;
 		},
-		getWeeklySummary (kw) {
+		getWeeklySummary (kwNumber, kw) {
+			console.log(52 - kwNumber, kw, this.getCurrentKW)
 			let hours = 0
 			let minutes = 0
-			if (this.kwListWithPoints.slice().reverse()[kw]) {
-				for (const item of this.kwListWithPoints.slice().reverse()[kw]) {
+			if (kw) {
+				for (const item of kw) {
 					const time = item.data.find(element => element.elementId === '83f4737a-0d63-407d-bdff-4ff576f97a13')
 					hours += parseInt(time.data.text.split(':')[0])
 					minutes += parseInt(time.data.text.split(':')[1])
@@ -178,11 +179,17 @@ export default {
 			}
 			const test = (hours + Math.floor(minutes/60)).toString() + ':' + (minutes%60).toString()
 			console.log(test)
-			return {
-				weekhours: test + '/33',
-				hoursaldo: '2:15',
-				holiday: 21,
-				sickdays: 4
+			if ((52 - kwNumber) === this.getCurrentKW) {
+				return {
+					weekhours: test,
+					hoursaldo: '0:00',
+					holiday: '0',
+					sickdays: '0'
+				}
+			} else {
+				return {
+					weekhours: test
+				}
 			}
 		},
 
@@ -237,9 +244,7 @@ export default {
 			if (this.pointsByUser) {
 				for (const point of this.pointsByUser) {
 					const date = point.data.find(item => item.elementId === 'd43d0fd0-172d-4b7a-a942-990597d3cb42').data.text.split('.')
-					console.log(date)
 					if(date[2] !== this.yearForZeiterfassung){
-						console.log(date[2], this.yearForZeiterfassung)
 						continue
 					}
 					const KWNumber = this.KalenderWoche(date[2], date[1], date[0])

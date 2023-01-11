@@ -81,54 +81,54 @@ export default {
   },
   methods: {
     async getPharmacyById(id){
-      if(this.pharmacyById[id]){
-        return this.pharmacyById[id]
-      } else {
-        this.pharmacyById[id] = (
-          await this.$apollo.query({
-            variables: {
-              pharmacyId : id
-            },
-            query: gql `
-              query (
-                $pharmacyId: String
-              ) {
-                queryFileData(
-                  id: $pharmacyId) {
-                    id
-                    label
-                    data
-                }
-              }
-            `
-          })
-        ).data.queryFileData
-        return this.pharmacyById[id]
-      }
+		if(this.pharmacyById[id]){
+			return this.pharmacyById[id]
+		} else {
+			this.pharmacyById[id] = (
+				await this.$apollo.query({
+					variables: {
+					pharmacyId : id
+					},
+					query: gql `
+					query (
+						$pharmacyId: String
+					) {
+						queryFileData(
+						id: $pharmacyId) {
+							id
+							label
+							data
+						}
+					}
+					`
+				})
+			).data.queryFileData
+			return this.pharmacyById[id]
+		}
     },
     async getDataFromMiscellaneous(id){ 
-      //optimizing the query, when the desired miscellaneous exists, break and returns it
-      if(this.miscellaneous[id]){
-        return this.miscellaneous[id];
-      }
-      this.miscellaneous[id] = (await this.$apollo.query({
-        variables: {
-          schemaId: id
-        },
-        query: gql`
-          query (
-            $schemaId: String
-          ) {
-            miscellaneousById(
-              id: $schemaId){
-                id
-                label
-                data
-              }
-            }
-          `
-        })).data.miscellaneousById;
-      return this.miscellaneous[id];
+		//optimizing the query, when the desired miscellaneous exists, break and returns it
+		if(this.miscellaneous[id]){
+			return this.miscellaneous[id];
+		}
+		this.miscellaneous[id] = (await this.$apollo.query({
+			variables: {
+				schemaId: id
+			},
+			query: gql`
+				query (
+					$schemaId: String
+				) {
+					miscellaneousById(
+					id: $schemaId){
+						id
+						label
+						data
+					}
+				}
+			`
+			})).data.miscellaneousById;
+		return this.miscellaneous[id];
     },
 	headersFill(){
 		if(this.querySchemaById){
@@ -205,8 +205,8 @@ export default {
 								for(const temp of (await this.getDataFromMiscellaneous(item.parameters?.selectableMiscellaneous)).data){
 									//if the point has an elementId in the data.text and its the same as the miscellaneous id
 									if(temp.id == currentItem.data.text){
-									//than overwrite the currentValue with the name of the correct miscellaneous data 
-									currentValue = temp.name;
+										//than overwrite the currentValue with the name of the correct miscellaneous data 
+										currentValue = temp.name;
 									}
 								}
 							}
@@ -230,6 +230,7 @@ export default {
 								for(const file of this.fileBySchemaId){
 									for(const fileData of file.data){
 										if(fileData.elementId == "577aa568-345a-47e5-9b71-848d5695bd5d" && currentValue == file.id){
+											console.log(fileData, file.id)
 											//bind the two data with each other
 											currentValue = [fileData.data.text, file.label].join('-')
 										}

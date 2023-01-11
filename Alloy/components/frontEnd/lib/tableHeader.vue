@@ -102,7 +102,6 @@ export default {
 	background-color: #272727;
     height: 50px;
     align-items: center;
-	justify-content: space-around;
 	padding: 0 15px;
 	position: relative;
 	
@@ -110,15 +109,15 @@ export default {
 
 h1 {
 	margin: 0 30px 0 0;
-	font-size: x-large;
+	font-size: 17px;
 }
 
 p {
-	margin: 0 40px 0 0;
+	margin: 0 30px 0 0;
 }
 
 p:first-of-type {
-	margin: 0 100px 0 0;
+	margin: 0 55px 0 0;
 }
 
 .button {
@@ -126,6 +125,6 @@ p:first-of-type {
 }
 
 span{
-	font-size: medium;
+	font-size: 17px;
 }
 </style>

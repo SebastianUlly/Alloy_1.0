@@ -330,26 +330,28 @@ export default {
 		// function to save the changed directory (SUL)
 		saveDirectory () {
 			console.log(this.$store.getters['directory/getDirectory'])
-			this.$apollo.mutate({
-				variables: {
-					directory: this.$store.getters['directory/getDirectory']
-				},
-
-				mutation: gql`
-					mutation(
-						$directory: JSON
-					) {
-						saveDirectory(
-							directory: $directory
+			if (this.$store.getters['directory/getDirectory']) {
+				this.$apollo.mutate({
+					variables: {
+						directory: this.$store.getters['directory/getDirectory']
+					},
+	
+					mutation: gql`
+						mutation(
+							$directory: JSON
 						) {
-							id
+							saveDirectory(
+								directory: $directory
+							) {
+								id
+							}
 						}
-					}
-				`
-			}).then(() => {
-			}).catch((error) => {
-				console.log({ error })
-			})
+					`
+				}).then(() => {
+				}).catch((error) => {
+					console.log({ error })
+				})
+			}
 		},
 
 		// function to delete the relationships the file in this entity might have, if it's finally deleted from the directory
