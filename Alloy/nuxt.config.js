@@ -38,13 +38,13 @@ export default {
 
   // Auto import components: https://go.nuxtjs.dev/config-components
   components: {
-		dirs: [
+		/* dirs: [
 			'./components/elements/image',
 			'./components/elements/lib',
 			'./components/elements/Text',
 			'./components/elements/singleLineText',
 			'./components/elements/relationships'
-		]
+		] */
 	},
 
   // Modules for dev and build (recommended): https://go.nuxtjs.dev/config-modules

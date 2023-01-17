@@ -27,8 +27,11 @@
 <script>
 import { mapGetters } from "vuex";
 import { hasAnythingChanged } from "~/assets/functions/hasChanged";
-
+import inputField from "~/components/elements/lib/inputField"
 export default {
+  components:{
+    inputField
+  },
   props: {
     elementId: {
       type: String,

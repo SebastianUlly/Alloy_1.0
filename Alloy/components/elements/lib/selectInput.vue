@@ -40,8 +40,11 @@
 <script>
 //importing mapgetters for using the store
 import { mapGetters } from "vuex";
-
+import hasChangedIndicator from "~/components/elements/lib/HasChangedIndicator";
 export default {
+	components:{
+		hasChangedIndicator
+	},
 	props: {
 		label: {
 			type: String,

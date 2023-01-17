@@ -1,5 +1,5 @@
 <template>
-	<!-- <v-app>
+	 <v-app>
 		<v-row v-if="files && schema">
 			<v-col>
 				<Container :files="files" :schema="schema" />
@@ -8,7 +8,7 @@
 				<InfoBox :schema="schema" />
 			</v-col>
 		</v-row>
-	</v-app> -->
+	</v-app>
 </template>
 
 <script>
@@ -17,10 +17,10 @@ import Container from '~/components/container'
 import InfoBox from '~/components/fileDisplay/infoBox'
 
 export default {
-	created(){
+	/* created(){
 		this.$router.push("/")
-	}
-/* 	// graphql-queries that are called when the component is called
+	} */
+ 	// graphql-queries that are called when the component is called
 	apollo: {
 		// query to get the files of the directory (SUL)
 		files: gql`
@@ -47,7 +47,7 @@ export default {
 	components: {
 		Container,
 		InfoBox
-	} */
+	}
 }
 </script>
 
