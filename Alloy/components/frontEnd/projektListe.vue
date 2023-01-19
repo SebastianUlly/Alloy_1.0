@@ -1,5 +1,4 @@
 <template>
-	
 	<div class="container">
 		<ClientOnly>
 			<div>
@@ -11,6 +10,7 @@
 						style="min-width:0"
 						class="addProject"
 						color="green"
+						:disabled="popUp"
 						@click="openNewProject(true)"
 					>
 						<!-- the icon with the file and + -->
@@ -333,11 +333,19 @@ export default {
 								this.headers.push({
 									text: item.label,
 									width:"5%",
-									align:'left',
+									align:'center',
 									sortable: true,
 									value: item.label.replace(/[^a-zA-Z ]/g, ""),
 									elementId: elementIdToFind
 								})
+							} else if (item.label === "Name"){
+								this.headers.push({
+									text: item.label,
+									align:'left',
+									sortable: false,
+									value: item.label.replace(/[^a-zA-Z ]/g, ""),
+									elementId: elementIdToFind,
+								})	
 							}
 							//every other case it will push with these default settings
 							else{

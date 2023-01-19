@@ -1,16 +1,20 @@
 .container{ 
 	display: flex; 
+	padding: 0;
 }
 .table{
-	max-width: 100%;
+	width:100%;
 }
 .addProject{
-	width:49px;
+	display: flex;
+    justify-content: center;
+    align-items: center;
+	width: 49px;
 	height: 49px;
 }
-.selectYearComponent{
+/* .selectYearComponent{
 	margin: 0 10px 0 0;
-}
+} */
 .searchContainer{
 	display:flex;
 }
@@ -21,8 +25,10 @@ div.icons{
 }
 .body{
 	margin-top: 25px;
+	width:900px;
 }
 .topSection{
+	margin-top: 30px;
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
@@ -31,7 +37,7 @@ div.icons{
    background-color: #1E1E1E !important;
 }
 /*set the color of line */
- .v-data-table-header th, .v-data-table__wrapper td{
+.v-data-table-header th, .v-data-table__wrapper td{
     border-bottom: thin solid #ffffff73 !important; 
 }
 .copyIcon {
