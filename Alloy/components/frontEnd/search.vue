@@ -51,7 +51,7 @@ export default {
     position:absolute;
     z-index: 1;
     color: white;
-    padding-left: 5px;
+    padding-left: 10px;
     padding-right: 10%;
 }
 .searchIcon{

@@ -5,6 +5,7 @@
 				style="min-width:0"
 				class="addProject"
 				color="green"
+				:disabled="popUp"
 				@click="openNewProject(true)"
 			>
 				<v-icon>
@@ -12,8 +13,10 @@
 				</v-icon>
 			</v-btn>
 			<!-- <dropDown/> -->
-			<selectYear @sendYear="captureMyYear" class="selectYearComponent"/>
-			<search @sendValue="captureMySearchValue" />
+			<div class= "searchContainer">
+				<selectYear @sendYear="captureMyYear" class="selectYearComponent"/>
+				<search @sendValue="captureMySearchValue" />
+			</div>
 		</div>
 		<popUp
 			v-if="popUp && popUpSchema"
@@ -126,7 +129,7 @@ export default {
 			},
 			clickedFile:"",
 			yearForZeiterfassung: "",
-			searchValueForZeiterfassung: ""
+			searchValueForZeiterfassung: "",
 		}
 	},
 
@@ -338,6 +341,9 @@ export default {
 }
 .zeiterfassung {
 	max-width: 900px
+}
+.searchContainer{
+	display:flex;
 }
 .top-section{
 	margin-top: 30px;

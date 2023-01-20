@@ -1,9 +1,9 @@
 <template>
     <div class="selectYearBackground">
-        <input v-model="year" type="text" class="selectYear" placeholder="Jahr">
-        <!-- <select v-model="year" class="selectYear" name="" id="">>
+        <!-- <input v-model="year" type="text" class="selectYear" placeholder="Jahr"> -->
+        <select v-model="year" class="selectYear" name="" id="">>
             <option v-for="item in availableYears" class="selectYearOption" :value="item" :key="item">{{item}}</option>
-        </select> -->
+        </select>
          <!-- <vue-json-pretty :data="availableYears"/> -->
 	</div>
 </template>
@@ -14,7 +14,7 @@ export default {
     data() {
         return {
            year:"",
-           /* availableYears:[] */
+           availableYears:["2023", "2024"]
         };
     },
     methods:{

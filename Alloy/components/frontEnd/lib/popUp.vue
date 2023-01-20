@@ -391,7 +391,7 @@ $columns: 12;
     background-color: #4D4D4D;
     justify-content: center;
     text-align: center;
-    box-shadow: 1px 3px 5px rgba(0, 0, 0, 0.5);
+    box-shadow: 10px 5px 5px rgba(0, 0, 0, 0.783);
 } 
 .popUpTop{
     position: relative;

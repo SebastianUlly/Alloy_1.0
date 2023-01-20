@@ -7,6 +7,7 @@
 			:single-expand="singleExpand"
 			:expanded.sync="expanded"
 			show-expand
+			:loading="loading"
 			:search="searchValue"
     	>
 		<template #item.actions="{item}" v-slot:item="props">
@@ -57,6 +58,7 @@ export default {
       weekday : ["So","Mo","Di","Mi","Do","Fr","Sa"],
       expanded: [],
       singleExpand: true,
+	  loading: true
     };
   },
   apollo: {
@@ -182,6 +184,7 @@ export default {
 	},
     async itemsFill() {
 		let tempItems = [];
+		this.loading = true;
 		if (this.querySchemaById) {
 			//filling the table
 			if(this.points){
@@ -258,6 +261,7 @@ export default {
 				this.items = tempItems
 			} 
 		}
+		this.loading = false;
 	}
 },
 	mounted(){
