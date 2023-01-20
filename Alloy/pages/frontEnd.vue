@@ -16,7 +16,7 @@ import zeiterfassung from "~/components/frontEnd/KW"
 export default {
 	data(){
 		return{
-			component: "zeiterfassung"
+			component: ""
 		}
 	},
     components: {

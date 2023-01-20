@@ -382,7 +382,7 @@ $columns: 12;
 .popUp{
     position: absolute;
     top: 300px;
-    left: 25%;
+    left: 15%;
     z-index: 2;
     margin: 30px;
     border-radius: 3px;
@@ -391,8 +391,19 @@ $columns: 12;
     background-color: #4D4D4D;
     justify-content: center;
     text-align: center;
-    box-shadow: 10px 5px 5px rgba(0, 0, 0, 0.783);
-} 
+    box-shadow: 25px 25px 40px rgba(0, 0, 0, 0.78), -25px -25px 40px rgba(0, 0, 0, 0.756);
+    animation: slideIn 0.2s ease-in;
+}
+@keyframes slideIn {
+  0% {
+    opacity: 0;
+    //height: 1px;
+  }
+  100% {
+    //height: fit-content;
+    opacity: 1;
+  }
+}
 .popUpTop{
     position: relative;
     height: 42px;
@@ -407,6 +418,7 @@ $columns: 12;
 
 .popUpBody{
     padding: 34px 22px;
+    animation: slideIn 0.2s ease-in;
 }
 .addButtonDiv{
     margin-bottom: 20px;

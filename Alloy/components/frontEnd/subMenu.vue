@@ -21,7 +21,10 @@ export default{
             this.$emit('sendComponentToFrontEnd', component)
 
         }
-    }
+    },
+    /* created (){
+        this.openComponent('zeiterfassung')
+    } */
 }
 
 </script>

@@ -16,8 +16,8 @@
             </div>
         </div>
         <div class="popUpBody">
-            <div class="inputContainer">
-                {{clickedFile.id}}
+            <div class="textContainer">
+                {{clickedFile.Datum}} - {{ clickedFile.Typ }} - {{ clickedFile.Projekt }} - {{ clickedFile.Ttigkeit }} - {{ clickedFile.Zeit }} <br><br>{{ clickedFile.Beschreibung }}
             </div>
         </div>
         <div class="addButtonDiv">
@@ -69,7 +69,7 @@ $columns: 12;
 .popUp{
     position: absolute;
     top: 300px;
-    left: 25%;
+    left: 15%;
     z-index: 2;
     margin: 30px;
     border-radius: 3px;
@@ -78,8 +78,19 @@ $columns: 12;
     background-color: #4D4D4D;
     justify-content: center;
     text-align: center;
-    box-shadow: 1px 3px 5px rgba(0, 0, 0, 0.5);
+    box-shadow: 25px 25px 40px rgba(0, 0, 0, 0.78), -25px -25px 40px rgba(0, 0, 0, 0.756);
+    animation: slideIn 0.2s ease-in;
 } 
+@keyframes slideIn {
+  0% {
+    opacity: 0;
+    //height: 1px;
+  }
+  100% {
+    //height: fit-content;
+    opacity: 1;
+  }
+}
 .popUpTop{
     position: relative;
     height: 42px;
@@ -94,6 +105,7 @@ $columns: 12;
 
 .popUpBody{
     padding: 34px 22px;
+    
 }
 .addButtonDiv{
     margin-bottom: 20px;
@@ -109,11 +121,11 @@ $columns: 12;
     width: 100%;
     height:auto;
 }
-.inputContainer{
-  display: flex;
+.textContainer{
+  
   flex-wrap: wrap;
   width: 100%;
-  gap: $gap-size;
+  text-align: center;
 }
 .empty{
     opacity: 0;

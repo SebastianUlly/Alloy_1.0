@@ -51,11 +51,11 @@ export default {
     position:absolute;
     z-index: 1;
     color: white;
-    padding-left: 10px;
-    padding-right: 10%;
+    padding-left: 4%;
+    padding-right: 40px;
 }
 .searchIcon{
-    float: right;
+    /* float: right; */
     margin-left: 85%;
 }
 </style>

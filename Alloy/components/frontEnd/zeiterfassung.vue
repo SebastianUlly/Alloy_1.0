@@ -213,6 +213,7 @@ export default {
 									}
 								}
 							}
+
 							if(currentItem.elementId == "d43d0fd0-172d-4b7a-a942-990597d3cb42"){
 								const [day, month] = currentItem.data.text.split(".")
 								currentValue = day + "." + month
@@ -248,7 +249,7 @@ export default {
 					//adding the elementId to the items array
 					newRow["id"] = rawItem.id;
 					//save the string as we store the date
-					const str = rawItem.data[0].data.text;
+					const str = rawItem.data.find(e => e.elementId === 'd43d0fd0-172d-4b7a-a942-990597d3cb42').data.text;
 					//creating the format of the Date object
 					const [day, month, year] = str.split('.');
 					//create the Date object
@@ -256,7 +257,7 @@ export default {
 					//getting the abbreviation from the array
 					newRow["Tag"] = this.weekday[date.getDay()];
 					//pushing the newRow to the items Array 
-					tempItems.push(newRow);
+					tempItems.push(newRow)
 				}
 				this.items = tempItems
 			} 

@@ -6,6 +6,7 @@
 				class="addProject"
 				color="green"
 				:disabled="popUp"
+				:loading="popUpLoading"
 				@click="openNewProject(true)"
 			>
 				<v-icon>
@@ -130,6 +131,7 @@ export default {
 			clickedFile:"",
 			yearForZeiterfassung: "",
 			searchValueForZeiterfassung: "",
+			popUpLoading: false
 		}
 	},
 
@@ -295,9 +297,11 @@ export default {
 		},
 		
 		openNewProject(value){
+			this.popUpLoading = true
 			this.clickedFile = null;
 			this.popUp = value;
 			this.getDataForPopUp(["c519459a-5624-4311-bffb-838d43e7f0d0"]);
+			
 		},
 
 		async getDataForPopUp(id){
@@ -330,6 +334,7 @@ export default {
 					}
 				})
 			}
+			this.popUpLoading = false
 		}
 	}
 }

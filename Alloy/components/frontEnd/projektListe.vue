@@ -12,6 +12,7 @@
 						color="green"
 						:disabled="popUp"
 						@click="openNewProject(true)"
+						:loading="popUpLoading"
 					>
 						<!-- the icon with the file and + -->
 						<v-icon>
@@ -138,7 +139,8 @@ export default {
 			clickedFile:"",
 			isActionAvailable: 0,
 			pharmacyAbb:{},
-			isFillingData: false
+			isFillingData: false,
+			popUpLoading: false
         };
     },
     apollo: {
@@ -257,6 +259,7 @@ export default {
 					}
 				})
 			}
+			this.popUpLoading = false
 		},
 		openEditProject(item){
 			this.getDataForPopUp(["ca78b111-d1f0-4b4b-b82c-c7e727804b0b", "77ffa6dc-8676-4ee3-acae-d12697f608a1"]);
@@ -265,6 +268,7 @@ export default {
 		},
 		//set the boolean variable true and the popUp opens
 		openNewProject(value){
+			this.popUpLoading = true
 			this.$store.commit("file/resetEnteredData")
 			this.clickedFile = null;
 			this.popUp = value;
