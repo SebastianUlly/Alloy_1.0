@@ -22,6 +22,8 @@ import { mapGetters } from 'vuex'
 import { deepCopy } from '~/assets/classes/objectClasses'
 // importing the necessary alloy classes from the classes-file
 import { GetElementData } from '~/assets/classes/alloyClasses'
+import imageUpload from '~/components/elements/lib/imageUpload.vue'
+import inputField from '../lib/inputField.vue'
 
 export default {
 	inheritAttrs: false,
@@ -43,6 +45,11 @@ export default {
 			required: false,
 			default: null
 		}
+	},
+
+	components: {
+		imageUpload,
+		inputField
 	},
 
 	data () {

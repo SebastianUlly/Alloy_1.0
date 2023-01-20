@@ -43,6 +43,8 @@
 </template>
 
 <script>
+import HasChangedIndicator from './HasChangedIndicator.vue'
+
 export default {
 	inheritAttrs: false,
 	props: {
@@ -60,6 +62,10 @@ export default {
 			required: false,
 			default: null
 		}
+	},
+
+	components: {
+		HasChangedIndicator
 	},
 
 	data () {

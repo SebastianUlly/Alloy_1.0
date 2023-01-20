@@ -23,6 +23,7 @@
 import { mapGetters } from "vuex";
 import { GetElementData } from "~/assets/classes/alloyClasses";
 import { deepCopy } from "~/assets/classes/objectClasses";
+import inputField from "~/components/elements/lib/inputField.vue";
 export default {
   props: {
     elementId: {
@@ -42,6 +43,9 @@ export default {
       required: false,
       default: null,
     },
+  },
+  components: {
+    inputField
   },
   data() {
     return { childrenWithData: null };

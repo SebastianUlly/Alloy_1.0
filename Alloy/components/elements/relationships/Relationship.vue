@@ -51,6 +51,7 @@
 import { v4 as uuidv4 } from 'uuid'
 import { mapGetters } from 'vuex'
 import { DirectoryOnlyWithAllowedSchemaIds, NestedDirectory } from '~/assets/directoryClasses'
+import RelationshipList from './RelationshipList.vue'
 
 export default {
 	props: {
@@ -71,6 +72,10 @@ export default {
 			type: Boolean,
 			default: false
 		}
+	},
+
+	components: {
+		RelationshipList
 	},
 
 	data () {
