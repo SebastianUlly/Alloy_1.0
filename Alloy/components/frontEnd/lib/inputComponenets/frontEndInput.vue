@@ -33,6 +33,7 @@
 <script>
 import { mapGetters } from "vuex"
 import { checkPermissionId } from '~/assets/functions/permission'
+import gql from "graphql-tag"
 export default{
     props: {
         elementId:{
@@ -52,6 +53,9 @@ export default{
         },
         permissions:{
             type: Object
+        },
+        selectedUserId:{
+            type: String
         }
     },
     data(){
@@ -87,7 +91,31 @@ export default{
             if(this.elementIdToSearch && this.elementId !=="75e96f94-0103-4804-abc0-5331ea980e9b" && this.data != undefined){
                 // clicking on the time edit icon will not display the data from the database but the full name of the logged in user
                 if(this.parameters.default == "currentUser" && this.elementIdToSearch){
-                    this.displayValue = this.userMeta.firstName + " " + this.userMeta.lastName
+                    //if the admin select someone else from the user selector
+                    if(this.selectedUserId !== this.userId){
+                        this.$apollo.query({
+                            query: gql`
+                                query {
+                                    getAllUser {
+                                        userId
+                                        data
+                                    }
+                                }
+                            `
+                        }).then((data)=>{
+                            const temp = data.data.getAllUser.find(currentUser => currentUser.userId == this.selectedUserId)
+                            const firstName = temp.data.find(userData => userData.elementId == "2d1b9f45-61f4-438d-b682-734000022169").data.text
+                            const lastName = temp.data.find(userData => userData.elementId == "7b990f61-122c-4d14-a234-34bd32472c63").data.text
+                            this.displayValue = firstName + " " + lastName;
+                            this.inputValue = this.selectedUser;
+                        })
+                    }
+                    //if the admin select itself with the user selector
+                    else {
+                        this.displayValue = this.userMeta.firstName + " " + this.userMeta.lastName
+                        this.inputValue = this.userId
+                    }
+                    //this.displayValue = this.userMeta.firstName + " " + this.userMeta.lastName
                 }
                 for(let item of this.data.data){
                     if(item.elementId == this.elementId){
@@ -100,8 +128,31 @@ export default{
                 this.inputValue = this.data.label
             }
             else if (this.parameters.default === "currentUser"){
-                this.displayValue = this.userMeta.firstName + " " + this.userMeta.lastName
-                this.inputValue = this.userId
+                //if the admin select someone else from the user selector
+                console.log(this.selectedUser)
+                if(this.selectedUserId !== this.userId && this.selectedUser){
+                    this.$apollo.query({
+                        query: gql`
+                            query {
+                                getAllUser {
+                                    userId
+                                    data
+                                }
+                            }
+                        `
+                    }).then((data)=>{
+                        const temp = data.data.getAllUser.find(currentUser => currentUser.userId == this.selectedUserId)
+                        const firstName = temp.data.find(userData => userData.elementId == "2d1b9f45-61f4-438d-b682-734000022169").data.text
+                        const lastName = temp.data.find(userData => userData.elementId == "7b990f61-122c-4d14-a234-34bd32472c63").data.text
+                        this.displayValue = firstName + " " + lastName;
+                        this.inputValue = this.selectedUser;
+                    })
+                }
+                //if the admin select itself with the user selector
+                else {
+                    this.displayValue = this.userMeta.firstName + " " + this.userMeta.lastName
+                    this.inputValue = this.userId
+                }
             }
             //if the default value is currentYear, set the defaultValue to the current year
             else if(this.parameters.default === "currentYear"){    

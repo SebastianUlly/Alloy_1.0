@@ -29,6 +29,7 @@
 			:popUpSchema="popUpSchema"
 			:clickedFile="clickedFile"
 			@saveSuccess="pointSaved"
+			:selectedUserId="selectedUserId"
 		/>
 		<confirmPopUp
 			v-if="confirmPopUp"
@@ -137,10 +138,7 @@ export default {
 	},
 
 	mounted () {
-		this.sortPoints()
-		if (!this.selectedUserId) {
-			this.selectedUserId = this.loggedInUserId
-		}
+		this.getPoints(this.loggedInUserId)
 	},
 
 	computed: {
@@ -249,6 +247,7 @@ export default {
 
 		// function that is called when a different user is selected in the selectUser-component
 		changeUser (data) {
+			
 			this.selectedUserId = data
 			this.$apollo.query({
 				variables: {

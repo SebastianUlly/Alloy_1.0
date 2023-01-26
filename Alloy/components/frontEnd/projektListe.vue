@@ -489,6 +489,10 @@ export default {
 			}
 		}
     },
+	created(){
+		this.headersFill();
+		this.itemsFill();
+	},
     computed: {
         ...mapGetters({
             getDirectory: "directory/getDirectory",

@@ -34,6 +34,7 @@
                         :elementIdToSearch="clickedFile"
                         :data="sendDataToInputs"
                         :permissions="item.permissions"
+                        :selectedUserId="selectedUserId"
 				    />
             </div>
         </div>
@@ -49,6 +50,7 @@
                 large
                 style="min-width:0"> Speichern </v-btn>
         </div>
+        {{ selectedUserId }}
     </div>
 </template>
 
@@ -69,6 +71,9 @@ export default {
             type: Object
         },
         clickedFile:{
+            type: String
+        },
+        selectedUserId:{
             type: String
         }
     },
