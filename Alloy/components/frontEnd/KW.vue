@@ -15,6 +15,10 @@
 			</v-btn>
 			<!-- <dropDown/> -->
 			<div class= "searchContainer">
+				<selectUser
+					v-if="checkPermissionIdsHere('b57d9dd1-646c-47dc-90d8-eef85a2cad1f')"
+					@userId="changeUser"
+				/>
 				<selectYear @sendYear="captureMyYear" class="selectYearComponent"/>
 				<search @sendValue="captureMySearchValue" />
 			</div>
@@ -80,9 +84,11 @@ import TableHeader from '~/components/frontEnd/lib/tableHeader';
 import { mergeSchemas } from '~/assets/classes/objectClasses'
 import confirmPopUp from "~/components/frontEnd/lib/confirmPopUp";
 import selectYear from "~/components/frontEnd/selectYear";
+import selectUser from "~/components/frontEnd/selectUser";
 import search from "~/components/frontEnd/search";
 import dropDown from "~/components/frontEnd/dropDown"
 import { mapGetters } from "vuex";
+import { checkPermissionId } from '~/assets/functions/permission'
 
 export default {
 	components: {
@@ -92,18 +98,23 @@ export default {
 		confirmPopUp,
 		selectYear,
 		search,
-		dropDown
+		dropDown,
+		selectUser
 	},
 
 	apollo: {
-		pointsByUser: gql`
-			query pointsByUser {
-				pointsByUser {
-					id
-					data
-				}
-			}
-		`,
+		// pointsByUserId: gql`
+		// 	query (
+		// 		$userId: String
+		// 	) {
+		// 		pointsByUserId (
+		// 			userId: $userId
+		// 		) {
+		// 			id
+		// 			data
+		// 		}
+		// 	}
+		// `,
 
 		directory: gql `
 			query directory{
@@ -131,7 +142,8 @@ export default {
 			clickedFile:"",
 			yearForZeiterfassung: "",
 			searchValueForZeiterfassung: "",
-			popUpLoading: false
+			popUpLoading: false,
+			pointsByUserId: []
 		}
 	},
 
@@ -141,13 +153,18 @@ export default {
 
 	computed: {
 		...mapGetters({
-			userMeta: 'authentication/getUserMeta'
+			loggedInUserId: 'authentication/getUserId',
+			userMeta: 'authentication/getUserMeta',
+			permissions: 'authentication/getPermissionIds'
 		}),
 		getCurrentKW () {
 			return this.KalenderWoche()
 		},
+
+		// returning the total workhours per week a user should be working
 		allWorkHoursPerWeek(){
 			let temp = 0
+			// looping through the distribution and adding all the values to get the sum
 			for(let day of this.userMeta.weeklyHours[0].distribution){
 				temp += day
 			} 
@@ -163,11 +180,11 @@ export default {
 			}
 		},
 
-		pointsByUser:{
+		pointsByUserId:{
 			deep: true,
 			handler(){
 				this.sortPoints()
-				this.$store.commit('point/setPointList', this.pointsByUser)
+				this.$store.commit('point/setPointList', this.pointsByUserId)
 			}
 		},
 		yearForZeiterfassung(){
@@ -176,31 +193,73 @@ export default {
 	},
 
 	methods: {
+		// function that is called when a different user is selected in the selectUser-component
+		changeUser (data) {
+			this.$apollo.query({
+				variables: {
+					userId: data
+				},
+				query: gql`
+					query (
+						$userId: String
+					) {
+						pointsByUserId (
+							userId: $userId
+						) {
+							id
+							data
+						}
+					}
+				`
+			}).then((data) => {
+				this.pointsByUserId = data.data.pointsByUserId
+			}).catch((error) => {
+				console.log({ error })
+			})
+		},
+
+		// function to check the permissions in this component
+		checkPermissionIdsHere (arg) {
+			if (this.permissions) {
+				return checkPermissionId(this.permissions, arg)
+			}
+			return false
+		},
+		
 		captureMySearchValue(value){
 			this.searchValueForZeiterfassung = value
 		},
 		captureMyYear (year) {
 			this.yearForZeiterfassung = year;
 		},
+
+		// getting the weekly summary
 		getWeeklySummary (kwNumber, kw) {
-			//console.log(52 - kwNumber, kw, this.getCurrentKW)
+			// first need to calculate the time worked per week
+			// starting with 0 hours and minutes
 			let hours = 0
 			let minutes = 0
+			// checking if a kw is given
 			if (kw) {
+				// looping through every entry in the kw
 				for (const item of kw) {
+					// getting the time of the entry
 					const time = item.data.find(element => element.elementId === '83f4737a-0d63-407d-bdff-4ff576f97a13')
+					// getting the sum of all the hours hours
 					hours += parseInt(time.data.text.split(':')[0])
+					// and the minutes
 					minutes += parseInt(time.data.text.split(':')[1])
 				}
 			}
+			// adding the hoiurs coming from the minutes which have reached the 60 miniute mark and combining it with minutes left over into a String
 			const test = (hours + Math.floor(minutes/60)).toString() + ':' + (minutes%60).toString()
-			
+			// returning the summary
 			if ((52 - kwNumber) === this.getCurrentKW) {
 				return {
 					weekhours: test,
-					hoursaldo: '0:00',
-					holiday: '0',
-					sickdays: '0'
+					hoursaldo: this.userMeta.summary.find(item => item.elementId === 'f6aede6f-2d0e-497a-bfc2-02596e46048a').data.text,
+					holiday: this.userMeta.summary.find(item => item.elementId === '19041546-0910-451a-929c-c41f059261f6').data.text,
+					sickdays: this.userMeta.summary.find(item => item.elementId === '7302e88a-66b3-4283-908e-7933813602de').data.text
 				}
 			} else {
 				return {
@@ -234,7 +293,7 @@ export default {
 						}
 					`
 				}).then(() => {
-					this.$apollo.queries.pointsByUser.refetch()
+					this.$apollo.queries.pointsByUserId.refetch()
 					this.confirmPopUp = false;
 				}).catch((error) => {
 					console.log({ error })
@@ -252,13 +311,13 @@ export default {
 		},
 		pointSaved(){
 			this.popUp = false
-			this.$apollo.queries.pointsByUser.refetch()
+			this.$apollo.queries.pointsByUserId.refetch()
 		},
 		sortPoints () {
 			this.kwListWithPoints = []
 			let tempList = new Array(53)
-			if (this.pointsByUser) {
-				for (const point of this.pointsByUser) {
+			if (this.pointsByUserId) {
+				for (const point of this.pointsByUserId) {
 					const date = point.data.find(item => item.elementId === 'd43d0fd0-172d-4b7a-a942-990597d3cb42').data.text.split('.')
 					if(date[2] !== this.yearForZeiterfassung){
 						continue
