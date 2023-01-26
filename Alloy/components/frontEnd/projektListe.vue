@@ -457,6 +457,7 @@ export default {
 			deep: true,
 			handler () {
 				this.completeDirectory();
+				this.itemsFill();
 			}
 		},
 		// watcher to react to changes in the files when they are called from the API
