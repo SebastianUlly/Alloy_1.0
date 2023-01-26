@@ -215,8 +215,8 @@ export default {
 							}
 
 							if(currentItem.elementId == "d43d0fd0-172d-4b7a-a942-990597d3cb42"){
-								const [day, month] = currentItem.data.text.split(".")
-								currentValue = day + "." + month
+								const [day, month, year] = currentItem.data.text.split(".")
+								currentValue = day + "." + month + "." + year
 							}
 							if(!currentValue){
 								//if the currentItem exists sets to the currentValue of currentItem.data.text or to an empty string
@@ -259,6 +259,22 @@ export default {
 					//pushing the newRow to the items Array 
 					tempItems.push(newRow)
 				}
+				//sort the tempItems by date
+				tempItems.sort(function (a, b) {
+					//trick to not manipulate the original object
+					const aTemp = JSON.parse(JSON.stringify(a))
+					const bTemp = JSON.parse(JSON.stringify(b))
+					//tempolary adding the year to the datum
+					aTemp.Datum = aTemp.Datum.split('.')[1] + '.' + aTemp.Datum.split('.')[0] + '.' + aTemp.Datum.split('.')[2]
+					bTemp.Datum = bTemp.Datum.split('.')[1] + '.' + bTemp.Datum.split('.')[0] + '.' + bTemp.Datum.split('.')[2]
+					//the sort function
+					return new Date(bTemp.Datum) - new Date(aTemp.Datum)
+				})
+				//restore the items by deleting the year
+				for (const item of tempItems) {
+					item.Datum = item.Datum.split('.')[0] + '.' + item.Datum.split('.')[1]
+				}
+				// console.log(tempItems)
 				this.items = tempItems
 			} 
 		}
