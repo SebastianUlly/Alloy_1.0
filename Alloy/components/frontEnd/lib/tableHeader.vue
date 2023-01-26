@@ -18,12 +18,12 @@
 			<span>
 				Stundensaldo:
 			</span>
-			<span
+			<span :style="'color: green'"
 				v-if="weeklySummary.hoursaldo[0] !== '-'"
 			>
-				+{{ weeklySummary.hoursaldo }}
+				{{ weeklySummary.hoursaldo }}
 			</span>
-			<span
+			<span :style="'color: red'"
 				v-else
 			>
 				{{ weeklySummary.hoursaldo }}
@@ -36,7 +36,7 @@
 			<span>
 				Urlaub:
 			</span>
-			<span>
+			<span :style="'color: green'">
 				+{{ weeklySummary.holiday }}
 			</span>
 			<span>
@@ -113,7 +113,7 @@ h1 {
 }
 
 p {
-	margin: 0 30px 0 0;
+	margin: 0 25px 0 0;
 }
 
 p:first-of-type {
