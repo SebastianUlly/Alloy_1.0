@@ -42,7 +42,7 @@
 			class="kw"
 		>
 			<TableHeader
-				v-if="(52 - index) === getCurrentKW && selectedUserId === loggedInUserId"
+				v-if="(52 - index) === getCurrentKW && selectedUserId === loggedInUserId && !arePointsReleased(kw)"
 				:headline="(52 - index).toString() + '. KW'"
 				:user-info="{
 					workhours: allWorkHoursPerWeek,
@@ -122,7 +122,7 @@ export default {
 			popUpSchema:{},
 			clickedFile: {},
 			userSummary: {
-				weekhours: 'loggedInUserId0:00',
+				weekhours: '0:00',
 				hoursaldo: '2:10',
 				holiday: 20,
 				sickdays: 3
@@ -138,6 +138,9 @@ export default {
 
 	mounted () {
 		this.sortPoints()
+		if (!this.selectedUserId) {
+			this.selectedUserId = this.loggedInUserId
+		}
 	},
 
 	computed: {
@@ -182,12 +185,23 @@ export default {
 	},
 
 	methods: {
+		arePointsReleased (kw) {
+			if (kw) {
+				return kw.every(
+					(point) => {
+						return point.data.find(item => item.elementId === 'ccf2057a-d5f7-4786-bb35-cc24ad152436').data.text === this.loggedInUserId
+					}
+				)
+			}
+			return false
+		},
+
 		releaseKW (kw) {
-			console.log(kw)
 			const pointsToRelease = []
 			for (const item of kw) {
 				pointsToRelease.push(item.id)
 			}
+			console.log(pointsToRelease)
 
 			this.$apollo.mutate({
 				variables: {
@@ -203,7 +217,31 @@ export default {
 					}
 				`
 			}).then((data) => {
-				console.log(data)
+				this.getPoints(this.loggedInUserId)
+			}).catch((error) => {
+				console.log({ error })
+			})
+		},
+
+		getPoints (userId) {
+			this.$apollo.query({
+				variables: {
+					userId: userId
+				},
+				query: gql`
+					query (
+						$userId: String
+					) {
+						pointsByUserId (
+							userId: $userId
+						) {
+							id
+							data
+						}
+					}
+				`
+			}).then((data) => {
+				this.pointsByUserId = data.data.pointsByUserId
 			}).catch((error) => {
 				console.log({ error })
 			})
