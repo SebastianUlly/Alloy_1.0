@@ -42,7 +42,7 @@
 			class="kw"
 		>
 			<TableHeader
-				v-if="(52 - index) === getCurrentKW"
+				v-if="(52 - index) === getCurrentKW && selectedUserId === loggedInUserId"
 				:headline="(52 - index).toString() + '. KW'"
 				:user-info="{
 					workhours: allWorkHoursPerWeek,
@@ -51,6 +51,7 @@
 				:weekly-summary="getWeeklySummary(index, kw)"
 				:button="'sign'"
 				class="tableHeader"
+				@releaseKW="releaseKW(kw)"
 			/>
 			<TableHeader
 				v-else-if="kw"
@@ -103,19 +104,6 @@ export default {
 	},
 
 	apollo: {
-		// pointsByUserId: gql`
-		// 	query (
-		// 		$userId: String
-		// 	) {
-		// 		pointsByUserId (
-		// 			userId: $userId
-		// 		) {
-		// 			id
-		// 			data
-		// 		}
-		// 	}
-		// `,
-
 		directory: gql `
 			query directory{
 				directory{
@@ -134,7 +122,7 @@ export default {
 			popUpSchema:{},
 			clickedFile: {},
 			userSummary: {
-				weekhours: '0:00',
+				weekhours: 'loggedInUserId0:00',
 				hoursaldo: '2:10',
 				holiday: 20,
 				sickdays: 3
@@ -143,7 +131,8 @@ export default {
 			yearForZeiterfassung: "",
 			searchValueForZeiterfassung: "",
 			popUpLoading: false,
-			pointsByUserId: []
+			pointsByUserId: [],
+			selectedUserId: ''
 		}
 	},
 
@@ -193,8 +182,36 @@ export default {
 	},
 
 	methods: {
+		releaseKW (kw) {
+			console.log(kw)
+			const pointsToRelease = []
+			for (const item of kw) {
+				pointsToRelease.push(item.id)
+			}
+
+			this.$apollo.mutate({
+				variables: {
+					pointIds: pointsToRelease
+				},
+				mutation: gql`
+					mutation (
+						$pointIds: [String]
+					) { 
+						releasePoints (
+							pointIds: $pointIds
+						)
+					}
+				`
+			}).then((data) => {
+				console.log(data)
+			}).catch((error) => {
+				console.log({ error })
+			})
+		},
+
 		// function that is called when a different user is selected in the selectUser-component
 		changeUser (data) {
+			this.selectedUserId = data
 			this.$apollo.query({
 				variables: {
 					userId: data

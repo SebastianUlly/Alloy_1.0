@@ -54,14 +54,15 @@
 				{{ weeklySummary.sickdays }}
 			</span>
 		</p>
-		<!-- <v-btn
+		<v-btn
 			v-if="button === 'sign'"
 			class="sign-button"
 			color="green"
+			@click="$emit('releaseKW')"
 		>
 			Freigeben
 		</v-btn>
-		<v-btn
+		<!-- <v-btn
 			v-if="button === 'pdf'"
 			class="button"
 		>
