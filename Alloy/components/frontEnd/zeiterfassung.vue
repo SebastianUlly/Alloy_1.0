@@ -10,7 +10,7 @@
 			:loading="loading"
 			:search="searchValue"
     	>
-		<template #item.actions="{item}" v-slot:item="props">
+		<template v-if="showActions" #item.actions="{item}" v-slot:item="props">
 			<div class="icons">
 					<button @click="$emit('getClickedItem', item)">
 						<v-icon>
@@ -47,6 +47,9 @@ export default {
 	},
 	year: {
 		type: String
+	},
+	showActions: {
+		type: Boolean
 	}
   },
   data() {
@@ -169,13 +172,15 @@ export default {
 						});
 					}
 				}
-			//adding the actions column
-			this.headers.push({
-				text: "Actions",
-				align:'center',
-				sortable: false,
-				value: "actions"
-			});
+			if (this.showActions) {
+				//adding the actions column
+				this.headers.push({
+					text: "Actions",
+					align:'center',
+					sortable: false,
+					value: "actions"
+				});
+			}
 			this.headers.push({
 				text: "",
 				value: "data-table-expand"

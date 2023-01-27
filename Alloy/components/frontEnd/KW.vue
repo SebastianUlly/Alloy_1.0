@@ -42,8 +42,37 @@
 			:key="index"
 			class="kw"
 		>
+
 			<TableHeader
-				v-if="(52 - index) === getCurrentKW && selectedUserId === loggedInUserId && !arePointsReleased(kw)"
+				v-if="(52 - index) === getCurrentKW && !arePointsReleased(kw) && selectedUserId === loggedInUserId"
+				:headline="(52 - index).toString() + '. KW'"
+				:user-info="{
+					workhours: allWorkHoursPerWeek,
+					holiday: userMeta.holidays
+				}"
+				:weekly-summary="getWeeklySummary(index, kw)"
+				:button="'release'"
+				:showButton="!arePointsReleased(kw)"
+				class="tableHeader"
+				@releaseKW="releaseKW(kw)"
+			/>
+
+			<TableHeader
+				v-else-if="kw && !arePointsReleased(kw) && selectedUserId === loggedInUserId"
+				:headline="(52 - index).toString() + '. KW'"
+				:user-info="{
+					workhours: allWorkHoursPerWeek,
+					holiday: userMeta.holidays
+				}"
+				:weekly-summary="getWeeklySummary(index, kw)"
+				:button="'release'"
+				:showButton="!arePointsReleased(kw)"
+				class="tableHeader"
+				@releaseKW="releaseKW(kw)"
+			/>
+			
+			<TableHeader
+				v-else-if="(52 - index) === getCurrentKW && arePointsReleased(kw) && !arePointsSigned(kw) && checkPermissionIdsHere('975abc9d-878b-4eb1-999e-3890991217f8')"
 				:headline="(52 - index).toString() + '. KW'"
 				:user-info="{
 					workhours: allWorkHoursPerWeek,
@@ -51,9 +80,53 @@
 				}"
 				:weekly-summary="getWeeklySummary(index, kw)"
 				:button="'sign'"
+				:showButton="!arePointsSigned(kw)"
 				class="tableHeader"
-				@releaseKW="releaseKW(kw)"
+				@signKW="signKW(kw)"
 			/>
+
+
+			
+			<TableHeader
+				v-else-if="kw && arePointsReleased(kw) && !arePointsSigned(kw) && checkPermissionIdsHere('975abc9d-878b-4eb1-999e-3890991217f8')"
+				:headline="(52 - index).toString() + '. KW'"
+				:user-info="{
+					workhours: allWorkHoursPerWeek,
+					holiday: userMeta.holidays
+				}"
+				:weekly-summary="getWeeklySummary(index, kw)"
+				:button="'sign'"
+				:showButton="!arePointsSigned(kw)"
+				class="tableHeader"
+				@signKW="signKW(kw)"
+			/>
+				
+			<TableHeader
+				v-else-if="(52 - index) === getCurrentKW && !arePointsReleased(kw) && selectedUserId !== loggedInUserId"
+				:headline="(52 - index).toString() + '. KW'"
+				:user-info="{
+					workhours: allWorkHoursPerWeek,
+					holiday: userMeta.holidays
+				}"
+				:weekly-summary="getWeeklySummary(index, kw)"
+				:button="'none'"
+				:showButton="false"
+				class="tableHeader"
+			/>
+
+			<TableHeader
+				v-else-if="kw && !arePointsReleased(kw) && selectedUserId !== loggedInUserId"
+				:headline="(52 - index).toString() + '. KW'"
+				:user-info="{
+					workhours: allWorkHoursPerWeek,
+					holiday: userMeta.holidays
+				}"
+				:weekly-summary="getWeeklySummary(index, kw)"
+				:button="'none'"
+				:showButton="false"
+				class="tableHeader"
+			/>
+
 			<TableHeader
 				v-else-if="kw"
 				:headline="(52 - index).toString() + '. KW'"
@@ -62,9 +135,13 @@
 					holiday: userMeta.holidays
 				}"
 				:weekly-summary="getWeeklySummary(index, kw)"
-				:button="'pdf'"
+				:button="'none'"
+				:showButton="false"
 				class="tableHeader"
 			/>
+
+
+
 			<zeiterfassung
 				v-if="kw"
 				:points="kw"
@@ -72,7 +149,8 @@
 				:searchValue="searchValueForZeiterfassung"
 				@getClickedItem="openEditTime"
 				@getClickedItemForDelete="getClickedItemForDelete"
-				class="zeiterfassung" 
+				class="zeiterfassung"
+				:showActions="!arePointsSigned(kw)"
 			/>
 		</div>
 	</div>
@@ -138,6 +216,7 @@ export default {
 	},
 
 	mounted () {
+		this.selectedUserId = this.loggedInUserId
 		this.getPoints(this.loggedInUserId)
 	},
 
@@ -187,7 +266,22 @@ export default {
 			if (kw) {
 				return kw.every(
 					(point) => {
-						return point.data.find(item => item.elementId === 'ccf2057a-d5f7-4786-bb35-cc24ad152436').data.text === this.loggedInUserId
+						return point.data.find(item => item.elementId === 'ccf2057a-d5f7-4786-bb35-cc24ad152436')?.data.text === this.selectedUserId
+					}
+				)
+			}
+			return false
+		},
+
+		arePointsSigned (kw) {
+			if (kw) {
+				return kw.every(
+					(point) => {
+						if (point.data.find(item => item.elementId === '86762034-4941-4bd1-b371-d5316c1838c6')) {
+							return point.data.find(item => item.elementId === '86762034-4941-4bd1-b371-d5316c1838c6')?.data.text !== ''
+						} else {
+							return point.data.find(item => item.elementId === '86762034-4941-4bd1-b371-d5316c1838c6')
+						}
 					}
 				)
 			}
@@ -199,7 +293,7 @@ export default {
 			for (const item of kw) {
 				pointsToRelease.push(item.id)
 			}
-			console.log(pointsToRelease)
+			console.log('release', pointsToRelease)
 
 			this.$apollo.mutate({
 				variables: {
@@ -221,7 +315,35 @@ export default {
 			})
 		},
 
+		signKW (kw) {
+			const pointsToRelease = []
+			for (const item of kw) {
+				pointsToRelease.push(item.id)
+			}
+			console.log('sign', pointsToRelease)
+
+			this.$apollo.mutate({
+				variables: {
+					pointIds: pointsToRelease
+				},
+				mutation: gql`
+					mutation (
+						$pointIds: [String]
+					) { 
+						signPoints (
+							pointIds: $pointIds
+						)
+					}
+				`
+			}).then((data) => {
+				this.getPoints(this.selectedUserId)
+			}).catch((error) => {
+				console.log({ error })
+			})
+		},
+
 		getPoints (userId) {
+			console.log(userId)
 			this.$apollo.query({
 				variables: {
 					userId: userId
@@ -247,29 +369,8 @@ export default {
 
 		// function that is called when a different user is selected in the selectUser-component
 		changeUser (data) {
-			
 			this.selectedUserId = data
-			this.$apollo.query({
-				variables: {
-					userId: data
-				},
-				query: gql`
-					query (
-						$userId: String
-					) {
-						pointsByUserId (
-							userId: $userId
-						) {
-							id
-							data
-						}
-					}
-				`
-			}).then((data) => {
-				this.pointsByUserId = data.data.pointsByUserId
-			}).catch((error) => {
-				console.log({ error })
-			})
+			this.getPoints(data)
 		},
 
 		// function to check the permissions in this component
@@ -347,7 +448,7 @@ export default {
 						}
 					`
 				}).then(() => {
-					this.$apollo.queries.pointsByUserId.refetch()
+					this.getPoints(this.selectedUserId)
 					this.confirmPopUp = false;
 				}).catch((error) => {
 					console.log({ error })
@@ -365,7 +466,7 @@ export default {
 		},
 		pointSaved(){
 			this.popUp = false
-			this.$apollo.queries.pointsByUserId.refetch()
+			this.getPoints(this.selectedUserId)
 		},
 		sortPoints () {
 			this.kwListWithPoints = []
