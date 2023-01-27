@@ -50,7 +50,6 @@
                 large
                 style="min-width:0"> Speichern </v-btn>
         </div>
-        {{ selectedUserId }}
     </div>
 </template>
 
