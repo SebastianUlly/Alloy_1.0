@@ -271,9 +271,10 @@ export default {
 					const bTemp = JSON.parse(JSON.stringify(b))
 					//tempolary adding the year to the datum
 					aTemp.Datum = aTemp.Datum.split('.')[1] + '.' + aTemp.Datum.split('.')[0] + '.' + aTemp.Datum.split('.')[2]
+					console.log(aTemp)
 					bTemp.Datum = bTemp.Datum.split('.')[1] + '.' + bTemp.Datum.split('.')[0] + '.' + bTemp.Datum.split('.')[2]
 					//the sort function
-					return new Date(bTemp.Datum) - new Date(aTemp.Datum)
+					return (bTemp.Datum > aTemp.Datum) ? 1 : (bTemp.Datum < aTemp.Datum) ? -1 : 0;
 				})
 				//restore the items by deleting the year
 				for (const item of tempItems) {
