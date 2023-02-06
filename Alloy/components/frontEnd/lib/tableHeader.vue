@@ -68,7 +68,7 @@
 			v-if="button === 'sign' && showButton"
 			class="button"
 			color="green"
-			@click="$emit('signKW')"
+			@click="$emit('signTheKW')"
 		>
 			Signieren
 		</v-btn>
