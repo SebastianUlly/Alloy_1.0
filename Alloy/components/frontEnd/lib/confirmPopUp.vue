@@ -3,11 +3,11 @@
         <div class="popUpTop">
             <div class="infoIcon">
                 <v-icon>
-                    mdi-delete-outline
+                   {{ confirmPopUpData.icon }}
                 </v-icon>
             </div>
             <div class="label">
-                Löschen bestätigen
+                {{confirmPopUpData.label}}
             </div>
             <div class="closeIcon">
                 <button  @click="closePopUp()">
@@ -17,21 +17,29 @@
         </div>
         <div class="popUpBody">
             <div class="textContainer">
-                {{clickedFile.Datum}} - {{ clickedFile.Typ }} - {{ clickedFile.Projekt }} - {{ clickedFile.Ttigkeit }} - {{ clickedFile.Zeit }} <br><br>{{ clickedFile.Beschreibung }}
+                <div v-if="confirmPopUpData.type == 'delete'">
+                    {{clickedFile.Datum}} - {{ clickedFile.Typ }} - {{ clickedFile.Projekt }} - {{ clickedFile.Ttigkeit }} - {{ clickedFile.Zeit }} <br><br>{{ clickedFile.Beschreibung }}
+                </div>
+                <div v-if="confirmPopUpData.type == 'sign'">
+                    <h1> Kalenderwoche signieren </h1>
+                </div>
+                <div v-if="confirmPopUpData.type == 'release'">
+                    <h1> Kalenderwoche freigeben </h1>
+                </div>
             </div>
         </div>
         <div class="addButtonDiv">
             <!-- emitting the clicked answer to the parent -->
             <v-btn
                 class="addButton"
-                @click="$emit('sendAnswer', true)"
+                @click="$emit('sendAnswer', true, confirmPopUpData.type, confirmPopUpData.kw)"
                 color="green"
                 large
-                style="min-width:0"> Löschen 
+                style="min-width:0"> Ja
             </v-btn>
             <v-btn
                 class="addButton"
-                @click="$emit('sendAnswer', false)"
+                @click="$emit('sendAnswer', false, confirmPopUpData.type, confirmPopUpData.kw)"
                 color="green"
                 large
                 style="min-width:0"> Nein 
@@ -45,6 +53,9 @@ import closeButtonImage from '~/assets/images/close-button.png'
 export default {
     props:{
         clickedFile:{
+            type: Object
+        },
+        confirmPopUpData:{
             type: Object
         }
     },

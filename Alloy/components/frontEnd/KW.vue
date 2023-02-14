@@ -45,8 +45,9 @@
 		<confirmPopUp
 			v-if="confirmPopUp"
 			:clickedFile = "clickedFile"
+			:confirmPopUpData = "confirmPopUpData"
 			@closePopUp = "setConfirmPopUp"
-			@sendAnswer="deletePointFromList"
+			@sendAnswer="getAnswerFromConfirmPopUp"
 		/>
 		<div
 			v-for="(kw, index) of kwListWithPoints.slice().reverse()"
@@ -65,7 +66,7 @@
 				:button="'release'"
 				:showButton="!arePointsReleased(kw)"
 				class="tableHeader"
-				@releaseKW="releaseKW(kw)"
+				@releaseKW="setConfirmPopUpData(kw, 'release', 'Kalenderwoche freigeben')"
 			/>
 
 			<TableHeader
@@ -79,7 +80,7 @@
 				:button="'release'"
 				:showButton="!arePointsReleased(kw)"
 				class="tableHeader"
-				@releaseKW="releaseKW(kw)"
+				@releaseKW="setConfirmPopUpData(kw, 'release', 'Kalenderwoche freigeben')"
 			/>
 			
 			<TableHeader
@@ -93,7 +94,7 @@
 				:button="'sign'"
 				:showButton="!arePointsSigned(kw)"
 				class="tableHeader"
-				@signKW="signKW(kw)"
+				@signTheKW="setConfirmPopUpData( kw ,'sign', 'Kalenderwoche signieren')"
 			/>
 
 
@@ -109,7 +110,7 @@
 				:button="'sign'"
 				:showButton="!arePointsSigned(kw)"
 				class="tableHeader"
-				@signKW="signKW(kw)"
+				@signTheKW="setConfirmPopUpData( kw, 'sign', 'Kalenderwoche signieren')"
 			/>
 				
 			<TableHeader
@@ -157,7 +158,7 @@
 				:year="yearForZeiterfassung"
 				:searchValue="searchValueForZeiterfassung"
 				@getClickedItem="openEditTime"
-				@getClickedItemForDelete="getClickedItemForDelete"
+				@setConfirmPopUpData="setConfirmPopUpData"
 				class="zeiterfassung"
 				:showActions="!arePointsSigned(kw)"
 				:paid-holidays="kwListWithHolidays[52 - index]"
@@ -210,6 +211,7 @@ export default {
 			kwListWithPoints: [],
 			popUp: false,
 			confirmPopUp: false,
+			confirmPopUpData: {},
 			popUpSchema:{},
 			clickedFile: {},
 			userSummary: {
@@ -432,6 +434,7 @@ export default {
 				`
 			}).then((data) => {
 				this.getPoints(this.loggedInUserId)
+				this.confirmPopUp = false
 			}).catch((error) => {
 				console.log({ error })
 			})
@@ -458,6 +461,7 @@ export default {
 				`
 			}).then((data) => {
 				this.getPoints(this.selectedUserId)
+				this.confirmPopUp = false;
 			}).catch((error) => {
 				console.log({ error })
 			})
@@ -552,16 +556,58 @@ export default {
 		},
 
 		//open the confirm popUp and send the clicked element to it
-		getClickedItemForDelete(clickedFileValue){
-			this.clickedFile = clickedFileValue
+		//"configuring" the popup with label icon and giving them a type
+		setConfirmPopUpData(item, type, label){
+			//clear the clickedFile
+			this.clickedFile = null
+			//if we click the delete button than it will forward the data to the popup, we want to delete
+			//so if item.Beschreibung exists just than forward the data
+			if(item.Beschreibung){
+				this.clickedFile = item;
+			}
+			//the type is needed to distinguish the content we want to display
+			this.confirmPopUpData.type = type;
+			this.confirmPopUpData.label = label;
+			if(type == 'sign'){
+				this.confirmPopUpData.icon = 'mdi-lock-outline'
+				this.confirmPopUpData.kw = item
+			}else if(type == 'release'){
+				this.confirmPopUpData.icon = 'mdi-lock-open-outline'
+				this.confirmPopUpData.kw = item
+				this.confirmPopUpData.label = 'Kalenderwoche freigeben'
+			}
+			else if(type == 'delete'){
+				this.confirmPopUpData.icon = 'mdi-delete-outline'
+			}
+			else {
+				this.confirmPopUpData.kw = null
+			}
+
 			this.confirmPopUp = true;
 		},
+		//closing the confirmPopUp
 		setConfirmPopUp(value){
 			this.confirmPopUp = value
 		},
+		//here we get the answer emit from the confirmPopUp
+		getAnswerFromConfirmPopUp(value, type, kw){
+			//switching between the function to run
+			if(type == 'delete'){
+				this.deletePointFromList(value, type)
+			}
+			if(type == 'sign' && value){
+				this.signKW(kw)
+			}
+			if(value == false){
+				this.confirmPopUp = false;
+			}
+			if(type == 'release' && value){
+				this.releaseKW(kw)
+			}
+		},
 		//if the answer from the confirm popUp is true, delete the clicked file
-		deletePointFromList(value){
-			if(value){
+		deletePointFromList(value, type){
+			if(value && type == 'delete'){
 				this.$apollo.mutate({
 					variables:{
 						id: this.clickedFile.id
@@ -581,9 +627,11 @@ export default {
 				}).catch((error) => {
 					console.log({ error })
 				})
+				//closing the popUP
+				this.confirmPopUp = false;
+			}else if(value == false && type == 'delete'){
+				this.confirmPopUp = false;
 			}
-			//closing the popUP
-			this.confirmPopUp = false;
 				
 		},
 		//open the edit time popUp with the merge method

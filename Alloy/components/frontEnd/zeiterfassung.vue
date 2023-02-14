@@ -23,7 +23,7 @@
 							mdi-timer-edit-outline
 						</v-icon>
 					</button>
-					<button @click="$emit('getClickedItemForDelete', item)">
+					<button @click="$emit('setConfirmPopUpData', item, 'delete', 'Löschen bestätigen')">
 						<v-icon> 
 							mdi-delete-outline
 						</v-icon>
