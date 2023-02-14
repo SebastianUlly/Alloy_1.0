@@ -1,10 +1,8 @@
 <template>
     <div class="selectYearBackground">
-        <input v-model="year" type="text" class="selectYear" placeholder="Jahr">
-        <!-- <select v-model="year" class="selectYear" name="" id="">>
+        <select v-model="year" class="selectYear" name="" id="">>
             <option v-for="item in availableYears" class="selectYearOption" :value="item" :key="item">{{item}}</option>
-        </select> -->
-         <!-- <vue-json-pretty :data="availableYears"/> -->
+        </select>
 	</div>
 </template>
 <script>
@@ -14,41 +12,18 @@ export default {
     data() {
         return {
            year:"",
-           /* availableYears:[] */
+           availableYears:["2022", "2023", "2024"]
         };
     },
-    methods:{
-         /* searchAvailableYears(){
-            for(let item of this.fileBySchemaId){
-                for(let i = 0; i < item.data.length; i++){
-                    if(item.data[i].elementId === "577aa568-345a-47e5-9b71-848d5695bd5d" && !this.availableYears.includes(item.data[i].data.text.toString())){
-                        this.availableYears.push(item.data[i].data.text.toString());
-                    }
-                }
-                
-            }
-        } */
-    },
-    created(){
-        /* this.searchAvailableYears(); */
+
+    created () {
         this.year = new Date().getFullYear();
     },
-    apollo:{
-         /* fileBySchemaId: gql `
-			query Files {
-				fileBySchemaId(schemaId: "44111b55-c2b8-4e30-97d3-452aed86c1f4") {
-					label
-					data
-					id
-				}
-			}
-		`, */
-    },
-    watch:{
-        year:{
-            handler(){
-                this.$emit('sendYear', this.year)
-                /* this.searchAvailableYears(); */
+
+    watch: {
+        year: {
+            handler () {
+                this.$emit('sendYear', this.year.toString())
             }
         }
     }

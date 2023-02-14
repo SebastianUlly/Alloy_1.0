@@ -20,6 +20,7 @@
 <script>
 import gql from "graphql-tag";
 import { mapGetters } from "vuex";
+import customSelect from "../lib/customSelect.vue";
 export default {
   props: {
     label: {
@@ -39,6 +40,9 @@ export default {
       required: false,
       default: null
     }
+  },
+  components: {
+    customSelect
   },
   data() {
     return {

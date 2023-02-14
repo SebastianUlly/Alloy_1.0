@@ -19,6 +19,7 @@
 import gql from 'graphql-tag'
 
 import { mapGetters } from 'vuex'
+import Relationship from './Relationship.vue'
 
 export default {
 	props: {
@@ -34,6 +35,10 @@ export default {
 			type: Boolean,
 			default: false
 		}
+	},
+
+	components: {
+		Relationship
 	},
 
 	data () {

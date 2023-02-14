@@ -81,7 +81,7 @@ export default {
     },
     labelColor: {
       type: String,
-      required: true
+      required: false
     }
   },
 

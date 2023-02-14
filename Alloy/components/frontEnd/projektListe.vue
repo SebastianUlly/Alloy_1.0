@@ -1,5 +1,4 @@
 <template>
-	
 	<div class="container">
 		<ClientOnly>
 			<div>
@@ -11,7 +10,9 @@
 						style="min-width:0"
 						class="addProject"
 						color="green"
+						:disabled="popUp"
 						@click="openNewProject(true)"
+						:loading="popUpLoading"
 					>
 						<!-- the icon with the file and + -->
 						<v-icon>
@@ -45,6 +46,7 @@
 						:header-props="{ sortIcon: null }"
 						:sort-by="'Nummer'"
 						:sort-desc="true"
+						:loading="isFillingData"
 					>
 						<!-- this template contains the last column with the action buttons -->
 						<template 
@@ -96,8 +98,7 @@
 				{{ text }}
 			</v-snackbar>
 		</ClientOnly>
-	</div>	
-	
+	</div>
 </template>
 
 <script>
@@ -109,6 +110,7 @@ import popUp from "~/components/frontEnd/lib/popUp";
 import { MainDirectory } from '~/assets/directoryClasses'
 import { mergeSchemas } from '~/assets/classes/objectClasses'
 import { checkPermissionId } from '~/assets/functions/permission'
+import { data } from "browserslist";
 export default {
 	components: {
     search,
@@ -135,8 +137,10 @@ export default {
 			popUpSchema: null,
 			ids:["ca78b111-d1f0-4b4b-b82c-c7e727804b0b", "77ffa6dc-8676-4ee3-acae-d12697f608a1"],
 			clickedFile:"",
-			isActionAvailable: 0
-			
+			isActionAvailable: 0,
+			pharmacyAbb:{},
+			isFillingData: false,
+			popUpLoading: false
         };
     },
     apollo: {
@@ -189,6 +193,27 @@ export default {
     },
 
     methods: {
+		async getPharmacyAbb(pharmacyId){
+			if(!this.pharmacyAbb[pharmacyId]){
+				this.pharmacyAbb[pharmacyId]=(
+				await this.$apollo.query({
+					variables: {
+							id: pharmacyId
+						},
+					query: gql`
+						query ($id: String){
+							queryFileData(id: $id){
+								id
+								label
+								data
+							}
+						}
+					`
+				}))
+			}
+
+			return this.pharmacyAbb[pharmacyId]
+		},
 		// function that is called when the project has been successfully saved
 		projectSaved () {
 			// refetching of all the files
@@ -234,6 +259,7 @@ export default {
 					}
 				})
 			}
+			this.popUpLoading = false
 		},
 		openEditProject(item){
 			this.getDataForPopUp(["ca78b111-d1f0-4b4b-b82c-c7e727804b0b", "77ffa6dc-8676-4ee3-acae-d12697f608a1"]);
@@ -242,6 +268,7 @@ export default {
 		},
 		//set the boolean variable true and the popUp opens
 		openNewProject(value){
+			this.popUpLoading = true
 			this.$store.commit("file/resetEnteredData")
 			this.clickedFile = null;
 			this.popUp = value;
@@ -268,26 +295,23 @@ export default {
 		},
 		//capturing the selected year from the component
 		captureMyYear(myYear){
-			this.year = myYear;
+			this.year = myYear.toString();
 		},
-        dataFill() {
-			//console.log(this.$hostname)
+		headersFill(){
 			this.headers = []
-			this.items = []
-			if (this.querySchemaById && this.directory && this.fileBySchemaId && this.files && this.schema) {
-				//filling the headers based on previewList
+			if (this.querySchemaById) {
 				for (const elementIdToFind of this.querySchemaById.metadata?.metadata_elements[0].parameters.previewList) {
 					//merge the elements and the metadata
 					for (const item of [...this.querySchemaById.elements, ...this.querySchemaById.metadata?.metadata_elements]) {
 						//if the element ID is the same as we need, it will push the label and add the elementIdToFind to the label
 						if (item.elementId === elementIdToFind) {
 							//checking if the row permissioinId needed or the user the permission has
-							if(item.permissionId && !this.checkPermissionIdsHere(item.permissionId)){
+							if (item.permissionId && !this.checkPermissionIdsHere(item.permissionId)) {
 								//if the permissinId exists but the user has no permission to see this row the continue will exacute
 								//it means that the for loop will jump to the next element
 								continue;
 							}
-							if(item.label === "Jahr"){
+							if (item.label === "Jahr") {
 								//pushing the row (object) with the following settings to the headers (array)
 								this.headers.push({
 									//the header name is the label of the item
@@ -301,23 +325,31 @@ export default {
 									value: item.label.replace(/[^a-zA-Z ]/g, ""),
 									//giving the elementId to the headers object too
 									elementId: elementIdToFind,
-									// filtering the projects to get just the list with the desired year (value comes from the selectYear component)
-									filter: value => {
+									// filtering the projects to get just the list with the desired year (yar comes from the selectYear component)
+									 filter: value => {
 										if (!this.year) return true
-										return value.toString().includes(this.year.toString())
+										return value.includes(this.year) 
 									}
 								})	
 							}
 							// the number is a special case where the width and the align must be set
-							else if(item.label === "Nummer"){
+							else if (item.label === "Nummer") {
 								this.headers.push({
 									text: item.label,
 									width:"5%",
-									align:'left',
+									align:'center',
 									sortable: true,
 									value: item.label.replace(/[^a-zA-Z ]/g, ""),
 									elementId: elementIdToFind
 								})
+							} else if (item.label === "Name"){
+								this.headers.push({
+									text: item.label,
+									align:'left',
+									sortable: false,
+									value: item.label.replace(/[^a-zA-Z ]/g, ""),
+									elementId: elementIdToFind,
+								})	
 							}
 							//every other case it will push with these default settings
 							else{
@@ -327,7 +359,7 @@ export default {
 									sortable: true,
 									value: item.label.replace(/[^a-zA-Z ]/g, ""),
 									elementId: elementIdToFind
-							});
+								});
 							}
 							
 						}
@@ -342,37 +374,64 @@ export default {
 						value: "actions"
 					});
 				}
+			}
+			if(this.fileBySchemaId){
+				this.itemsFill();
+			}
+		},
+        async itemsFill() {
+			if (this.querySchemaById && this.directory && this.fileBySchemaId && this.files && this.schema) {
+				this.isFillingData = true;
+				let tempItems = [];
+				//filling the headers based on previewList
+				
 				for (const rawItem of this.fileBySchemaId) {
-					if (this.directory[0].hierarchy.some(e => e.fileId === rawItem.id)) {
-						//reseting the temorary new row
-						let newRow = {};
-						//merge the elements and the metadata
-						for (const elementIdToFind of this.querySchemaById.metadata.metadata_elements[0].parameters.previewList) {
-							//creating the currentItem variable that contains the elementId of the currentItem
-							let currentItem = rawItem.data.find(item => item.elementId === elementIdToFind);
-							//creating the currentKey variable that contains the elementId of the headers
-							let currentKey = this.headers.find(item => item.elementId === elementIdToFind)?.value;
-							//setting the currentValue default to undefined
-							let currentValue;
-							if (currentItem) {
-								//if the currentItem exists sets to the currentValue of currentItem.data.text or to an empty string
-								currentValue = currentItem.data.text ?? "";
+					try {
+						if (this.directory[0].hierarchy.some(e => e.fileId === rawItem.id)) {
+							//reseting the temporary new row
+							let newRow = {};
+							//merge the elements and the metadata
+							for (const elementIdToFind of this.querySchemaById.metadata.metadata_elements[0].parameters.previewList) {
+								//creating the currentItem variable that contains the elementId of the currentItem
+								let currentItem = rawItem.data.find(item => item.elementId === elementIdToFind);
+								//creating the currentKey variable that contains the elementId of the headers
+								let currentKey = this.headers.find(item => item.elementId === elementIdToFind)?.value;
+								//setting the currentValue default to undefined
+								let currentValue;
+								if(currentKey === 'Apotheke'){
+									let temp = await this.getPharmacyAbb(currentItem.data.text)
+									//at the single pharmacies the name is under data.text 
+									if(temp.data.queryFileData.data[0].data.text){
+										currentValue = temp.data.queryFileData.data[0].data.text
+									} 
+									//but at the group under the queryFileData.label
+									else if(temp.data.queryFileData.data[0].data.values){
+										currentValue = temp.data.queryFileData.label
+									}
+								} else if (currentItem) {
+									//if the currentItem exists sets to the currentValue of currentItem.data.text or to an empty string
+									currentValue = currentItem.data.text ?? "";
+								} else if (rawItem.label && (currentKey === 'Nummer')) {
+									//if the data was not in elements than it muss be the label of rawItem
+									currentValue = rawItem.label;
+								}
+								
+								//if the currentKey and the currentValue not undefined, than set the newRows value to currentValue
+								if (currentKey && currentValue) {
+									newRow[currentKey] = currentValue;
+								}
 							}
-							else if (rawItem.label && (currentKey === 'Nummer')) {
-								//if the data was not in elements than it muss be the label of rawItem
-								currentValue = rawItem.label;
-							}
-							//if the currentKey and the currentValue not undefined, than set the newRows value to currentValue
-							if (currentKey && currentValue) {
-								newRow[currentKey] = currentValue;
-							}
+							//adding the elementId to the items array
+							newRow["id"] = rawItem.id;
+							//pushing the newRow to the items Array 
+							tempItems.push(newRow);
 						}
-						//adding the elementId to the items array
-						newRow["id"] = rawItem.id;
-						//pushing the newRow to the items Array 
-						this.items.push(newRow);
+					} catch (error) {
+						console.log({error}, rawItem)
 					}
 				}
+				this.items = tempItems
+				this.isFillingData = false;
 			}
         },
 		completeDirectory () {
@@ -397,31 +456,29 @@ export default {
 		directory: {
 			deep: true,
 			handler () {
-				this.completeDirectory()
-				this.dataFill()
+				this.completeDirectory();
+				this.itemsFill();
 			}
 		},
 		// watcher to react to changes in the files when they are called from the API
 		files: {
 			deep: true,
 			handler () {
-				this.completeDirectory()
-				this.dataFill()
+				this.completeDirectory();
 			}
 		},
 		// watcher to react to changes in the schema when they are called from the API
 		schema: {
 			deep: true,
-			handler () {
-				this.completeDirectory()
-				this.dataFill()
+			handler(){
+				this.completeDirectory();
 			}
 		},
 		// watcher to react to changes in the projectSchema when it is called from the API
         querySchemaById: {
             deep: true,
             handler() {
-                this.dataFill();
+				this.headersFill();
             }
         },
 		// watcher to react to changes in the project-files when they are called from the API
@@ -429,10 +486,14 @@ export default {
 			deep: true,
 			handler () {
 				this.$store.commit('file/setFileList', this.fileBySchemaId)
-				this.dataFill()
+				this.itemsFill();
 			}
 		}
     },
+	created(){
+		this.headersFill();
+		this.itemsFill();
+	},
     computed: {
         ...mapGetters({
             getDirectory: "directory/getDirectory",
