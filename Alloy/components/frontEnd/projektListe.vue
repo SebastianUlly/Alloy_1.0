@@ -110,7 +110,7 @@ import popUp from "~/components/frontEnd/lib/popUp";
 import { MainDirectory } from '~/assets/directoryClasses'
 import { mergeSchemas } from '~/assets/classes/objectClasses'
 import { checkPermissionId } from '~/assets/functions/permission'
-import { data } from "browserslist";
+
 export default {
 	components: {
     search,
