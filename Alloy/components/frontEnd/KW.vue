@@ -1,27 +1,37 @@
 <template>
 	<div>
 		<div class="top-section">
-			<v-btn
-				style="min-width:0"
-				class="addProject"
-				color="green"
-				:disabled="popUp"
-				:loading="popUpLoading"
-				@click="openNewProject(true)"
-			>
-				<v-icon>
-					mdi-timer-plus-outline
-				</v-icon>
-			</v-btn>
-			<!-- <dropDown/> -->
-			<div class= "searchContainer">
-				<selectUser
-					v-if="checkPermissionIdsHere('b57d9dd1-646c-47dc-90d8-eef85a2cad1f')"
-					@userId="changeUser"
-				/>
-				<selectYear @sendYear="captureMyYear" class="selectYearComponent"/>
-				<search @sendValue="captureMySearchValue" />
+			{{ getSummary }}
+			<div class="top-section__left">
+				<v-btn
+					style="min-width:0"
+					class="addProject"
+					color="green"
+					:disabled="popUp"
+					:loading="popUpLoading"
+					@click="openNewProject(true)"
+				>
+					<v-icon>
+						mdi-timer-plus-outline
+					</v-icon>
+				</v-btn>
+				<!-- <dropDown/> -->
+				<div class= "searchContainer">
+					<selectUser
+						v-if="checkPermissionIdsHere('b57d9dd1-646c-47dc-90d8-eef85a2cad1f')"
+						@userId="changeUser"
+					/>
+					<selectYear @sendYear="captureMyYear" class="selectYearComponent"/>
+					<search @sendValue="captureMySearchValue" />
+				</div>
 			</div>
+			<UserSummary
+				class="top-section__right"
+				:userInfo="{
+					holidays: userMeta.holidays
+				}"
+				:weekly-summary="getSummary"
+			/>
 		</div>
 		<popUp
 			v-if="popUp && popUpSchema"
@@ -30,6 +40,7 @@
 			:clickedFile="clickedFile"
 			@saveSuccess="pointSaved"
 			:selectedUserId="selectedUserId"
+			:paid-holidays="paidHolidayList"
 		/>
 		<confirmPopUp
 			v-if="confirmPopUp"
@@ -47,7 +58,7 @@
 				v-if="(52 - index) === getCurrentKW && !arePointsReleased(kw) && selectedUserId === loggedInUserId"
 				:headline="(52 - index).toString() + '. KW'"
 				:user-info="{
-					workhours: allWorkHoursPerWeek,
+					workhours: allWorkHoursPerWeek(index),
 					holiday: userMeta.holidays
 				}"
 				:weekly-summary="getWeeklySummary(index, kw)"
@@ -61,7 +72,7 @@
 				v-else-if="kw && !arePointsReleased(kw) && selectedUserId === loggedInUserId"
 				:headline="(52 - index).toString() + '. KW'"
 				:user-info="{
-					workhours: allWorkHoursPerWeek,
+					workhours: allWorkHoursPerWeek(index),
 					holiday: userMeta.holidays
 				}"
 				:weekly-summary="getWeeklySummary(index, kw)"
@@ -75,7 +86,7 @@
 				v-else-if="(52 - index) === getCurrentKW && arePointsReleased(kw) && !arePointsSigned(kw) && checkPermissionIdsHere('975abc9d-878b-4eb1-999e-3890991217f8')"
 				:headline="(52 - index).toString() + '. KW'"
 				:user-info="{
-					workhours: allWorkHoursPerWeek,
+					workhours: allWorkHoursPerWeek(index),
 					holiday: userMeta.holidays
 				}"
 				:weekly-summary="getWeeklySummary(index, kw)"
@@ -91,7 +102,7 @@
 				v-else-if="kw && arePointsReleased(kw) && !arePointsSigned(kw) && checkPermissionIdsHere('975abc9d-878b-4eb1-999e-3890991217f8')"
 				:headline="(52 - index).toString() + '. KW'"
 				:user-info="{
-					workhours: allWorkHoursPerWeek,
+					workhours: allWorkHoursPerWeek(index),
 					holiday: userMeta.holidays
 				}"
 				:weekly-summary="getWeeklySummary(index, kw)"
@@ -105,7 +116,7 @@
 				v-else-if="(52 - index) === getCurrentKW && !arePointsReleased(kw) && selectedUserId !== loggedInUserId"
 				:headline="(52 - index).toString() + '. KW'"
 				:user-info="{
-					workhours: allWorkHoursPerWeek,
+					workhours: allWorkHoursPerWeek(index),
 					holiday: userMeta.holidays
 				}"
 				:weekly-summary="getWeeklySummary(index, kw)"
@@ -118,7 +129,7 @@
 				v-else-if="kw && !arePointsReleased(kw) && selectedUserId !== loggedInUserId"
 				:headline="(52 - index).toString() + '. KW'"
 				:user-info="{
-					workhours: allWorkHoursPerWeek,
+					workhours: allWorkHoursPerWeek(index),
 					holiday: userMeta.holidays
 				}"
 				:weekly-summary="getWeeklySummary(index, kw)"
@@ -131,7 +142,7 @@
 				v-else-if="kw"
 				:headline="(52 - index).toString() + '. KW'"
 				:user-info="{
-					workhours: allWorkHoursPerWeek,
+					workhours: allWorkHoursPerWeek(index),
 					holiday: userMeta.holidays
 				}"
 				:weekly-summary="getWeeklySummary(index, kw)"
@@ -139,8 +150,6 @@
 				:showButton="false"
 				class="tableHeader"
 			/>
-
-
 
 			<zeiterfassung
 				v-if="kw"
@@ -151,6 +160,7 @@
 				@getClickedItemForDelete="getClickedItemForDelete"
 				class="zeiterfassung"
 				:showActions="!arePointsSigned(kw)"
+				:paid-holidays="kwListWithHolidays[52 - index]"
 			/>
 		</div>
 	</div>
@@ -169,6 +179,7 @@ import search from "~/components/frontEnd/search";
 import dropDown from "~/components/frontEnd/dropDown"
 import { mapGetters } from "vuex";
 import { checkPermissionId } from '~/assets/functions/permission'
+import UserSummary from './lib/Summary.vue';
 
 export default {
 	components: {
@@ -179,7 +190,8 @@ export default {
 		selectYear,
 		search,
 		dropDown,
-		selectUser
+		selectUser,
+		UserSummary
 	},
 
 	apollo: {
@@ -211,13 +223,16 @@ export default {
 			searchValueForZeiterfassung: "",
 			popUpLoading: false,
 			pointsByUserId: [],
-			selectedUserId: ''
+			selectedUserId: '',
+			paidHolidayList: [],
+			kwListWithHolidays: []
 		}
 	},
 
 	mounted () {
 		this.selectedUserId = this.loggedInUserId
 		this.getPoints(this.loggedInUserId)
+		this.getPaidHolidayList()
 	},
 
 	computed: {
@@ -230,15 +245,20 @@ export default {
 			return this.KalenderWoche()
 		},
 
-		// returning the total workhours per week a user should be working
-		allWorkHoursPerWeek(){
-			let temp = 0
-			// looping through the distribution and adding all the values to get the sum
-			for(let day of this.userMeta.weeklyHours[0].distribution){
-				temp += day
-			} 
-			return temp
-		}
+		summary () {
+			if (this.altSummary) {
+				return this.altSummary
+			}
+			return this.userMeta.summary
+		},
+
+		getSummary () {
+			return {
+				hoursaldo: this.summary.find(item => item.elementId === 'f6aede6f-2d0e-497a-bfc2-02596e46048a').data.text,
+				holiday: this.summary.find(item => item.elementId === '19041546-0910-451a-929c-c41f059261f6').data.text,
+				sickdays: this.summary.find(item => item.elementId === '7302e88a-66b3-4283-908e-7933813602de').data.text
+			}
+		},
 	},
 
 	watch:{
@@ -258,10 +278,113 @@ export default {
 		},
 		yearForZeiterfassung(){
 			this.sortPoints()
+		},
+		paidHolidayList: {
+			deep: true,
+			handler () {
+				this.sortPaidHolidays()
+			}
+		},
+
+		selectedUserId () {
+			this.getPoints(this.selectedUserId)
+			this.getSummaryPointByUserId(this.selectedUserId)
 		}
 	},
 
 	methods: {
+		getSummaryPointByUserId (userIdToGet) {
+			console.log(userIdToGet)
+			// if (userIdToGet) {
+				this.$apollo.query({
+					variables: {
+						userId: userIdToGet
+					},
+					query: gql`
+						query (
+							$userId: String!
+						) {
+							getSummaryToUserId (
+								userId: $userId
+							) {
+								id
+								data
+							}
+						}
+					`
+				}).then((data) => {
+					this.altSummary = data.data.getSummaryToUserId.data
+				}).catch((error) => {
+					console.log({ error })
+				})
+			// }
+		},
+		// returning the total workhours per week a user should be working
+		allWorkHoursPerWeek(index){
+			if (index){
+				let timeToWorkInAFullWeek = 0
+				// looping through the distribution and adding all the values to get the sum
+				for(let day of this.userMeta.weeklyHours[0].distribution){
+					timeToWorkInAFullWeek += day
+				}
+	
+				let timeDeductetFromTotalTimeToWorkDueToPaidHolidays = 0
+				if (this.kwListWithHolidays[52 - index]) {
+					for (const item of this.kwListWithHolidays[52 - index]) {
+						timeDeductetFromTotalTimeToWorkDueToPaidHolidays += this.userMeta.weeklyHours[0].distribution[0]
+					}
+				}
+	
+				return timeToWorkInAFullWeek - timeDeductetFromTotalTimeToWorkDueToPaidHolidays
+			}
+			return 0
+		},
+
+		getPaidHolidayList () {
+			this.$apollo.query({
+				variables: {
+					id: '6905fcdb-d575-4002-9fcd-35534aaa4c87'
+				},
+				query: gql`
+					query (
+						$id: String
+					) {
+						miscellaneousById (
+							id: $id
+						) {
+							id
+							label
+							data
+						}
+					}
+				`
+			}).then((data) => {
+				// console.log(data.data.miscellaneousById)
+				this.paidHolidayList = data.data.miscellaneousById.data
+			}).catch((error) => {
+				console.log({ error })
+			})
+		},
+
+		sortPaidHolidays () {
+			this.kwListWithHolidays = []
+			let tempList = new Array(53)
+			if (this.paidHolidayList) {
+				for (const holiday of this.paidHolidayList) {
+					const date = holiday.date.split('.')
+					if(date[2] !== this.yearForZeiterfassung){
+						continue
+					}
+					const KWNumber = this.KalenderWoche(date[2], date[1], date[0])
+					if (!tempList[KWNumber]) {
+						tempList[KWNumber] = []
+					}
+					tempList[KWNumber].push(holiday)
+				}
+				this.kwListWithHolidays = tempList
+			}
+		},
+
 		arePointsReleased (kw) {
 			if (kw) {
 				return kw.every(
@@ -293,7 +416,6 @@ export default {
 			for (const item of kw) {
 				pointsToRelease.push(item.id)
 			}
-			console.log('release', pointsToRelease)
 
 			this.$apollo.mutate({
 				variables: {
@@ -320,7 +442,6 @@ export default {
 			for (const item of kw) {
 				pointsToRelease.push(item.id)
 			}
-			console.log('sign', pointsToRelease)
 
 			this.$apollo.mutate({
 				variables: {
@@ -343,7 +464,6 @@ export default {
 		},
 
 		getPoints (userId) {
-			console.log(userId)
 			this.$apollo.query({
 				variables: {
 					userId: userId
@@ -370,7 +490,6 @@ export default {
 		// function that is called when a different user is selected in the selectUser-component
 		changeUser (data) {
 			this.selectedUserId = data
-			this.getPoints(data)
 		},
 
 		// function to check the permissions in this component
@@ -406,19 +525,28 @@ export default {
 					minutes += parseInt(time.data.text.split(':')[1])
 				}
 			}
+
+			let hoursWorkedSummary = (hours + Math.floor(minutes/60)).toString()
+			if (hoursWorkedSummary.length === 1) {
+				hoursWorkedSummary = '0' + hoursWorkedSummary
+			}
+			let minutesWorkedSummary = (minutes%60).toString()
+			if (minutesWorkedSummary.length === 1) {
+				minutesWorkedSummary = '0' + minutesWorkedSummary
+			}
 			// adding the hoiurs coming from the minutes which have reached the 60 miniute mark and combining it with minutes left over into a String
-			const test = (hours + Math.floor(minutes/60)).toString() + ':' + (minutes%60).toString()
+			const hoursWorked = hoursWorkedSummary + ':' + minutesWorkedSummary
 			// returning the summary
 			if ((52 - kwNumber) === this.getCurrentKW) {
 				return {
-					weekhours: test,
+					weekhours: hoursWorked,
 					hoursaldo: this.userMeta.summary.find(item => item.elementId === 'f6aede6f-2d0e-497a-bfc2-02596e46048a').data.text,
 					holiday: this.userMeta.summary.find(item => item.elementId === '19041546-0910-451a-929c-c41f059261f6').data.text,
 					sickdays: this.userMeta.summary.find(item => item.elementId === '7302e88a-66b3-4283-908e-7933813602de').data.text
 				}
 			} else {
 				return {
-					weekhours: test
+					weekhours: hoursWorked
 				}
 			}
 		},
@@ -564,11 +692,22 @@ export default {
 .searchContainer{
 	display:flex;
 }
-.top-section{
+
+// .top-section {
+// 	display: flex;
+// 	width: 1300px;
+// }
+.top-section__left{
 	margin-top: 30px;
 	max-width: 900px;
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
+}
+
+.top-section__right {
+	position: fixed;
+	right: 30px;
+	top: 147px;
 }
 </style>

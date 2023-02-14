@@ -15,46 +15,7 @@
 					({{ userInfo.workhours }})
 				</span>
 			</p>
-			<p v-if="weeklySummary.hoursaldo">
-				<span>
-					Stundensaldo:
-				</span>
-				<span :style="'color: green'"
-					v-if="weeklySummary.hoursaldo[0] !== '-'"
-				>
-					{{ weeklySummary.hoursaldo }}
-				</span>
-				<span :style="'color: red'"
-					v-else
-				>
-					{{ weeklySummary.hoursaldo }}
-				</span>
-				<v-icon class="icon">
-					mdi-clock-outline
-				</v-icon>
-			</p>
-			<p v-if="weeklySummary.holiday">
-				<span>
-					Urlaub:
-				</span>
-				<span :style="'color: green'">
-					+{{ weeklySummary.holiday }}
-				</span>
-				<span>
-					({{ userInfo.holiday }})
-				</span>
-				<v-icon class="icon">
-					mdi-calendar-blank
-				</v-icon>
-			</p>
-			<p v-if="weeklySummary.sickdays">
-				<span>
-					Krankentage:
-				</span>
-				<span>
-					{{ weeklySummary.sickdays }}
-				</span>
-			</p>
+			
 		</div>
 		<v-btn
 			v-if="button === 'release' && showButton"

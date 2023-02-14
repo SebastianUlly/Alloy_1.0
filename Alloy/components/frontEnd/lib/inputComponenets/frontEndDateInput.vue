@@ -26,11 +26,13 @@
                 @input="menu = false"
                 :max="maxDate"
                 :first-day-of-week="1"
+                :allowed-dates="allowedDates"
             ></v-date-picker>
         </v-menu>
     </div>
 </template>
 <script>
+import gql from 'graphql-tag'
 import { mapGetters } from "vuex"
 import { checkPermissionId } from '~/assets/functions/permission'
 export default{
@@ -63,10 +65,49 @@ export default{
             formattedDate:"",
             menu: false,
             isInputOkValue: false,
-            maxDate: new Date()
+            maxDate: new Date(),
+            paidHolidayList: []
         }
     },
+
     methods:{
+        getPaidHolidayList () {
+			this.$apollo.query({
+				variables: {
+					id: '6905fcdb-d575-4002-9fcd-35534aaa4c87'
+				},
+				query: gql`
+					query (
+						$id: String
+					) {
+						miscellaneousById (
+							id: $id
+						) {
+							id
+							label
+							data
+						}
+					}
+				`
+			}).then((data) => {
+				// console.log(data.data.miscellaneousById)
+				this.paidHolidayList = data.data.miscellaneousById.data
+			}).catch((error) => {
+				console.log({ error })
+			})
+        },
+
+        allowedDates (val) {
+            // console.log(val)
+            for (const holiday of this.paidHolidayList) {
+                const date = val.split('-')[2] + '.' + val.split('-')[1] + '.' + val.split('-')[0]
+                if (date === holiday.date) {
+                    return false
+                }
+            }
+            return true
+        },
+
         //set the default value for the input if elementIdToSearch not exists
         setDefaultValue(){
             //set the max value. The range value comes from the database
@@ -140,6 +181,7 @@ export default{
     mounted(){
         //send the default date to the store
         this.sendEvent();
+        this.getPaidHolidayList()
     },
     created(){
         this.setDefaultValue();

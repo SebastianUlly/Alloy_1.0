@@ -25,7 +25,7 @@
                     v-if="options"
                     v-for="(item, index) in options"
                     :value="item.id"
-                >{{item.year}}-{{item.projectNumber}}</option>
+                >{{item.year}}-{{item.projectNumber}}-{{item.projectName}}</option>
                 <!-- options if the source comes from the database -->
                 <option
                     v-if="optionsFromDatabase"
@@ -298,7 +298,8 @@ export default{
                                     this.filesProject.push({
                                         id: file.id,
                                         year: file.data.find(element => element.elementId === "577aa568-345a-47e5-9b71-848d5695bd5d").data.text,
-                                        projectNumber: file.label
+                                        projectNumber: file.label,
+                                        projectName: file.data.find(element => element.elementId === "5187f38c-c1b7-4f8e-9c00-b87f703650ee").data.text
                                     })
                                 }
                             }

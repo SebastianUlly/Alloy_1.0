@@ -33,8 +33,8 @@
                 v-model= "inputValueMinutes"
                 class="timeInput"
                 min="00"
-                max="45"
-                step="15"
+                max="55"
+                step="5"
                 type="number">
         </div>
     </div>
