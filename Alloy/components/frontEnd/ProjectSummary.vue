@@ -9,8 +9,11 @@
 			/>
 		</div>
 		<singleProjectView
-				:selectedProjectId="selectedProjectId"
-			/>
+			:selectedProjectId="selectedProjectId"
+		/>
+		<projectTimeTable
+			:selectedProjectId="selectedProjectId"
+		/>
 	</div>
 </template>
 
@@ -18,16 +21,19 @@
 import singleProjectView from "~/components/frontEnd/singleProjectView";
 import selectYear from "~/components/frontEnd/selectYear";
 import selectProject from "~/components/frontEnd/selectProject";
+import projectTimeTable from '~/components/frontEnd/projectTimeTable'
 export default {
 	components:{
 		selectYear,
 		selectProject,
-		singleProjectView
+		singleProjectView,
+		projectTimeTable
 	},
 	data(){
 		return{
 			sendYearToSelectProject: '2023',
-			selectedProjectId: ''
+			selectedProjectId: '',
+			projectTimeTable: false
 		}
 	},
 	methods:{
@@ -36,6 +42,7 @@ export default {
 		}, 
 		getSelectedProjectId(id){
 			this.selectedProjectId = id
+			this.projectTimeTable = true
 		}
 	}
 }

@@ -33,6 +33,7 @@ export default {
 	methods:{
 		openComponent(component){
 			this.component = component
+			this.$store.commit('file/resetEnteredData')
 		}
 	}
 };

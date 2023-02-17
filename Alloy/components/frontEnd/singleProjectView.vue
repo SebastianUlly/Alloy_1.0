@@ -2,7 +2,7 @@
     <div>
         <popUp
             v-if="popUp && popUpSchema"
-            @closeNewProject="openNewProject($event)"
+            @closeNewProject="openProjectPopUp($event)"
             @saveSuccess="projectSaved"
             :popUpSchema = "popUpSchema"
             :clickedFile = "clickedFile"
@@ -19,7 +19,7 @@
             <div v-if="selectedProjectId">
                 {{ project.year }} - {{ project.label }} - {{ project.name }} - {{ project.pharmacyAbb }} - {{ project.status }}
             </div>
-            <v-btn @click="openEditProject" :loading="popUpLoading">
+            <v-btn @click="openEditProject" v-if="selectedProjectId" :loading="popUpLoading">
                 <v-icon>
                     mdi-pencil-outline
                 </v-icon>
@@ -95,10 +95,10 @@ export default{
 				return this.pharmacyById[id]
 			}
 		},
-        openNewProject(value){
+        openProjectPopUp(value){
 			this.popUpLoading = true
 			this.$store.commit("file/resetEnteredData")
-			this.clickedFile = null;
+			
 			this.popUp = value;
 			this.getDataForPopUp(["ca78b111-d1f0-4b4b-b82c-c7e727804b0b"]);
 		},
@@ -177,7 +177,7 @@ export default{
                 pharmacy: this.pharmacyById[data.queryFileData.data.find(element => element.elementId == "09c5ba61-4e52-4a68-afde-bb7334b45b35").data.text].label,
                 pharmacyAbb: this.pharmacyById[data.queryFileData.data.find(element => element.elementId == "09c5ba61-4e52-4a68-afde-bb7334b45b35").data.text].data.find(element => element.elementId == "91f42e63-98b4-462b-bf65-58b416718cb0").data.text
             }
-            this.loading = false
+            this.loading = false;
         }
     },
     watch:{
