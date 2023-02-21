@@ -16,6 +16,12 @@
 		>
 			Data Editor
 		</v-btn> -->
+		<v-btn
+			text
+			to="/dataEditor"
+		>
+			Data Editor
+		</v-btn>
 		<!-- <v-btn
 			v-if="checkPermissionIdsHere('3fde6c2c-0867-4aba-9442-f4eeccf467ff')"
 			text
