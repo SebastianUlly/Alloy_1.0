@@ -64,6 +64,8 @@ import frontEndDateInput from "~/components/frontEnd/lib/inputComponenets/frontE
 import frontEndSelectInput from "~/components/frontEnd/lib/inputComponenets/frontEndSelectInput";
 import frontEndTextArea from "~/components/frontEnd/lib/inputComponenets/frontEndTextArea";
 import closeButtonImage from "~/assets/images/close-button.png"
+import frontEndFileUpload from "~/components/frontEnd/lib/inputComponenets/frontEndFileUpload";
+
 export default {
     props:{
         popUpSchema:{
@@ -81,7 +83,8 @@ export default {
         frontEndSelectInput,
         frontEndTimeInput,
         frontEndDateInput,
-        frontEndTextArea
+        frontEndTextArea,
+        frontEndFileUpload
     },
     data(){
         return{
