@@ -296,7 +296,6 @@ export default {
 
 	methods: {
 		getSummaryPointByUserId (userIdToGet) {
-			console.log(userIdToGet)
 			// if (userIdToGet) {
 				this.$apollo.query({
 					variables: {

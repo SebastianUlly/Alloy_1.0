@@ -4,6 +4,7 @@
             v-if="selectedProjectId"
             :headers="headers"
             :items="items"
+            :search="searchValue"
         />
     </div>
 </template>
@@ -14,6 +15,9 @@ import gql from "graphql-tag";
 export default{
     props: {
         selectedProjectId:{
+            type: String
+        },
+        searchValue:{
             type: String
         }
     },
@@ -95,7 +99,7 @@ export default{
         },
         
         async getPointsByProjectId(){
-            console.log(this.selectedProjectId)
+            this.items = [];
             const { data } = await this.$apollo.query({
                 variables:{
                     userId: this.selectedProjectId
