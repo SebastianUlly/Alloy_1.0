@@ -33,7 +33,8 @@ export default {
 
 <style scoped>
 .searchField{
-    width: 500px;
+    min-width: 300px;
+    width: auto;
     height: 50px;
     background-color: #1E1E1E;
     border-radius: 2px;

@@ -15,6 +15,17 @@
 						mdi-timer-plus-outline
 					</v-icon>
 				</v-btn>
+				<v-btn
+					:loading="updatePointsLoading"
+					color="green"
+					class="button"
+					@click="getPoints(loggedInUserId)"
+				>	
+					aktualisieren
+					<v-icon>	
+						mdi-refresh
+					</v-icon>
+				</v-btn>
 				<!-- <dropDown/> -->
 				<div class= "searchContainer">
 					<selectUser
@@ -227,7 +238,8 @@ export default {
 			pointsByUserId: [],
 			selectedUserId: '',
 			paidHolidayList: [],
-			kwListWithHolidays: []
+			kwListWithHolidays: [],
+			updatePointsLoading: false
 		}
 	},
 
@@ -467,6 +479,7 @@ export default {
 		},
 
 		getPoints (userId) {
+			this.updatePointsLoading = true;
 			this.$apollo.query({
 				variables: {
 					userId: userId
@@ -660,6 +673,7 @@ export default {
 					this.kwListWithPoints = tempList
 				}
 			}
+			this.updatePointsLoading = false
 		},
 
 		KalenderWoche(j,m,t) {

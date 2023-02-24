@@ -17,18 +17,20 @@
 			</p>
 			
 		</div>
+		<v-spacer/>
+		
 		<v-btn
 			v-if="button === 'release' && showButton"
-			class="button"
 			color="green"
+			class="button"
 			@click="$emit('releaseKW')"
 		>
 			Freigeben
 		</v-btn>
 		<v-btn
 			v-if="button === 'sign' && showButton"
-			class="button"
 			color="green"
+			class="button"
 			@click="$emit('signTheKW')"
 		>
 			Signieren
@@ -99,7 +101,6 @@ p:first-of-type {
 }
 
 .button {
-	position: absolute;
-	right: 15px;
+	margin: 5px;
 }
 </style>
