@@ -1,11 +1,5 @@
 <template>
 	<div>
-		<div v-if="paidHolidays">
-			Feiertage:
-			<div v-for="item of paidHolidays" :key="item.id">
-				{{ item.date }}
-			</div>
-		</div>
 		<v-data-table 
 			v-if="headers"
 			:headers="headers"
@@ -41,6 +35,7 @@
 
 <script>
 import gql from "graphql-tag";
+import { v4 as uuidv4 } from 'uuid';
 
 export default {
 	name: "zeiterfassung",
@@ -298,9 +293,76 @@ export default {
 					for (const item of tempItems) {
 						item.Datum = item.Datum.split('.')[0] + '.' + item.Datum.split('.')[1]
 					}
-					this.items = tempItems
+				} 
+
+				if(this.paidHolidays){
+					for (const holiday of this.paidHolidays) {
+						let newRow = {};
+						for (const elementIdToFind of this.querySchemaById.metadata.metadata_elements[0].parameters.previewList) {
+							//creating the currentKey variable that contains the elementId of the headers
+							let currentKey = this.headers.find(item => item.elementId === elementIdToFind)?.value;
+														
+							const dateKey = this.headers.find(item => item.elementId === 'd43d0fd0-172d-4b7a-a942-990597d3cb42')?.value;
+							const dateValue = holiday.date
+							newRow[dateKey] = dateValue;
+								
+							const pharmacyKey = this.headers.find(item => item.elementId === '0c9cf456-edc3-4779-b00c-14237863fa16')?.value;
+							const pharmacyValue = (await this.getPharmacyById('15550a00-46dd-4695-8650-e7ab0f0ce738')).data.find(e => e.elementId == "91f42e63-98b4-462b-bf65-58b416718cb0").data.text ?? "";
+							newRow[pharmacyKey] = pharmacyValue;
+
+							//searching the file and the correct year
+							const file = this.fileBySchemaId.find(item => item.id === '4e5f968b-5314-46e3-85a5-95d22db27047')
+							for(const fileData of file.data){
+								if(fileData.elementId == "577aa568-345a-47e5-9b71-848d5695bd5d"){
+									const projectKey = this.headers.find(item => item.elementId === '30a1d57d-ac51-4a54-9f83-2c493253b944')?.value;
+									//bind the two data with each other
+									const projectValue = [fileData.data.text, file.label].join('-')
+									newRow[projectKey] = projectValue;
+								}
+							}
+							
+
+							for(const temp of (await this.getDataFromMiscellaneous('e0bef030-e8ed-45d5-a06a-e5f40eaf4c5d')).data){
+								if(temp.id == '2ed7c498-1b47-46f2-9f7f-74f8f7959cff'){
+									const typeKey = this.headers.find(item => item.elementId === 'f951c3cf-1594-435e-85be-e951be00bb44')?.value;
+									const typeValue = temp.name
+									newRow[typeKey] = typeValue;
+								}
+							}
+						}
+						//adding the elementId to the items array
+						newRow["id"] = uuidv4();
+						//save the string as we store the date
+						const str = holiday.date;
+						//creating the format of the Date object
+						const [day, month, year] = str.split('.');
+						//create the Date object
+						const date = new Date(+year, +month - 1, +day);
+						//getting the abbreviation from the array
+						newRow["Tag"] = this.weekday[date.getDay()];
+						//pushing the newRow to the items Array 
+						tempItems.push(newRow)
+					}
+
+					//sort the tempItems by date
+					tempItems.sort(function (a, b) {
+						console.log(a)
+						//trick to not manipulate the original object
+						const aTemp = JSON.parse(JSON.stringify(a))
+						const bTemp = JSON.parse(JSON.stringify(b))
+						//tempolary adding the year to the datum
+						aTemp.Datum = aTemp.Datum.split('.')[1] + '.' + aTemp.Datum.split('.')[0] + '.' + aTemp.Datum.split('.')[2]
+						bTemp.Datum = bTemp.Datum.split('.')[1] + '.' + bTemp.Datum.split('.')[0] + '.' + bTemp.Datum.split('.')[2]
+						//the sort function
+						return (bTemp.Datum > aTemp.Datum) ? 1 : (bTemp.Datum < aTemp.Datum) ? -1 : 0;
+					})
+					//restore the items by deleting the year
+					for (const item of tempItems) {
+						item.Datum = item.Datum.split('.')[0] + '.' + item.Datum.split('.')[1]
+					}
 				} 
 			}
+			this.items = tempItems
 			this.loading = false;
 		}
 	},

@@ -6,8 +6,6 @@
 	</div>
 </template>
 <script>
-import { data } from "browserslist";
-import gql from "graphql-tag";
 export default {
     data() {
         return {

@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<div class="top-section">
-			{{ getSummary }}
+			<!-- {{ getSummary }} -->
 			<div class="top-section__left">
 				<v-btn
 					style="min-width:0"
@@ -296,7 +296,6 @@ export default {
 
 	methods: {
 		getSummaryPointByUserId (userIdToGet) {
-			console.log(userIdToGet)
 			// if (userIdToGet) {
 				this.$apollo.query({
 					variables: {
