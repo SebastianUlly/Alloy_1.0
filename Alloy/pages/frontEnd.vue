@@ -15,6 +15,7 @@ import projektListe from '~/components/frontEnd/projektListe';
 import subMenu from '~/components/frontEnd/subMenu';
 import zeiterfassung from '~/components/frontEnd/KW';
 import projectsummary from '~/components/frontEnd/ProjectSummary'
+import externBills from '~/components/frontEnd/externBills'
 
 export default {
 	data(){
@@ -27,7 +28,8 @@ export default {
       	projektListe,
 		subMenu,
 		zeiterfassung,
-		projectsummary
+		projectsummary,
+		externBills
     },
 
 	methods:{

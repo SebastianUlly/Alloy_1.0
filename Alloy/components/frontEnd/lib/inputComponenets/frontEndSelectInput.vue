@@ -100,7 +100,8 @@ export default{
     computed:{
         ...mapGetters({
             permissionIds: 'authentication/getPermissionIds',
-            directory: 'directory/getDatabaseDirectory'
+            directory: 'directory/getDatabaseDirectory',
+            autoFillId: 'point/getAutoFillId'
         })
     },
 
@@ -252,7 +253,7 @@ export default{
             //if elementIdToSearch and this element is not the Number, set the default value from the database
             if(this.elementIdToSearch && this.data != undefined){
                 this.inputValue = (this.data.data.find(item => item.elementId === this.elementId).data.text)
-            }   
+            }
         },
         //sending the selected data to the store
         sendEvent(){
@@ -292,7 +293,8 @@ export default{
                     //filling the files array with the data of fileBySchemaId.data where elementData.elementId (name field of an apotheke) is the same
                     }).then((data) => {
                         //if the current selectInput is not the pharmacy selector
-                        if(this.elementId !== "09c5ba61-4e52-4a68-afde-bb7334b45b35"){
+                        if(this.elementId !== "09c5ba61-4e52-4a68-afde-bb7334b45b35" && !this.autoFillId){
+
                             for (const file of data.data.fileBySchemaId) {
                                 if(this.directory[0]?.hierarchy.some(e => e.fileId === file.id)){
                                     this.filesProject.push({
@@ -311,6 +313,16 @@ export default{
                                     label: pharmacy.data.find(element => element.elementId === "91f42e63-98b4-462b-bf65-58b416718cb0").data.text
                                 })
                             }
+                        } else {
+                            //when the autofillId exists limit the options just with one file
+                            const autoFillFile = data.data.fileBySchemaId.find(file => file.id == this.autoFillId)
+                            this.filesProject.push({
+                                id: autoFillFile.id,
+                                year: autoFillFile.data.find(element => element.elementId === "577aa568-345a-47e5-9b71-848d5695bd5d").data.text,
+                                projectNumber: autoFillFile.label,
+                                projectName: autoFillFile.data.find(element => element.elementId === "5187f38c-c1b7-4f8e-9c00-b87f703650ee").data.text
+                            })
+                            this.inputValue = this.filesProject[0].id
                         }
                         //run the sort files function that sort the filesProject array
                         this.sortFilesProject()

@@ -55,6 +55,14 @@
 								<!-- the icons div contains the action icons and buttons-->
 								<div class="icons">
 									<!-- the first icon is a timer watch with a small pencil at the corner, its open the set time popup-->
+									<button
+										title="Zeit hinzufügen"
+										@click="openAddTime(item)">
+										<!-- copy icon -->
+										<v-icon>
+											mdi-timer-plus-outline
+										</v-icon>
+									</button>
 									<button v-if="checkPermissionIdsHere('658c3149-1004-4ab9-9c1c-032390a61497')">
 										<v-icon>
 											mdi-timer-edit-outline
@@ -82,6 +90,7 @@
 											mdi-content-copy
 										</v-icon>
 									</button>
+									
 								</div>
 						</template>
 					</v-data-table>
@@ -113,9 +122,9 @@ import { checkPermissionId } from '~/assets/functions/permission'
 
 export default {
 	components: {
-    search,
-    selectYear,
-    popUp
+		search,
+		selectYear,
+		popUp
 },
     data() {
         return {
@@ -260,6 +269,12 @@ export default {
 				})
 			}
 			this.popUpLoading = false
+		},
+		openAddTime(item){
+			this.getDataForPopUp(["c519459a-5624-4311-bffb-838d43e7f0d0"]);
+			this.$store.commit("point/setAutoFillId", item.id)
+			this.popUp = true;
+			this.clickedFile = null;
 		},
 		openEditProject(item){
 			this.getDataForPopUp(["ca78b111-d1f0-4b4b-b82c-c7e727804b0b", "77ffa6dc-8676-4ee3-acae-d12697f608a1"]);

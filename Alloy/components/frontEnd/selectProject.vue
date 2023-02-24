@@ -8,7 +8,7 @@
                 :value="item.id"
                 :key="item.id"
             >
-                {{ item.label }} - {{ item.name }}
+                {{ item.label }} - {{item.pharmacy}} - {{ item.name }}
             </option>
         </select>
     </div>
@@ -25,7 +25,8 @@ export default{
     data(){
         return  {
             projectList: [],
-            selectedProjectId: ''
+            selectedProjectId: '',
+            pharmacyAbb:{}
         }
     },
     apollo: {
@@ -40,23 +41,49 @@ export default{
 		`,
     },
     methods:{
+        sortListByNumber(){
+            this.projectList.sort((a, b) => parseInt(b.label) - parseInt(a.label))
+        },
+        async getPharmacyAbb(pharmacyId){
+			if(!this.pharmacyAbb[pharmacyId]){
+				this.pharmacyAbb[pharmacyId]=(
+				await this.$apollo.query({
+					variables: {
+							id: pharmacyId
+						},
+					query: gql`
+						query ($id: String){
+							queryFileData(id: $id){
+								id
+								label
+								data
+							}
+						}
+					`
+				}))
+			}
+			return this.pharmacyAbb[pharmacyId]
+		},
         selectProject(){
             this.$emit('sendSelectedProject', this.selectedProjectId)
         },
-        createProjectList(){
+        async createProjectList(){
             this.projectList = [];
             for(let project of this.fileBySchemaId){
+                //the function gives back the pharmacy data by the pharmacyId
+                let temp = await this.getPharmacyAbb(project.data.find(item => item.elementId == "09c5ba61-4e52-4a68-afde-bb7334b45b35").data.text)
                 if(project.data.find(item => item.elementId == "577aa568-345a-47e5-9b71-848d5695bd5d").data.text == this.sendYearToSelectProject){
                     let item = {
                         id: project.id,
                         label: project.label,
+                        pharmacy: temp.data.queryFileData.data[0].data.text,
                         name: project.data.find(item => item.elementId == "5187f38c-c1b7-4f8e-9c00-b87f703650ee").data.text,
                         year: project.data.find(item => item.elementId == "577aa568-345a-47e5-9b71-848d5695bd5d").data.text
                     }
                     this.projectList.push(item);
-                } 
+                }
             }
-            
+            this.sortListByNumber()
         }
     },
     watch:{
@@ -72,9 +99,6 @@ export default{
             }
         }
     }
-
-
-
 }
 </script>
 

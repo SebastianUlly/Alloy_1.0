@@ -129,7 +129,6 @@ export default{
             }
             else if (this.parameters.default === "currentUser"){
                 //if the admin select someone else from the user selector
-                console.log(this.selectedUser)
                 if(this.selectedUserId !== this.userId && this.selectedUser){
                     this.$apollo.query({
                         query: gql`

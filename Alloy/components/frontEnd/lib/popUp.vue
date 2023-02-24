@@ -64,6 +64,8 @@ import frontEndDateInput from "~/components/frontEnd/lib/inputComponenets/frontE
 import frontEndSelectInput from "~/components/frontEnd/lib/inputComponenets/frontEndSelectInput";
 import frontEndTextArea from "~/components/frontEnd/lib/inputComponenets/frontEndTextArea";
 import closeButtonImage from "~/assets/images/close-button.png"
+import frontEndFileUpload from "~/components/frontEnd/lib/inputComponenets/frontEndFileUpload";
+
 export default {
     props:{
         popUpSchema:{
@@ -81,7 +83,8 @@ export default {
         frontEndSelectInput,
         frontEndTimeInput,
         frontEndDateInput,
-        frontEndTextArea
+        frontEndTextArea,
+        frontEndFileUpload
     },
     data(){
         return{
@@ -110,7 +113,6 @@ export default {
     mounted () {
         this.createNewFile()
     },
-
     methods:{
         isDayTypeHoliday(){
             //if Urlaub || Krankentag || Zeitausgleich clicked change the props for child components
@@ -261,6 +263,7 @@ export default {
 		},
         //calls the desired function
         selectFunction(functionName){
+            this.$store.commit("point/setAutoFillId", undefined)
             this[functionName]();
         },
         //get the clicked file and send it to the components
@@ -289,6 +292,7 @@ export default {
         },
         //close the popUp window
         closeNewProject(){
+            this.$store.commit("point/setAutoFillId", undefined)
             this.$emit('closeNewProject', false);
         },
         createNewFile(){
