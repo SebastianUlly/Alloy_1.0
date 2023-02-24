@@ -31,6 +31,8 @@
                         :class="item.parameters.size"
                         @update="getDataFromComponent"
                         @getCurrentFolderId="setParentId"
+                        @sendNetto="sendNettoValueToComponent"
+                        :nettoValue="nettoValueToSend"
                         :elementIdToSearch="clickedFile"
                         :data="sendDataToInputs"
                         :permissions="item.permissions"
@@ -91,7 +93,8 @@ export default {
             payload:"",
             icon: "",
             sendDataToInputs: {},
-            closeButtonImage: closeButtonImage
+            closeButtonImage: closeButtonImage,
+            nettoValueToSend
         }
     },
 
@@ -114,6 +117,9 @@ export default {
         this.createNewFile()
     },
     methods:{
+        sendNettoValueToComponent(nettoValue){
+            this.nettoValueToSend = nettoValue
+        },
         isDayTypeHoliday(){
             //if Urlaub || Krankentag || Zeitausgleich clicked change the props for child components
             if(this.getDataToSave.find(item => item.elementId == "f951c3cf-1594-435e-85be-e951be00bb44")?.data?.text == "95aa87dc-9f80-4c33-8ccd-f59f543bec8e" ||

@@ -56,6 +56,9 @@ export default{
         },
         selectedUserId:{
             type: String
+        },
+        nettoValueToSend:{
+            type: Number
         }
     },
     data(){
@@ -186,6 +189,8 @@ export default{
                     this.inputValue = this.tempValue;
                 }
                 this.sendEvent();
+            } else if(this.parameters.default === "calculateTax" && !this.elementIdToSearch){
+                this.inputValue = "test"
             }
         },
         //sends the payload to the parent
@@ -196,8 +201,9 @@ export default{
                     text : this.inputValue
                 }
             }
-            if(this.parameters.required){
-                
+            //if the component the Netto inputField is, send the netto value to parent component
+            if(this.elementId == "aedf15c2-24ef-4d16-acfe-94511f24b498" && !this.elementIdToSearch){
+                this.$emit('sendNetto', this.inputValue)
             }
             this.$emit('update', payload);
         },
