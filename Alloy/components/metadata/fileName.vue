@@ -17,10 +17,13 @@
 
 <script>
 import { mapGetters } from 'vuex'
-
+import inputField from '~/components/elements/lib/inputField'
 import { deepCopy } from '~/assets/classes/objectClasses'
 
 export default {
+	components:{
+		inputField
+	},
 	props: {
 		elementId: {
 			type: String,

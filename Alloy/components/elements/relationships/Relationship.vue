@@ -1,5 +1,6 @@
 <template>
 	<div>
+		{{ directoryWithOnlyAllowedEntitiesAndParents }}
 		<!-- {{ relationships }} -->
 		<div class="tree" :id="elementId">
 			<!-- treeview for the selection of new relationships -->
@@ -51,6 +52,7 @@
 import { v4 as uuidv4 } from 'uuid'
 import { mapGetters } from 'vuex'
 import { DirectoryOnlyWithAllowedSchemaIds, NestedDirectory } from '~/assets/directoryClasses'
+import RelationshipList from './RelationshipList.vue'
 
 export default {
 	props: {
@@ -71,6 +73,10 @@ export default {
 			type: Boolean,
 			default: false
 		}
+	},
+
+	components: {
+		RelationshipList
 	},
 
 	data () {
@@ -116,7 +122,7 @@ export default {
 
 	methods: {
 		findSchemaIdsToRelatedElementIds () {
-			// console.log(this.schemaRelationships)
+			console.log(this.schemaRelationships)
 			for (const relationshipPossibility of this.schemaRelationships) {
 				// console.log(relationshipPossibility.relationship)
 				if (relationshipPossibility.relationship.some(item => item.elementId === this.elementId)) {
@@ -132,6 +138,7 @@ export default {
 
 		// function to get te directory for the selection of the relationships
 		filterDirectory () {
+			console.log(this.schemaIds)
 			// creating a new instance of a directory with only entities of the alowed schemas
 			const directory = new DirectoryOnlyWithAllowedSchemaIds(this.storeDirestory, this.schemaIds, this.fileValues.id)
 

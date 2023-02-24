@@ -1,43 +1,41 @@
 <template>
-	<div class="background">
+	<div>
+		<subMenu @sendComponentToFrontEnd="openComponent($event)" />
 		<div class="leftSection">
-			<projektListe />
+			<component
+				v-if="component"
+				:is="component"
+			/>
 		</div>
 	</div>
 </template>
+
 <script>
-import projektListe from "~/components/frontEnd/projektListe";
-import Cookie from 'js-cookie'
-import Vue from 'vue'
-Vue.prototype.$hostname = 'your variable name'
+import projektListe from '~/components/frontEnd/projektListe';
+import subMenu from '~/components/frontEnd/subMenu';
+import zeiterfassung from '~/components/frontEnd/KW';
+import projectsummary from '~/components/frontEnd/ProjectSummary'
+import externBills from '~/components/frontEnd/externBills'
+
 export default {
-    components: {
-      	projektListe
+	data(){
+		return{
+			component: ''
+		}
+	},
+    
+	components: {
+      	projektListe,
+		subMenu,
+		zeiterfassung,
+		projectsummary,
+		externBills
     },
 
-	created () {
-		this.getToken()
-		
-	},
-	
-	methods: {
-		getToken () {
-			
-			const token = Cookie.get('apollo-token')
-			// if a token is found
-			if (token) {
-				// extracting the encoded payload from the token
-				const base64Url = token.split('.')[1]
-				// replacing characters in the encoded payload
-				const base64 = base64Url.replace('-', '+').replace('_', '/')
-				// decoding and parsing the payload into a JSON-object
-				const payload = JSON.parse(window.atob(base64))
-
-				// console.log(payload)
-				
-				// coomiting the payload to the store
-				this.$store.commit('authentication/setTokenInfo', payload)
-			}
+	methods:{
+		openComponent(component){
+			this.component = component
+			this.$store.commit('file/resetEnteredData')
 		}
 	}
 };

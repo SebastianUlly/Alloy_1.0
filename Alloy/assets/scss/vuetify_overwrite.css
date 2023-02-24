@@ -1,0 +1,20 @@
+/* modifications for the dateinput */
+.v-text-field {
+    padding-top: 0 !important;
+}
+ .v-input__slot:before .v-input__slot:after{
+    border: none !important;
+}
+.v-input__slot:after {
+    border: none !important;
+} 
+/* .theme--dark.v-text-field:not(.v-input--has-state):hover > .v-input__control > .v-input__slot:before {
+    border-color: #00000000 !important;
+} */
+.theme--dark.v-text-field > .v-input__control > .v-input__slot:before {
+    border-color: rgb(0 0 0 / 0%) !important;
+}
+
+.v-input.fileInput.theme--dark.v-text-field.v-text-field--is-booted.v-file-input {
+    margin-top: 12px;
+}

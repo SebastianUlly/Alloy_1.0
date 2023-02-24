@@ -16,7 +16,13 @@
 <script>
 import gql from "graphql-tag";
 import { mapGetters } from "vuex";
+import selectInput from "~/components/elements/lib/selectInput"
+import customSelect from "~/components/elements/lib/customSelect.vue";
 export default {
+	components:{
+		selectInput,
+		customSelect
+	},
 	props: {
 		label: {
 			type: String,

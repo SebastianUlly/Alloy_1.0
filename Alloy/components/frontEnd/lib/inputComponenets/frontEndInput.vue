@@ -1,26 +1,39 @@
 <template>
-    <div class="body">
+    <div class="inputMain">
         <!-- the label of the input component -->
         <div class="label">
            {{label}}
         </div>
-        <!-- the inputDiv contains the inputfield --> 
+        <!-- the inputDivBackground contains the inputfield --> 
         <div
-            class="inputDiv"
-            ref="inputX">
+            class="inputDivBackground"
+            ref="inputDiv"
+        >
             <!-- the input becomes the parameters from the parameters prop -->
             <input
+                v-if="displayValue"
                 :disabled="setEditable(permissions.toEdit)"
                 :style="'text-align:' + parameters.align"
-                v-model= "inputValue"
-                class="myInput"
-                type="text">
+                :value="displayValue"
+                class="input"
+                type="text"
+            >
+            <!-- the input becomes the parameters from the parameters prop -->
+            <input
+                v-else
+                :disabled="setEditable(permissions.toEdit)"
+                :style="'text-align:' + parameters.align"
+                v-model="inputValue"
+                class="input"
+                type="text"
+            >
         </div>
     </div>
 </template>
 <script>
 import { mapGetters } from "vuex"
 import { checkPermissionId } from '~/assets/functions/permission'
+import gql from "graphql-tag"
 export default{
     props: {
         elementId:{
@@ -40,13 +53,17 @@ export default{
         },
         permissions:{
             type: Object
+        },
+        selectedUserId:{
+            type: String
         }
     },
     data(){
         return{
-            inputValue:"",
+            inputValue: '',
+            displayValue: '',
             isInputOkValue: false,
-            tempValue: ""
+            tempValue: ''
         }
     },
     methods:{
@@ -58,7 +75,7 @@ export default{
 			}
 			return false
 		},
-        //check if the permissions.toEdit is a boolian or a permissionId
+        //check if the permissions.toEdit is a boolean or a permissionId
         setEditable(value){ 
             if(typeof value === "boolean"){
                 return !value
@@ -70,16 +87,78 @@ export default{
         },
         //checking the database default value
         setDefaultValue(){
-            //console.log(this.data)
+            //checking if the elementId is not the id of Number
             if(this.elementIdToSearch && this.elementId !=="75e96f94-0103-4804-abc0-5331ea980e9b" && this.data != undefined){
-                this.inputValue = (this.data.data.find(item => item.elementId === this.elementId).data.text)
+                // clicking on the time edit icon will not display the data from the database but the full name of the logged in user
+                if(this.parameters.default == "currentUser" && this.elementIdToSearch){
+                    //if the admin select someone else from the user selector
+                    if(this.selectedUserId !== this.userId){
+                        this.$apollo.query({
+                            query: gql`
+                                query {
+                                    getAllUser {
+                                        userId
+                                        data
+                                    }
+                                }
+                            `
+                        }).then((data)=>{
+                            const temp = data.data.getAllUser.find(currentUser => currentUser.userId == this.selectedUserId)
+                            const firstName = temp.data.find(userData => userData.elementId == "2d1b9f45-61f4-438d-b682-734000022169").data.text
+                            const lastName = temp.data.find(userData => userData.elementId == "7b990f61-122c-4d14-a234-34bd32472c63").data.text
+                            this.displayValue = firstName + " " + lastName;
+                            this.inputValue = this.selectedUser;
+                        })
+                    }
+                    //if the admin select itself with the user selector
+                    else {
+                        this.displayValue = this.userMeta.firstName + " " + this.userMeta.lastName
+                        this.inputValue = this.userId
+                    }
+                    //this.displayValue = this.userMeta.firstName + " " + this.userMeta.lastName
+                }
+                for(let item of this.data.data){
+                    if(item.elementId == this.elementId){
+                        this.inputValue = item.data.text
+                    }
+                } 
+                //this.inputValue = (this.data.data.find(item => item.elementId === this.elementId).data.text)
             }
             else if(this.elementIdToSearch && this.elementId =="75e96f94-0103-4804-abc0-5331ea980e9b" && this.data != undefined){
                 this.inputValue = this.data.label
             }
+            else if (this.parameters.default === "currentUser"){
+                //if the admin select someone else from the user selector
+                if(this.selectedUserId !== this.userId && this.selectedUser){
+                    this.$apollo.query({
+                        query: gql`
+                            query {
+                                getAllUser {
+                                    userId
+                                    data
+                                }
+                            }
+                        `
+                    }).then((data)=>{
+                        const temp = data.data.getAllUser.find(currentUser => currentUser.userId == this.selectedUserId)
+                        const firstName = temp.data.find(userData => userData.elementId == "2d1b9f45-61f4-438d-b682-734000022169").data.text
+                        const lastName = temp.data.find(userData => userData.elementId == "7b990f61-122c-4d14-a234-34bd32472c63").data.text
+                        this.displayValue = firstName + " " + lastName;
+                        this.inputValue = this.selectedUser;
+                    })
+                }
+                //if the admin select itself with the user selector
+                else {
+                    this.displayValue = this.userMeta.firstName + " " + this.userMeta.lastName
+                    this.inputValue = this.userId
+                }
+            }
+            //if the default value is currentYear, set the defaultValue to the current year
             else if(this.parameters.default === "currentYear"){    
                 this.inputValue = new Date().getFullYear().toString();
-            }else if(this.parameters.default === "consecutiveNumber" &&  this.directory && !this.elementIdToSearch){
+            }
+            //if the defaultValue consecutiveNumber, find the previous largest number of projects and add one
+            else if(this.parameters.default === "consecutiveNumber" &&  this.directory && !this.elementIdToSearch){
                 let currentFolderId = "";
                 for(let item of this.directory){
                      if(item.name == new Date().getFullYear()){
@@ -104,8 +183,9 @@ export default{
                 }else if(this.tempValue.length == 1){
                     this.inputValue = "00" + this.tempValue;
                 } else{
-                    inputValue = this.tempValue;
-                } 
+                    this.inputValue = this.tempValue;
+                }
+                this.sendEvent();
             }
         },
         //sends the payload to the parent
@@ -125,11 +205,11 @@ export default{
         //sending with an event to the parent componenet if the field  is filled or not
         isInputOk(){
             if(this.inputValue === "" && this.parameters.required){
-                this.$refs.inputX.classList.add("myInputError");
+                this.$refs.inputDiv.classList.add("inputError");
                 this.isInputOkValue = false
             }else{
                 this.isInputOkValue = true
-                this.$refs.inputX.classList.remove("myInputError");
+                this.$refs.inputDiv.classList.remove("inputError");
             }
             let tempPayload = {
                 elementId: this.elementId,
@@ -149,7 +229,10 @@ export default{
     computed:{
         ...mapGetters({
             directory : "directory/getDirectory",
-            permissionIds: 'authentication/getPermissionIds'
+            permissionIds: 'authentication/getPermissionIds',
+            userId: 'authentication/getUserId',
+            userName: 'authentication/getUserName',
+            userMeta: 'authentication/getUserMeta'
         })
     },
      watch: {
@@ -169,12 +252,12 @@ export default{
 }
 </script>
 <style scoped>
-.body{
+.inputMain{
     margin-bottom: 10px;
     position: relative;
     width:100%;
 }
-.inputDiv{
+.inputDivBackground{
     height:31px;
     background-color: #282828;
     border-style: solid;
@@ -183,10 +266,10 @@ export default{
     border-radius: 3px;
     width: 100%;
 }
-.inputDiv:has(.myInput:disabled){
+.inputDivBackground:has(.input:disabled){
     border-color:gray;
 }
-.myInputError{
+.inputError{
     height:31px;
     background-color: #282828;
     border-style: solid;
@@ -195,17 +278,17 @@ export default{
     border-radius: 3px;
     width: 100%;
 }
-.myInput:focus-visible{
+.input:focus-visible{
     outline: none;
 }
-.myInput{
+.input{
     padding: 3px 5px 0 5px;
     width: 100%;
     color:white;
     outline-offset: 0px;
     outline: none;
 }
-.myInput:disabled{
+.input:disabled{
     color:gray;
 }
 .label{
@@ -215,7 +298,4 @@ export default{
     top: -15px;
     font-size: 11px;
 }
-/* .body:has(.myInput:disabled) .label{
-    color: grey;
-} */
 </style>

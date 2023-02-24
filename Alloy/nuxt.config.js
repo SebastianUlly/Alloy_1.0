@@ -22,8 +22,10 @@ export default {
 
   // Global CSS: https://go.nuxtjs.dev/config-css
   css: [
-      'quill/dist/quill.core.css',
-		'quill/dist/quill.snow.css'
+    'quill/dist/quill.core.css',
+		'quill/dist/quill.snow.css',
+    'assets/scss/vuetify_overwrite.css'
+    
   ],
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
@@ -36,13 +38,13 @@ export default {
 
   // Auto import components: https://go.nuxtjs.dev/config-components
   components: {
-		dirs: [
+		/* dirs: [
 			'./components/elements/image',
 			'./components/elements/lib',
 			'./components/elements/Text',
 			'./components/elements/singleLineText',
 			'./components/elements/relationships'
-		]
+		] */
 	},
 
   // Modules for dev and build (recommended): https://go.nuxtjs.dev/config-modules
@@ -106,4 +108,8 @@ export default {
 			}
 		}
 	},
+
+  serverMiddleware: [
+		'~/api/index'
+	],
 }

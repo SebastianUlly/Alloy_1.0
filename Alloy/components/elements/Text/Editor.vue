@@ -29,6 +29,7 @@ import { mapGetters } from 'vuex'
 import { deepCopy } from '~/assets/classes/objectClasses'
 // importing the necessary alloy classes from the classes-file
 import { GetElementData } from '~/assets/classes/alloyClasses'
+import quillEditor from '../lib/quillEditor.vue'
 
 export default {
 	inheritAttrs: false,
@@ -50,6 +51,10 @@ export default {
 			required: false,
 			default: null
 		}
+	},
+
+	components: {
+		quillEditor
 	},
 
 	data () {

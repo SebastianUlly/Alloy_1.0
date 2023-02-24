@@ -58,8 +58,12 @@ dependents: Has Changed Indicator
 import { getConsecutiveNumber } from "~/assets/functions/consecutiveNumber";
 import { mapGetters } from "vuex";
 import gql from "graphql-tag";
+import hasChangedIndicator from "~/components/elements/lib/HasChangedIndicator"
 
 export default {
+  components:{
+    hasChangedIndicator
+  },
   inheritAttrs: false,
   props: {
     label: {

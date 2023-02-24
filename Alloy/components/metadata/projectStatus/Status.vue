@@ -13,8 +13,11 @@
 
 <script>
 import { mapGetters } from "vuex";
-
+import selectInput from "~/components/elements/lib/selectInput"
 export default {
+	components:{
+		selectInput
+	},
 	props: {
 		elementId: {
 			type: String,

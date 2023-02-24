@@ -16,7 +16,11 @@
 import { mapGetters } from "vuex";
 import { GetElementData } from "~/assets/classes/alloyClasses";
 import { deepCopy } from "~/assets/classes/objectClasses";
+import inputField from '~/components/elements/lib/inputField'
 export default {
+  components:{
+    inputField
+  },
   props: {
     elementId: {
       type: String,

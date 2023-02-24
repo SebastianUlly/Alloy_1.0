@@ -35,6 +35,12 @@ import projectDate from '~/components/metadata/projectDate/projectDate'
 import projectNumber from '~/components/metadata/projectNumber/projectNumber'
 import pharmacyAbb from '~/components/metadata/pharmacyAbb/pharmacyAbb'
 import selectFromDatabase from '~/components/metadata/selectFromDatabase/selectFromDatabase'
+import SingleLineText from '~/components/elements/singleLineText/SingleLineText'
+import SingleImage from '~/components/elements/image/SingleImage.vue'
+import SingleFile from '~/components/elements/file/SingleFile.vue'
+import Editor from './elements/Text/Editor.vue'
+import parentComponent from './schemaEditor/parentComponent.vue'
+
 export default {
 	components: {
 		projectList,
@@ -52,6 +58,11 @@ export default {
 		projectNumber,
 		pharmacyAbb,
 		selectFromDatabase,
+		SingleLineText,
+		SingleImage,
+		Editor,
+		parentComponent,
+		SingleFile
 	},
 	data () {
 		return {

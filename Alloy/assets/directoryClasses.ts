@@ -167,7 +167,9 @@ class OrphanedFiles extends DirectoryImage {
 			if (!directoryString.includes(file.fileId)) {
 				file.id = file.fileId
 				const schemaToFile = schema.find(item => item.id === file.schemaId)!
-				file.isLeaf = schemaToFile.metadata.isLeaf
+				if (schemaToFile) {
+					file.isLeaf = schemaToFile.metadata.isLeaf
+				}
 				this.orphanedFiles.push(file)
 			}
 		}
