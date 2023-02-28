@@ -15,17 +15,7 @@
 						mdi-timer-plus-outline
 					</v-icon>
 				</v-btn>
-				<v-btn
-					:loading="updatePointsLoading"
-					color="green"
-					class="button"
-					@click="getPoints(loggedInUserId)"
-				>	
-					aktualisieren
-					<v-icon>	
-						mdi-refresh
-					</v-icon>
-				</v-btn>
+				
 				<!-- <dropDown/> -->
 				<div class= "searchContainer">
 					<selectUser
@@ -34,6 +24,7 @@
 					/>
 					<selectYear @sendYear="captureMyYear" class="selectYearComponent"/>
 					<search @sendValue="captureMySearchValue" />
+					
 				</div>
 			</div>
 			<UserSummary
@@ -78,6 +69,7 @@
 				:showButton="!arePointsReleased(kw)"
 				class="tableHeader"
 				@releaseKW="setConfirmPopUpData(kw, 'release', 'Kalenderwoche freigeben')"
+				@refreshKW="refreshKW()"
 			/>
 
 			<TableHeader
@@ -92,6 +84,7 @@
 				:showButton="!arePointsReleased(kw)"
 				class="tableHeader"
 				@releaseKW="setConfirmPopUpData(kw, 'release', 'Kalenderwoche freigeben')"
+				@refreshKW="refreshKW()"
 			/>
 			
 			<TableHeader
@@ -106,6 +99,7 @@
 				:showButton="!arePointsSigned(kw)"
 				class="tableHeader"
 				@signTheKW="setConfirmPopUpData( kw ,'sign', 'Kalenderwoche signieren')"
+				@refreshKW="refreshKW()"
 			/>
 
 
@@ -122,6 +116,7 @@
 				:showButton="!arePointsSigned(kw)"
 				class="tableHeader"
 				@signTheKW="setConfirmPopUpData( kw, 'sign', 'Kalenderwoche signieren')"
+				@refreshKW="refreshKW()"
 			/>
 				
 			<TableHeader
@@ -135,6 +130,7 @@
 				:button="'none'"
 				:showButton="false"
 				class="tableHeader"
+				@refreshKW="refreshKW()"
 			/>
 
 			<TableHeader
@@ -148,6 +144,7 @@
 				:button="'none'"
 				:showButton="false"
 				class="tableHeader"
+				@refreshKW="refreshKW()"
 			/>
 
 			<TableHeader
@@ -161,6 +158,7 @@
 				:button="'none'"
 				:showButton="false"
 				class="tableHeader"
+				@refreshKW="refreshKW()"
 			/>
 
 			<zeiterfassung
@@ -173,6 +171,7 @@
 				class="zeiterfassung"
 				:showActions="!arePointsSigned(kw)"
 				:paid-holidays="kwListWithHolidays[52 - index]"
+				:refreshKWList="refreshKWList"
 			/>
 		</div>
 	</div>
@@ -239,7 +238,8 @@ export default {
 			selectedUserId: '',
 			paidHolidayList: [],
 			kwListWithHolidays: [],
-			updatePointsLoading: false
+			updatePointsLoading: false,
+			refreshKWList: []
 		}
 	},
 
@@ -307,6 +307,9 @@ export default {
 	},
 
 	methods: {
+		refreshKW(){
+			this.refreshKWList.push('refresh')
+		},
 		getSummaryPointByUserId (userIdToGet) {
 			// if (userIdToGet) {
 				this.$apollo.query({

@@ -55,6 +55,9 @@ export default {
 		},
 		paidHolidays: {
 			type: Array
+		},
+		refreshKWList:{
+			type: Array
 		}
 	},
 	data() {
@@ -381,6 +384,12 @@ export default {
 				this.itemsFill()
 			}
 		},
+		refreshKWList:{
+			deep: true,
+			handler(){
+				this.itemsFill()
+			}
+		}
 	} 
 };
 </script>
