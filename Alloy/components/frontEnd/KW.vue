@@ -552,17 +552,50 @@ export default {
 			}
 			// adding the hoiurs coming from the minutes which have reached the 60 miniute mark and combining it with minutes left over into a String
 			const hoursWorked = hoursWorkedSummary + ':' + minutesWorkedSummary
+
+			let releaseOrSignObj = {
+				released: '',
+				signed: ''
+			}
+			if (kw) {
+				let signed = false
+				let released = false
+				for (const point of kw) {
+					if (point.data.find(item => item.elementId === '29f73e9d-d87c-49c4-a2f9-57fd27cfaa77')) {
+						released = true
+					} else {
+						released = false
+						break
+					}
+				}
+				for (const point of kw) {
+					if (point.data.find(item => item.elementId === 'f825155a-51a3-4904-a32c-1fe7f0cc78e4')) {
+						signed = true
+					} else {
+						signed = false
+						break
+					}
+				}
+				if (signed) {
+					releaseOrSignObj.signed = kw[0].data.find(item => item.elementId === 'f825155a-51a3-4904-a32c-1fe7f0cc78e4').data.text
+				} else if (released) {
+					releaseOrSignObj.released = kw[0].data.find(item => item.elementId === '29f73e9d-d87c-49c4-a2f9-57fd27cfaa77').data.text
+				}
+				console.log(releaseOrSignObj)
+			}
 			// returning the summary
 			if ((52 - kwNumber) === this.getCurrentKW) {
 				return {
 					weekhours: hoursWorked,
 					hoursaldo: this.userMeta.summary.find(item => item.elementId === 'f6aede6f-2d0e-497a-bfc2-02596e46048a').data.text,
 					holiday: this.userMeta.summary.find(item => item.elementId === '19041546-0910-451a-929c-c41f059261f6').data.text,
-					sickdays: this.userMeta.summary.find(item => item.elementId === '7302e88a-66b3-4283-908e-7933813602de').data.text
+					sickdays: this.userMeta.summary.find(item => item.elementId === '7302e88a-66b3-4283-908e-7933813602de').data.text,
+					releaseOrSignObj: releaseOrSignObj
 				}
 			} else {
 				return {
-					weekhours: hoursWorked
+					weekhours: hoursWorked,
+					releaseOrSignObj: releaseOrSignObj
 				}
 			}
 		},

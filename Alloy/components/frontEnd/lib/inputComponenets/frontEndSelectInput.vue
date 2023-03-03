@@ -9,32 +9,32 @@
             <div class="wrapper">
                 <select class="select" v-model="inputValue" :disabled="!editable" type="text" >
                 <!-- writing options depending on which function is running -->
-                <option
-                    v-if="files"
-                    v-for="(item, index) in files"
-                    :value="item.id"
-                >{{item.label}}</option>
-                <!-- options from the miscellaneous or from getPharmacyByName() function -->
-                <option
-                    v-if="filesFromMiscellaneous"
-                    v-for="(item, index) in filesFromMiscellaneous"
-                    :value="item.id"
-                >{{item.name}}</option>
-                <!-- options for the select project comes from getFile function -->
-                <option
-                    v-if="options"
-                    v-for="(item, index) in options"
-                    :value="item.id"
-                >{{item.year}}-{{item.projectNumber}}-{{item.projectName}}</option>
-                <!-- options if the source comes from the database -->
-                <option
-                    v-if="optionsFromDatabase"
-                    v-for="(item, index) in optionsFromDatabase"
-                    :value="item"
-                >{{item}}</option>
-            </select>
-            <!-- dropdown arrow -->
-            <v-icon class="mdi-chevron" v-if="editable">mdi-chevron-down</v-icon>
+                    <option
+                        v-if="files"
+                        v-for="(item, index) in files"
+                        :value="item.id"
+                    >{{item.label}}</option>
+                    <!-- options from the miscellaneous or from getPharmacyByName() function -->
+                    <option
+                        v-if="filesFromMiscellaneous"
+                        v-for="(item, index) in filesFromMiscellaneous"
+                        :value="item.id"
+                    >{{item.name}}</option>
+                    <!-- options for the select project comes from getFile function -->
+                    <option
+                        v-if="options"
+                        v-for="(item, index) in options"
+                        :value="item.id"
+                    >{{item.year}}-{{item.projectNumber}}-{{getPharmNameByIdForSingleId(item.projectPharmacy)}}-{{item.projectName}}</option>
+                    <!-- options if the source comes from the database -->
+                    <option
+                        v-if="optionsFromDatabase"
+                        v-for="(item, index) in optionsFromDatabase"
+                        :value="item"
+                    >{{item}}</option>
+                </select>
+                <!-- dropdown arrow -->
+                <v-icon class="mdi-chevron" v-if="editable">mdi-chevron-down</v-icon>
             </div> 
         </div>
     </div>
@@ -228,8 +228,6 @@ export default{
                 this.filesFromMiscellaneous.push({name: data.data.queryFileData.data.find(data => data.elementId === "91f42e63-98b4-462b-bf65-58b416718cb0").data.text, ids})
              })
             }
-            
-
         },
         //checks if the permissionId is in the permissions list and sends the permissionId to the checkPermissionId function
         checkPermissionIdsHere (arg) {
@@ -269,6 +267,26 @@ export default{
             }
             this.$emit('update', payload);
         },
+
+        getPharmNameByIdForSingleId (id) {
+            this.$apollo.query({
+                variables:{
+                    fileId: id
+                },
+                query: gql`
+                    query ($fileId: String) {
+                        queryFileData(id: $fileId){
+                            label
+                        }
+                    }
+                
+                `
+             }).then((data) => {
+                return data.data.queryFileData.label
+             }).catch((error) => {
+                console.log({ error })
+             })
+        },
         //get the file by the schema of parameters
         getfile() {
             if(this.parameters.default){
@@ -301,7 +319,8 @@ export default{
                                         id: file.id,
                                         year: file.data.find(element => element.elementId === "577aa568-345a-47e5-9b71-848d5695bd5d").data.text,
                                         projectNumber: file.label,
-                                        projectName: file.data.find(element => element.elementId === "5187f38c-c1b7-4f8e-9c00-b87f703650ee").data.text
+                                        projectName: file.data.find(element => element.elementId === "5187f38c-c1b7-4f8e-9c00-b87f703650ee").data.text,
+                                        projectPharmacy: file.data.find(element => element.elementId === "09c5ba61-4e52-4a68-afde-bb7334b45b35").data.text
                                     })
                                 }
                             }

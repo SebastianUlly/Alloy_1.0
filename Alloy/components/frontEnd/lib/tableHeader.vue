@@ -18,7 +18,12 @@
 			
 		</div>
 		<v-spacer/>
-		
+		<div v-if="weeklySummary.releaseOrSignObj.signed">
+			Signiert am: {{  signDate }}
+		</div>
+		<div v-else-if="weeklySummary.releaseOrSignObj.released">
+			Warten auf Freigabe
+		</div>
 		<v-btn
 			v-if="button === 'release' && showButton"
 			color="green"
@@ -59,6 +64,18 @@ export default {
 
 		showButton: {
 			type: Boolean
+		}
+	},
+
+	computed: {
+		signDate () {
+			let signDate
+			if (this.weeklySummary.releaseOrSignObj.signed) {
+				signDate = this.weeklySummary.releaseOrSignObj.signed.split('T')[0].split('-')[2] + '.'
+						+ this.weeklySummary.releaseOrSignObj.signed.split('T')[0].split('-')[1] + '.'
+						+ this.weeklySummary.releaseOrSignObj.signed.split('T')[0].split('-')[0]
+			}
+			return signDate
 		}
 	}
 }
