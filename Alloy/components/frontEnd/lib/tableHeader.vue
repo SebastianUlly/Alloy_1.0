@@ -17,6 +17,15 @@
 			</p>
 			
 		</div>
+		<v-btn
+			color="green"
+			class="button"
+			@click="$emit('refreshKW')"
+		>	
+			<v-icon>	
+				mdi-refresh
+			</v-icon>
+		</v-btn>
 		<v-spacer/>
 		<div v-if="weeklySummary.releaseOrSignObj.signed">
 			Signiert am: {{  signDate }}
