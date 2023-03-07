@@ -31,12 +31,12 @@
                         :class="item.parameters.size"
                         @update="getDataFromComponent"
                         @getCurrentFolderId="setParentId"
-                        @sendNetto="sendNettoValueToComponent"
-                        :nettoValue="nettoValueToSend"
                         :elementIdToSearch="clickedFile"
                         :data="sendDataToInputs"
                         :permissions="item.permissions"
                         :selectedUserId="selectedUserId"
+                        @sendNetto="getNetto"
+                        @sendTaxValue="getTaxValue"
 				    />
             </div>
         </div>
@@ -94,7 +94,8 @@ export default {
             icon: "",
             sendDataToInputs: {},
             closeButtonImage: closeButtonImage,
-            nettoValueToSend
+            taxValue: 0,
+            nettoValue: 0
         }
     },
 
@@ -117,8 +118,18 @@ export default {
         this.createNewFile()
     },
     methods:{
-        sendNettoValueToComponent(nettoValue){
-            this.nettoValueToSend = nettoValue
+        getTaxValue(taxValue){
+            this.taxValue = parseInt(taxValue)
+        },
+        getNetto(netto){
+            this.nettoValue = netto
+        },
+        setBruttoValue(){
+            if(this.taxValue && this.nettoValue){
+                console.log("asdawe")
+                this.popUpSchema.elements.find(element => element.elementId == "4b156b8d-c58d-4ada-b1b8-65618258112d").parameters.default = (Math.ceil(parseFloat(this.nettoValue * (this.taxValue * 0.01 + 1)) * 10 ) / 10 ).toFixed(2) 
+
+            }
         },
         isDayTypeHoliday(){
             //if Urlaub || Krankentag || Zeitausgleich clicked change the props for child components
@@ -382,6 +393,16 @@ export default {
                 if(this.popUpSchema.id == "c519459a-5624-4311-bffb-838d43e7f0d0" || this.popUpSchema.id == "50dd57aa-b759-42e7-9bae-3830cd605f02"){
                     this.isDayTypeHoliday();
                 }
+            }
+        },
+        nettoValue:{
+            handler(){
+                this.setBruttoValue()
+            }
+        },
+        taxValue:{
+            handler(){
+                this.setBruttoValue()
             }
         }
 	}

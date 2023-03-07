@@ -56,9 +56,6 @@ export default{
         },
         selectedUserId:{
             type: String
-        },
-        nettoValueToSend:{
-            type: Number
         }
     },
     data(){
@@ -189,8 +186,6 @@ export default{
                     this.inputValue = this.tempValue;
                 }
                 this.sendEvent();
-            } else if(this.parameters.default === "calculateTax" && !this.elementIdToSearch){
-                this.inputValue = "test"
             }
         },
         //sends the payload to the parent
@@ -252,6 +247,17 @@ export default{
             handler(){
                 this.isInputOk();
                 this.sendEvent();
+                if(this.elementId == "aedf15c2-24ef-4d16-acfe-94511f24b498"){
+                    this.$emit('sendNetto', this.inputValue)
+                }
+                
+            }
+        },
+        parameters:{
+            deep: true,
+            handler(){
+                this.inputValue = this.parameters.default
+                this.displayValue = this.parameters.default
             }
         }
     } 
