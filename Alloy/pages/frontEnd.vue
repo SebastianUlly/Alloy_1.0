@@ -13,7 +13,7 @@
 <script>
 import projektListe from '~/components/frontEnd/projektListe';
 import subMenu from '~/components/frontEnd/subMenu';
-import zeiterfassung from '~/components/frontEnd/KW';
+import zeiterfassung from '~/components/frontEnd/TimeParent';
 import projectsummary from '~/components/frontEnd/ProjectSummary'
 import externBills from '~/components/frontEnd/externBills'
 

@@ -349,7 +349,7 @@ export default {
 
 					//sort the tempItems by date
 					tempItems.sort(function (a, b) {
-						console.log(a)
+						// console.log(a)
 						//trick to not manipulate the original object
 						const aTemp = JSON.parse(JSON.stringify(a))
 						const bTemp = JSON.parse(JSON.stringify(b))

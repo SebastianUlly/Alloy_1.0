@@ -1,43 +1,8 @@
 <template>
 	<div>
-		<div class="top-section">
-			<!-- {{ getSummary }} -->
-			<div class="top-section__left">
-				<v-btn
-					style="min-width:0"
-					class="addProject"
-					color="green"
-					:disabled="popUp"
-					:loading="popUpLoading"
-					@click="openNewProject(true)"
-				>
-					<v-icon>
-						mdi-timer-plus-outline
-					</v-icon>
-				</v-btn>
-				
-				<!-- <dropDown/> -->
-				<div class= "searchContainer">
-					<selectUser
-						v-if="checkPermissionIdsHere('b57d9dd1-646c-47dc-90d8-eef85a2cad1f')"
-						@userId="changeUser"
-					/>
-					<selectYear @sendYear="captureMyYear" class="selectYearComponent"/>
-					<search @sendValue="captureMySearchValue" />
-					
-				</div>
-			</div>
-			<UserSummary
-				class="top-section__right"
-				:userInfo="{
-					holidays: userMeta.holidays
-				}"
-				:weekly-summary="getSummary"
-			/>
-		</div>
 		<popUp
 			v-if="popUp && popUpSchema"
-			@closeNewProject="openNewProject($event)"
+			@closeNewProject="popUp = false"
 			:popUpSchema="popUpSchema"
 			:clickedFile="clickedFile"
 			@saveSuccess="pointSaved"
@@ -46,9 +11,9 @@
 		/>
 		<confirmPopUp
 			v-if="confirmPopUp"
-			:clickedFile = "clickedFile"
-			:confirmPopUpData = "confirmPopUpData"
-			@closePopUp = "setConfirmPopUp"
+			:clickedFile="clickedFile"
+			:confirmPopUpData="confirmPopUpData"
+			@closePopUp="setConfirmPopUp"
 			@sendAnswer="getAnswerFromConfirmPopUp"
 		/>
 		<div
@@ -60,111 +25,102 @@
 			<TableHeader
 				v-if="(52 - index) === getCurrentKW && !arePointsReleased(kw) && selectedUserId === loggedInUserId"
 				:headline="(52 - index).toString() + '. KW'"
-				:user-info="{
-					workhours: allWorkHoursPerWeek(index),
-					holiday: userMeta.holidays
-				}"
+				:weeklyWorkTimeOfUser="weeklyWorkTimeOfUser"
 				:weekly-summary="getWeeklySummary(index, kw)"
 				:button="'release'"
 				:showButton="!arePointsReleased(kw)"
+				:stateOfPoints="'needToBeReleased'"
 				class="tableHeader"
 				@releaseKW="setConfirmPopUpData(kw, 'release', 'Kalenderwoche freigeben')"
 				@refreshKW="refreshKW()"
+				@reset="resetKW(kw)"
 			/>
 
 			<TableHeader
 				v-else-if="kw && !arePointsReleased(kw) && selectedUserId === loggedInUserId"
 				:headline="(52 - index).toString() + '. KW'"
-				:user-info="{
-					workhours: allWorkHoursPerWeek(index),
-					holiday: userMeta.holidays
-				}"
+				:weeklyWorkTimeOfUser="weeklyWorkTimeOfUser"
 				:weekly-summary="getWeeklySummary(index, kw)"
 				:button="'release'"
+				:stateOfPoints="'needToBeReleased'"
 				:showButton="!arePointsReleased(kw)"
 				class="tableHeader"
 				@releaseKW="setConfirmPopUpData(kw, 'release', 'Kalenderwoche freigeben')"
 				@refreshKW="refreshKW()"
+				@reset="resetKW(kw)"
 			/>
 			
 			<TableHeader
 				v-else-if="(52 - index) === getCurrentKW && arePointsReleased(kw) && !arePointsSigned(kw) && checkPermissionIdsHere('975abc9d-878b-4eb1-999e-3890991217f8')"
 				:headline="(52 - index).toString() + '. KW'"
-				:user-info="{
-					workhours: allWorkHoursPerWeek(index),
-					holiday: userMeta.holidays
-				}"
+				:weeklyWorkTimeOfUser="weeklyWorkTimeOfUser"
 				:weekly-summary="getWeeklySummary(index, kw)"
 				:button="'sign'"
+				:stateOfPoints="'needToBeSigned'"
 				:showButton="!arePointsSigned(kw)"
 				class="tableHeader"
 				@signTheKW="setConfirmPopUpData( kw ,'sign', 'Kalenderwoche signieren')"
 				@refreshKW="refreshKW()"
+				@reset="resetKW(kw)"
 			/>
 
-
-			
 			<TableHeader
 				v-else-if="kw && arePointsReleased(kw) && !arePointsSigned(kw) && checkPermissionIdsHere('975abc9d-878b-4eb1-999e-3890991217f8')"
 				:headline="(52 - index).toString() + '. KW'"
-				:user-info="{
-					workhours: allWorkHoursPerWeek(index),
-					holiday: userMeta.holidays
-				}"
+				:weeklyWorkTimeOfUser="weeklyWorkTimeOfUser"
 				:weekly-summary="getWeeklySummary(index, kw)"
 				:button="'sign'"
+				:stateOfPoints="'needToBeSigned'"
 				:showButton="!arePointsSigned(kw)"
 				class="tableHeader"
 				@signTheKW="setConfirmPopUpData( kw, 'sign', 'Kalenderwoche signieren')"
 				@refreshKW="refreshKW()"
+				@reset="resetKW(kw)"
 			/>
 				
 			<TableHeader
 				v-else-if="(52 - index) === getCurrentKW && !arePointsReleased(kw) && selectedUserId !== loggedInUserId"
 				:headline="(52 - index).toString() + '. KW'"
-				:user-info="{
-					workhours: allWorkHoursPerWeek(index),
-					holiday: userMeta.holidays
-				}"
+				:weeklyWorkTimeOfUser="weeklyWorkTimeOfUser"
 				:weekly-summary="getWeeklySummary(index, kw)"
 				:button="'none'"
 				:showButton="false"
+				:stateOfPoints="'needToBeReleased'"
 				class="tableHeader"
 				@refreshKW="refreshKW()"
+				@reset="resetKW(kw)"
 			/>
 
 			<TableHeader
 				v-else-if="kw && !arePointsReleased(kw) && selectedUserId !== loggedInUserId"
 				:headline="(52 - index).toString() + '. KW'"
-				:user-info="{
-					workhours: allWorkHoursPerWeek(index),
-					holiday: userMeta.holidays
-				}"
+				:weeklyWorkTimeOfUser="weeklyWorkTimeOfUser"
 				:weekly-summary="getWeeklySummary(index, kw)"
 				:button="'none'"
 				:showButton="false"
+				:stateOfPoints="'needToBeReleased'"
 				class="tableHeader"
 				@refreshKW="refreshKW()"
+				@reset="resetKW(kw)"
 			/>
 
 			<TableHeader
-				v-else-if="kw"
+				v-else-if="kw && arePointsReleased(kw)"
 				:headline="(52 - index).toString() + '. KW'"
-				:user-info="{
-					workhours: allWorkHoursPerWeek(index),
-					holiday: userMeta.holidays
-				}"
+				:weeklyWorkTimeOfUser="weeklyWorkTimeOfUser"
 				:weekly-summary="getWeeklySummary(index, kw)"
 				:button="'none'"
 				:showButton="false"
+				:stateOfPoints="'signed'"
 				class="tableHeader"
 				@refreshKW="refreshKW()"
+				@reset="resetKW(kw)"
 			/>
 
 			<zeiterfassung
 				v-if="kw"
 				:points="kw"
-				:year="yearForZeiterfassung"
+				:year="selectedYear"
 				:searchValue="searchValueForZeiterfassung"
 				@getClickedItem="openEditTime"
 				@setConfirmPopUpData="setConfirmPopUpData"
@@ -178,31 +134,55 @@
 </template>
 
 <script>
-import gql from "graphql-tag";
 import zeiterfassung from "./zeiterfassung.vue";
 import popUp from "~/components/frontEnd/lib/popUp";
 import TableHeader from '~/components/frontEnd/lib/tableHeader';
 import { mergeSchemas } from '~/assets/classes/objectClasses'
 import confirmPopUp from "~/components/frontEnd/lib/confirmPopUp";
-import selectYear from "~/components/frontEnd/selectYear";
-import selectUser from "~/components/frontEnd/selectUser";
-import search from "~/components/frontEnd/search";
 import dropDown from "~/components/frontEnd/dropDown"
 import { mapGetters } from "vuex";
 import { checkPermissionId } from '~/assets/functions/permission'
-import UserSummary from './lib/Summary.vue';
+import gql from "graphql-tag";
 
 export default {
+	props: {
+		searchValue: {
+			type: String,
+			required: false
+		},
+		
+		selectedYear: {
+			type: String,
+			required: false
+		},
+
+		selectedUserId: {
+			type: String,
+			required: true
+		},
+		
+		paidHolidayList: {
+			type: Array,
+			required: false
+		},
+
+		weeklyWorkTimeOfUser: {
+			type: Number,
+			required: false
+		},
+
+		newPointSaved: {
+			type: Boolean,
+			required: false
+		}
+	},
+
 	components: {
 		zeiterfassung,
 		popUp,
 		TableHeader,
 		confirmPopUp,
-		selectYear,
-		search,
-		dropDown,
-		selectUser,
-		UserSummary
+		dropDown
 	},
 
 	apollo: {
@@ -223,20 +203,13 @@ export default {
 			confirmPopUp: false,
 			confirmPopUpData: {},
 			popUpSchema:{},
-			clickedFile: {},
 			userSummary: {
-				weekhours: '0:00',
-				hoursaldo: '2:10',
-				holiday: 20,
-				sickdays: 3
+				weekhours: '0:00'
 			},
-			clickedFile:"",
-			yearForZeiterfassung: "",
-			searchValueForZeiterfassung: "",
+			clickedFile: null,
+			searchValueForZeiterfassung: '',
 			popUpLoading: false,
 			pointsByUserId: [],
-			selectedUserId: '',
-			paidHolidayList: [],
 			kwListWithHolidays: [],
 			updatePointsLoading: false,
 			refreshKWList: []
@@ -244,9 +217,7 @@ export default {
 	},
 
 	mounted () {
-		this.selectedUserId = this.loggedInUserId
-		this.getPoints(this.loggedInUserId)
-		this.getPaidHolidayList()
+		this.getPoints(this.selectedUserId)
 	},
 
 	computed: {
@@ -255,24 +226,10 @@ export default {
 			userMeta: 'authentication/getUserMeta',
 			permissions: 'authentication/getPermissionIds'
 		}),
+
 		getCurrentKW () {
 			return this.KalenderWoche()
-		},
-
-		summary () {
-			if (this.altSummary) {
-				return this.altSummary
-			}
-			return this.userMeta.summary
-		},
-
-		getSummary () {
-			return {
-				hoursaldo: this.summary.find(item => item.elementId === 'f6aede6f-2d0e-497a-bfc2-02596e46048a').data.text,
-				holiday: this.summary.find(item => item.elementId === '19041546-0910-451a-929c-c41f059261f6').data.text,
-				sickdays: this.summary.find(item => item.elementId === '7302e88a-66b3-4283-908e-7933813602de').data.text
-			}
-		},
+		}
 	},
 
 	watch:{
@@ -290,9 +247,11 @@ export default {
 				this.$store.commit('point/setPointList', this.pointsByUserId)
 			}
 		},
-		yearForZeiterfassung(){
+
+		selectedYear(){
 			this.sortPoints()
 		},
+
 		paidHolidayList: {
 			deep: true,
 			handler () {
@@ -302,39 +261,46 @@ export default {
 
 		selectedUserId () {
 			this.getPoints(this.selectedUserId)
-			this.getSummaryPointByUserId(this.selectedUserId)
+			this.$emit('userId', this.selectedUserId)
+		},
+
+		newPointSaved () {
+			this.getPoints(this.selectedUserId)
 		}
 	},
 
 	methods: {
+		resetKW (kw) {
+			const pointsToReset = []
+			for (const item of kw) {
+				pointsToReset.push(item.id)
+			}
+
+			this.$apollo.mutate({
+				variables: {
+					pointIds: pointsToReset
+				},
+				mutation: gql`
+					mutation (
+						$pointIds: [String]
+					) { 
+						resetPoints (
+							pointIds: $pointIds
+						)
+					}
+				`
+			}).then((data) => {
+				this.getPoints(this.loggedInUserId)
+				this.confirmPopUp = false
+			}).catch((error) => {
+				console.log({ error })
+			})
+		},
+
 		refreshKW(){
-			this.refreshKWList.push('refresh')
+			this.getPoints(this.selectedUserId)
 		},
-		getSummaryPointByUserId (userIdToGet) {
-			// if (userIdToGet) {
-				this.$apollo.query({
-					variables: {
-						userId: userIdToGet
-					},
-					query: gql`
-						query (
-							$userId: String!
-						) {
-							getSummaryToUserId (
-								userId: $userId
-							) {
-								id
-								data
-							}
-						}
-					`
-				}).then((data) => {
-					this.altSummary = data.data.getSummaryToUserId.data
-				}).catch((error) => {
-					console.log({ error })
-				})
-			// }
-		},
+
 		// returning the total workhours per week a user should be working
 		allWorkHoursPerWeek(index){
 			if (index){
@@ -356,39 +322,13 @@ export default {
 			return 0
 		},
 
-		getPaidHolidayList () {
-			this.$apollo.query({
-				variables: {
-					id: '6905fcdb-d575-4002-9fcd-35534aaa4c87'
-				},
-				query: gql`
-					query (
-						$id: String
-					) {
-						miscellaneousById (
-							id: $id
-						) {
-							id
-							label
-							data
-						}
-					}
-				`
-			}).then((data) => {
-				// console.log(data.data.miscellaneousById)
-				this.paidHolidayList = data.data.miscellaneousById.data
-			}).catch((error) => {
-				console.log({ error })
-			})
-		},
-
 		sortPaidHolidays () {
 			this.kwListWithHolidays = []
 			let tempList = new Array(53)
 			if (this.paidHolidayList) {
 				for (const holiday of this.paidHolidayList) {
 					const date = holiday.date.split('.')
-					if(date[2] !== this.yearForZeiterfassung){
+					if(date[2] !== this.selectedYear){
 						continue
 					}
 					const KWNumber = this.KalenderWoche(date[2], date[1], date[0])
@@ -482,6 +422,7 @@ export default {
 		},
 
 		getPoints (userId) {
+			// console.log('getPoints', userId)
 			this.updatePointsLoading = true;
 			this.$apollo.query({
 				variables: {
@@ -506,24 +447,12 @@ export default {
 			})
 		},
 
-		// function that is called when a different user is selected in the selectUser-component
-		changeUser (data) {
-			this.selectedUserId = data
-		},
-
 		// function to check the permissions in this component
 		checkPermissionIdsHere (arg) {
 			if (this.permissions) {
 				return checkPermissionId(this.permissions, arg)
 			}
 			return false
-		},
-		
-		captureMySearchValue(value){
-			this.searchValueForZeiterfassung = value
-		},
-		captureMyYear (year) {
-			this.yearForZeiterfassung = year;
 		},
 
 		// getting the weekly summary
@@ -557,8 +486,13 @@ export default {
 			const hoursWorked = hoursWorkedSummary + ':' + minutesWorkedSummary
 
 			let releaseOrSignObj = {
+				isLoggedInUser: true,
 				released: '',
 				signed: ''
+			}
+
+			if (this.selectedUserId !== this.loggedInUserId) {
+				releaseOrSignObj.isLoggedInUser = false
 			}
 			if (kw) {
 				let signed = false
@@ -584,7 +518,7 @@ export default {
 				} else if (released) {
 					releaseOrSignObj.released = kw[0].data.find(item => item.elementId === '29f73e9d-d87c-49c4-a2f9-57fd27cfaa77').data.text
 				}
-				console.log(releaseOrSignObj)
+				// console.log(releaseOrSignObj)
 			}
 			// returning the summary
 			if ((52 - kwNumber) === this.getCurrentKW) {
@@ -698,7 +632,7 @@ export default {
 			if (this.pointsByUserId) {
 				for (const point of this.pointsByUserId) {
 					const date = point.data.find(item => item.elementId === 'd43d0fd0-172d-4b7a-a942-990597d3cb42').data.text.split('.')
-					if(date[2] !== this.yearForZeiterfassung){
+					if(date[2] !== this.selectedYear){
 						continue
 					}
 					const KWNumber = this.KalenderWoche(date[2], date[1], date[0])
@@ -709,6 +643,7 @@ export default {
 					this.kwListWithPoints = tempList
 				}
 			}
+			// console.log(this.kwListWithPoints)
 			this.updatePointsLoading = false
 		},
 
@@ -733,14 +668,6 @@ export default {
 				kw = Math.ceil((Datum.getTime() - Start) /604800000);
 			}
 			return kw;
-		},
-		
-		openNewProject(value){
-			this.popUpLoading = true
-			this.clickedFile = null;
-			this.popUp = value;
-			this.getDataForPopUp(["c519459a-5624-4311-bffb-838d43e7f0d0"]);
-			
 		},
 
 		async getDataForPopUp(id){
@@ -785,26 +712,5 @@ export default {
 }
 .zeiterfassung {
 	max-width: 900px
-}
-.searchContainer{
-	display:flex;
-}
-
-// .top-section {
-// 	display: flex;
-// 	width: 1300px;
-// }
-.top-section__left{
-	margin-top: 30px;
-	max-width: 900px;
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-}
-
-.top-section__right {
-	position: fixed;
-	right: 30px;
-	top: 147px;
 }
 </style>
