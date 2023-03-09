@@ -43,6 +43,7 @@
 </template>
 <script>
 import gql from "graphql-tag";
+import { pathToFileURL } from "url";
 import { mapGetters } from "vuex";
 import { checkPermissionId } from '~/assets/functions/permission'
 export default{
@@ -56,7 +57,7 @@ export default{
         parameters:{
             type: Object
         },
-        elementIdToSearch:{
+        clickedFileId:{
             type: String
         },
         data:{
@@ -79,7 +80,8 @@ export default{
             filesProject:[],
             editable: true,
             options:[],
-            optionsFromDatabase:[]
+            optionsFromDatabase:[],
+            listOfAllPharmacies: []
         }
     },
 
@@ -95,6 +97,7 @@ export default{
         this.setEditable(this.permissions.toEdit)
         //if the component is the company selector then listen to the emit and sends the payloads data to the function
         if(this.elementId === "0c9cf456-edc3-4779-b00c-14237863fa16"){
+            console.log("get event")
             this.$root.$on('sendSelectedProject', data => {this.setEditableByProject(data)})
         }
     },
@@ -113,6 +116,7 @@ export default{
             handler(){
                 this.sendEvent();
                 this.isInputok();
+                console.log(this.InputValue, 'input Value')
             }
         },
         permissions:{
@@ -120,6 +124,12 @@ export default{
             handler(){
                 this.setEditable(this.permissions.toEdit);
                 this.getfile(this.parameters.default);
+            }
+        },
+        data:{
+            deep:true,
+            handler(){
+                this.setDefaultValue()
             }
         }
     },
@@ -150,8 +160,8 @@ export default{
             return array
         },
         //function that call getPharmacyId with the pharmacyId of selected project
-        setEditableByProject(value){
-             this.$apollo.query({
+        async setEditableByProject(value){
+            const result = await this.$apollo.query({
                 variables:{
                     fileId: value.data.text
                 },
@@ -166,9 +176,22 @@ export default{
                     }
                 
                 `
-             }).then(data => {
-                this.getPharmacyById(data.data.queryFileData.data.find(data => data.elementId === "09c5ba61-4e52-4a68-afde-bb7334b45b35").data.text)
-             })
+            })
+            
+            //console.log(await this.getPharmacyById(result.data.queryFileData.data.find(element => element.elementId === "09c5ba61-4e52-4a68-afde-bb7334b45b35").data.text))
+            this.files = []
+            this.options = []
+            this.optionsFromDatabase = []
+            
+            this.filesFromMiscellaneous = await this.getPharmacyById(result.data.queryFileData.data.find(element => element.elementId === "09c5ba61-4e52-4a68-afde-bb7334b45b35").data.text)
+            if(this.filesFromMiscellaneous.length > 1){
+                this.editable = true
+            } else {
+                this.editable = false
+            }
+            this.inputValue = result.data.queryFileData.data.find(element => element.elementId === "09c5ba61-4e52-4a68-afde-bb7334b45b35").data.text
+            this.setDefaultValue()
+            console.log(result.data.queryFileData.data.find(element => element.elementId === "09c5ba61-4e52-4a68-afde-bb7334b45b35").data.text, 'input')
         },
         //querying the pharmacy 
         // async getPharmacyById(pharmacyId){
@@ -207,31 +230,77 @@ export default{
         //     this.inputValue = pharmacyId
         // },
         //search the pharmacy name by id and push to the files from miscellaneous
+        checkApos (id) {
+            if (this.listOfAllPharmacies.some(item => item.id === id)) {
+                return true
+            }
+            return false
+        },
+
+
         async getPharmacyById(id){
-            this.$apollo.query({
-                variables:{
-                    fileId: id
-                },
-                query: gql`
-                    query ($fileId: String) {
-                        queryFileData(id: $fileId){
-                            id
-                            label
-                            data
-                            schemaId
-                        }
+            const isInList = this.checkApos(id)
+            if (isInList) {
+                // console.log('aus cache')
+                const pharm = this.listOfAllPharmacies.find(item => item.id === id)
+                // console.log(pharm.schemaId)
+                if (pharm.schemaId === '961fe75d-2d0e-4ccb-8afd-cde072b37380'){
+                    // console.log(pharm)
+                    return [pharm]
+                } else if (pharm.schemaId === '7c70a676-ef00-432c-bce0-60f7c8b6fb0b') {
+                    let tempPharmacyList = []
+                    tempPharmacyList.push(pharm)
+                    for (let pharmacyId of pharm.data.find(element => element.elementId === '09c5ba61-4e52-4a68-afde-bb7334b45b35').data.values) {
+                        tempPharmacyList.push((await this.getPharmacyById(pharmacyId))[0])
                     }
-                
-                `
-            }).then(data => {
-                return {
-                    name: data.data.queryFileData.data.find(data => data.elementId === "91f42e63-98b4-462b-bf65-58b416718cb0").data.text,
-                    id: data.data.queryFileData.id
+                    return tempPharmacyList
                 }
-                // this.filesFromMiscellaneous.push({name: data.data.queryFileData.data.find(data => data.elementId === "91f42e63-98b4-462b-bf65-58b416718cb0").data.text, id: data.data.queryFileData.id})
-            }).catch((error) => {
-                console.log({ error })
-            })
+            } else {
+                // console.log('nicht aus cache')
+                const result = await this.$apollo.query({
+                    variables:{
+                        fileId: id
+                    },
+                    query: gql`
+                        query ($fileId: String) {
+                            queryFileData(id: $fileId){
+                                id
+                                label
+                                data
+                                schemaId
+                            }
+                        }
+                    
+                    `
+                })
+                // console.log(result.data.queryFileData)
+                this.listOfAllPharmacies.push({
+                    name: result.data.queryFileData.data.find(data => data.elementId === '91f42e63-98b4-462b-bf65-58b416718cb0').data.text,
+                    id: result.data.queryFileData.id,
+                    schemaId: result.data.queryFileData.schemaId,
+                    data: result.data.queryFileData.data
+                })
+                if (result.data.queryFileData.schemaId === "961fe75d-2d0e-4ccb-8afd-cde072b37380"){
+                    return [{
+                        name: result.data.queryFileData.data.find(data => data.elementId === '91f42e63-98b4-462b-bf65-58b416718cb0').data.text,
+                        id: result.data.queryFileData.id,
+                        schemaId: result.data.queryFileData.schemaId,
+                        data: result.data.queryFileData.data
+                    }]
+                } else if (result.data.queryFileData.schemaId === '7c70a676-ef00-432c-bce0-60f7c8b6fb0b') {
+                    let tempPharmacyList = []
+                    tempPharmacyList.push({
+                        name: result.data.queryFileData.data.find(data => data.elementId === '91f42e63-98b4-462b-bf65-58b416718cb0').data.text,
+                        id: result.data.queryFileData.id,
+                        schemaId: result.data.queryFileData.schemaId,
+                        data: result.data.queryFileData.data
+                    })
+                    for (let pharmacyId of result.data.queryFileData.data.find(element => element.elementId === '09c5ba61-4e52-4a68-afde-bb7334b45b35').data.values) {
+                        tempPharmacyList.push((await this.getPharmacyById(pharmacyId))[0])
+                    }
+                    return tempPharmacyList
+                }
+            }
         },
         //checks if the permissionId is in the permissions list and sends the permissionId to the checkPermissionId function
         checkPermissionIdsHere (arg) {
@@ -251,24 +320,24 @@ export default{
             }
         },
         setDefaultValue(value){
-            //if elementIdToSearch and this element is not the Number, set the default value from the database
-            if(this.elementIdToSearch && this.data != undefined){
-                if(this.elementId === "0c9cf456-edc3-4779-b00c-14237863fa16"){
-                    console.log(this.data.data)
-                }
+            //if clickedFileId and this element is not the Number, set the default value from the database
+            if(this.clickedFileId && this.data != undefined){
                 this.inputValue = this.data.data.find(item => item.elementId === this.elementId).data.text
             }
+
         },
         //sending the selected data to the store
         sendEvent(){
             let payload = {
-                elementId: this.elementId,
                 data:{
                     text : this.inputValue
-                } 
+                },
+                elementId: this.elementId
             }
+            
             //if the elementId is from the project select then emitting the payloads data
             if(payload.elementId === "30a1d57d-ac51-4a54-9f83-2c493253b944"){
+                console.log("send event")
                 this.$root.$emit('sendSelectedProject', payload);
             }
             this.$emit('update', payload);
@@ -308,8 +377,8 @@ export default{
             }
         },
 
-        getTest (schemaId) {
-            this.$apollo.query({
+        async getTest (schemaId) {
+            const result = await this.$apollo.query({
                 variables: {
                     schemaId: schemaId
                 },
@@ -323,24 +392,27 @@ export default{
                     }
                 `,
             //filling the files array with the data of fileBySchemaId.data where elementData.elementId (name field of an apotheke) is the same
-            }).then((data) => {
+            })
+            // .then((data) => {
+                
                 //if the current selectInput is not the pharmacy selector
                 if(this.elementId !== "09c5ba61-4e52-4a68-afde-bb7334b45b35" && !this.autoFillId){
-                    
-                    for (const file of data.data.fileBySchemaId) {
+                    for (const file of result.data.fileBySchemaId) {
                         if(this.directory[0]?.hierarchy.some(e => e.fileId === file.id)){
-                            // const pharmacyAbb = await this.getPharmacyById(file.data.find(element => element.elementId == "09c5ba61-4e52-4a68-afde-bb7334b45b35").data.text).name
+                            const pharmacy = await this.getPharmacyById(file.data.find(element => element.elementId == "09c5ba61-4e52-4a68-afde-bb7334b45b35").data.text)
+                            // console.log(pharmacy, 'laskjd')
+                            const pharmacyAbb = pharmacy[0].name
                             this.filesProject.push({
                                 id: file.id,
                                 year: file.data.find(element => element.elementId === "577aa568-345a-47e5-9b71-848d5695bd5d").data.text,
-                                // pharmacy: pharmacyAbb,
+                                pharmacy: pharmacyAbb,
                                 projectNumber: file.label,
                                 projectName: file.data.find(element => element.elementId === "5187f38c-c1b7-4f8e-9c00-b87f703650ee").data.text
                             })
-                            
                         } else if (this.elementId == "09c5ba61-4e52-4a68-afde-bb7334b45b35") {
+                            
                             //if the current selectInput is the pharmacy selector
-                            for(const pharmacy of data.data.fileBySchemaId){
+                            for(const pharmacy of result.data.fileBySchemaId){
                                 this.files.push({
                                     id: pharmacy.id,
                                     label: pharmacy.data.find(element => element.elementId === "91f42e63-98b4-462b-bf65-58b416718cb0").data.text
@@ -353,20 +425,19 @@ export default{
                 } else if (this.elementId !== "09c5ba61-4e52-4a68-afde-bb7334b45b35" && this.autoFillId){
                     this.options = []
                     // //when the autofillId exists limit the options just with one file
-                    const autoFillFile = data.data.fileBySchemaId.find(file => file.id === this.autoFillId)
-                    console.log(autoFillFile)
+                    const autoFillFile = result.data.fileBySchemaId.find(file => file.id === this.autoFillId)
+                    
                     this.options.push({
                         id: autoFillFile.id,
                         year: autoFillFile.data.find(element => element.elementId === "577aa568-345a-47e5-9b71-848d5695bd5d").data.text,
                         projectNumber: autoFillFile.label,
                         projectName: autoFillFile.data.find(element => element.elementId === "5187f38c-c1b7-4f8e-9c00-b87f703650ee").data.text
                     })
-                    console.log('ölaksdj')
                     this.inputValue = autoFillFile.id
                 }
-            }).catch((error) => {
-                console.log({ error } );
-            });
+            // }).catch((error) => {
+            //     console.log({ error } );
+            // });
         },
         //isInputOk a function that changes the color of an input and sets the save button available
         isInputok(){

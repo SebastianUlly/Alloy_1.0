@@ -31,7 +31,7 @@
                         :class="item.parameters.size"
                         @update="getDataFromComponent"
                         @getCurrentFolderId="setParentId"
-                        :elementIdToSearch="clickedFile"
+                        :clickedFileId="clickedFile"
                         :data="sendDataToInputs"
                         :permissions="item.permissions"
                         :selectedUserId="selectedUserId"
