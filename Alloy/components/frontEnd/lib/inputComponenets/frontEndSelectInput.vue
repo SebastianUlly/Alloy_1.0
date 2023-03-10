@@ -81,7 +81,8 @@ export default{
             editable: true,
             options:[],
             optionsFromDatabase:[],
-            listOfAllPharmacies: []
+            listOfAllPharmacies: [],
+            hashMapOfAllPharmacies: {}
         }
     },
 
@@ -230,22 +231,12 @@ export default{
         //     this.inputValue = pharmacyId
         // },
         //search the pharmacy name by id and push to the files from miscellaneous
-        checkApos (id) {
-            if (this.listOfAllPharmacies.some(item => item.id === id)) {
-                return true
-            }
-            return false
-        },
-
 
         async getPharmacyById(id){
-            const isInList = this.checkApos(id)
-            if (isInList) {
-                // console.log('aus cache')
-                const pharm = this.listOfAllPharmacies.find(item => item.id === id)
-                // console.log(pharm.schemaId)
+            if (this.hashMapOfAllPharmacies[id]) {
+                const pharm = this.hashMapOfAllPharmacies[id]
+                // console.log(this.hashMapOfAllPharmacies, pharm)
                 if (pharm.schemaId === '961fe75d-2d0e-4ccb-8afd-cde072b37380'){
-                    // console.log(pharm)
                     return [pharm]
                 } else if (pharm.schemaId === '7c70a676-ef00-432c-bce0-60f7c8b6fb0b') {
                     let tempPharmacyList = []
@@ -274,12 +265,12 @@ export default{
                     `
                 })
                 // console.log(result.data.queryFileData)
-                this.listOfAllPharmacies.push({
+                this.hashMapOfAllPharmacies[id] = {
                     name: result.data.queryFileData.data.find(data => data.elementId === '91f42e63-98b4-462b-bf65-58b416718cb0').data.text,
                     id: result.data.queryFileData.id,
                     schemaId: result.data.queryFileData.schemaId,
                     data: result.data.queryFileData.data
-                })
+                }
                 if (result.data.queryFileData.schemaId === "961fe75d-2d0e-4ccb-8afd-cde072b37380"){
                     return [{
                         name: result.data.queryFileData.data.find(data => data.elementId === '91f42e63-98b4-462b-bf65-58b416718cb0').data.text,
