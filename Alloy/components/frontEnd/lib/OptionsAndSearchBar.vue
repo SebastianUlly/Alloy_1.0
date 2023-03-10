@@ -82,6 +82,7 @@ export default {
 	display: flex;
 }
 .searchContainer{
+	margin: 24px 0 0 70px;
 	display:flex;
 }
 </style>
