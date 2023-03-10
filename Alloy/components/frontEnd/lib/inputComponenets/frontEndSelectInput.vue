@@ -235,7 +235,7 @@ export default{
         async getPharmacyById(id){
             if (this.hashMapOfAllPharmacies[id]) {
                 const pharm = this.hashMapOfAllPharmacies[id]
-                // console.log(this.hashMapOfAllPharmacies, pharm)
+                console.log(this.hashMapOfAllPharmacies, pharm)
                 if (pharm.schemaId === '961fe75d-2d0e-4ccb-8afd-cde072b37380'){
                     return [pharm]
                 } else if (pharm.schemaId === '7c70a676-ef00-432c-bce0-60f7c8b6fb0b') {

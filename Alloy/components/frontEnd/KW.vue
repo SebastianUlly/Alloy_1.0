@@ -121,7 +121,7 @@
 				v-if="kw"
 				:points="kw"
 				:year="selectedYear"
-				:searchValue="searchValueForZeiterfassung"
+				:searchValue="searchValue"
 				@getClickedItem="openEditTime"
 				@setConfirmPopUpData="setConfirmPopUpData"
 				class="zeiterfassung"
@@ -207,7 +207,6 @@ export default {
 				weekhours: '0:00'
 			},
 			clickedFile: null,
-			searchValueForZeiterfassung: '',
 			popUpLoading: false,
 			pointsByUserId: [],
 			kwListWithHolidays: [],
