@@ -32,6 +32,7 @@
                         @update="getDataFromComponent"
                         @getCurrentFolderId="setParentId"
                         :clickedFileId="clickedFile"
+                        :elementIdToSearch="clickedFile"
                         :data="sendDataToInputs"
                         :permissions="item.permissions"
                         :selectedUserId="selectedUserId"

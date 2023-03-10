@@ -113,6 +113,7 @@ export default{
     created(){
         this.setEditable();
         this.setDefaultValue();
+        console.log(this.data)
     },
     mounted() {
         this.isInputOk();
