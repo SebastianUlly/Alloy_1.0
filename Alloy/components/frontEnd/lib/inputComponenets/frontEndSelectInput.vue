@@ -36,7 +36,14 @@
                 </select>
                 <!-- dropdown arrow -->
                 <v-icon class="mdi-chevron" v-if="editable">mdi-chevron-down</v-icon>
-            </div> 
+                <v-progress-linear
+                    v-if="loadingFiles"
+                    indeterminate
+                    color="green"
+                    :rounded="true"
+                ></v-progress-linear>
+            </div>
+            {{ inputValue }}
         </div>
     </div>
 </template>
@@ -80,7 +87,8 @@ export default{
             options:[],
             optionsFromDatabase:[],
             listOfAllPharmacies: [],
-            hashMapOfAllPharmacies: {}
+            hashMapOfAllPharmacies: {},
+            loadingFiles: false
         }
     },
 
@@ -103,7 +111,8 @@ export default{
         ...mapGetters({
             permissionIds: 'authentication/getPermissionIds',
             directory: 'directory/getDatabaseDirectory',
-            autoFillId: 'point/getAutoFillId'
+            autoFillId: 'point/getAutoFillId',
+            projectsFromStore: 'file/getProjectList'
         })
     },
 
@@ -308,7 +317,7 @@ export default{
             //querying the pharmacies of the selectable schema
             if(this.parameters?.selectableSchema){
                 for(let schemaId of this.parameters?.selectableSchema){
-                    this.getTest(schemaId)
+                    this.getPharmacyBySchemaId(schemaId)
                 }
             //if its not an pharmacy then fills it with the parameters.options from the parent component
             }else if(this.parameters.options) {
@@ -334,7 +343,30 @@ export default{
                 })
             }
         },
-        async getTest (schemaId) {
+        getProjectsFromStore () {
+            for (const project of this.projectsFromStore) {
+                if(this.directory[0]?.hierarchy.some(e => e.fileId === project.id) && project.schemaId === '44111b55-c2b8-4e30-97d3-452aed86c1f4'){
+                    this.filesProject.push({
+                        id: project.id,
+                        year: project.data.find(element => element.elementId === "577aa568-345a-47e5-9b71-848d5695bd5d").data.text,
+                        pharmacy: project.data.find(element => element.elementId === "09c5ba61-4e52-4a68-afde-bb7334b45b35").data.text,
+                        projectNumber: project.label,
+                        projectName: project.data.find(element => element.elementId === "5187f38c-c1b7-4f8e-9c00-b87f703650ee").data.text
+                    })
+                }
+                if (this.elementId == "09c5ba61-4e52-4a68-afde-bb7334b45b35") {  
+                    //if the current selectInput is the pharmacy selector
+                    console.log('asd')
+                    this.files.push({
+                        id: project.id,
+                        label: project.data.find(element => element.elementId === "91f42e63-98b4-462b-bf65-58b416718cb0").data.text
+                    })
+                }
+            }
+            this.sortFilesProject()
+        },
+        async getPharmacyBySchemaId (schemaId) {
+           
             const result = await this.$apollo.query({
             variables: {
                 schemaId: schemaId
@@ -361,6 +393,10 @@ export default{
             }
             //if the current selectInput is not the pharmacy selector
             if(this.elementId !== "09c5ba61-4e52-4a68-afde-bb7334b45b35" && !this.autoFillId){
+                this.getProjectsFromStore()
+
+                /*  this.loadingFiles = true
+                 console.log(this.directory[0]?.hierarchy)
                 for (const file of result.data.fileBySchemaId) {
                     if(this.directory[0]?.hierarchy.some(e => e.fileId === file.id)){
                         const pharmacy = await this.getPharmacyById(file.data.find(element => element.elementId == "09c5ba61-4e52-4a68-afde-bb7334b45b35").data.text)
@@ -372,7 +408,8 @@ export default{
                             projectNumber: file.label,
                             projectName: file.data.find(element => element.elementId === "5187f38c-c1b7-4f8e-9c00-b87f703650ee").data.text
                         })
-                    } else if (this.elementId == "09c5ba61-4e52-4a68-afde-bb7334b45b35") {  
+                    }
+                    if (this.elementId == "09c5ba61-4e52-4a68-afde-bb7334b45b35") {  
                         //if the current selectInput is the pharmacy selector
                         for(const pharmacy of result.data.fileBySchemaId){
                             this.files.push({
@@ -383,7 +420,8 @@ export default{
                     }
                     //run the sort files function that sort the filesProject array
                     this.sortFilesProject()
-                } 
+                } */
+                this.loadingFiles = false
             } else if (this.elementId !== "09c5ba61-4e52-4a68-afde-bb7334b45b35" && this.autoFillId){
                 this.options = []
                 // //when the autofillId exists limit the options just with one file

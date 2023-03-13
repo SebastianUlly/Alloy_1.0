@@ -16,7 +16,7 @@ import subMenu from '~/components/frontEnd/subMenu';
 import zeiterfassung from '~/components/frontEnd/TimeParent';
 import projectsummary from '~/components/frontEnd/ProjectSummary'
 import externBills from '~/components/frontEnd/externBills'
-
+import gql from "graphql-tag";
 export default {
 	data(){
 		return{
@@ -31,11 +31,28 @@ export default {
 		projectsummary,
 		externBills
     },
-
+	created () {
+		this.getProjects()
+	},
 	methods:{
 		openComponent(component){
 			this.component = component
 			this.$store.commit('file/resetEnteredData')
+		},
+		async getProjects () {
+			const projects = await this.$apollo.query({
+				query: gql`
+					query {
+						files_v2{
+							id
+							label
+							data
+							schemaId
+						}
+					}
+				`
+			})
+			this.$store.commit('file/setProjectList', projects.data.files_v2)
 		}
 	}
 };

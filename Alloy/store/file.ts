@@ -6,10 +6,15 @@ export const state = () => ({
 	valuesToSave: {},
 	dataToSave: [],
 	fileList: [],
-	isInputOk: []
+	isInputOk: [],
+	allFilesHashTable: []
 })
 
 export const mutations = {
+	setProjectList (state: object, projects: object[] ) {
+		Vue.set(state, 'allFilesHashTable', projects)
+	},
+
 	setFile (state: object, fileData: { id: string, schemaId: number, label: string, parentIds: string[], data: object[] }) {
 		const values = {
 			id: fileData.id,
@@ -82,6 +87,10 @@ export const mutations = {
 }
 
 export const getters = {
+	getProjectList (state: { allFilesHashTable: object[] }) {
+		return state.allFilesHashTable
+	},
+	
 	getFileValues (state: { values: object }) {
 		return state.values
 	},
