@@ -44,14 +44,17 @@
         <!-- add button at the bottom of popUp window calls the createFile function that saves the file to the database-->
         <div class="addButtonDiv">
             <v-btn
+                v-for="button of popUpSchema.metadata.buttons"
                 v-if="popUpSchema.metadata"
                 class="addButton"
-                @click="selectFunction(popUpSchema.metadata.saveFunction)"
+                @click="selectFunction(button.function)"
                 :loading="false"
                 :disabled="!readyToSave"
                 color="green"
                 large
-                style="min-width:0"> Speichern </v-btn>
+                style="min-width:0"> {{ button.text }}
+            </v-btn>
+            {{ popUpSchema.metadata }}
         </div>
     </div>
 </template>
@@ -240,6 +243,9 @@ export default {
                 this.$emit("saveSuccess")
             })
 
+        },
+        splitPopUp(){
+            console.log("split")
         },
         createFile(){
             this.$apollo.mutate({
@@ -458,6 +464,9 @@ $columns: 12;
 }
 .addButtonDiv{
     margin-bottom: 20px;
+}
+.addButton{
+    margin: 0 10px;
 }
 .popUpLabellabel{
     font-size: 20px;

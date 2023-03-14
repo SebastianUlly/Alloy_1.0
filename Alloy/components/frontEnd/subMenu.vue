@@ -20,11 +20,11 @@
             >
                 Projektübersicht
             </v-btn>
-            <!-- <v-btn
+             <v-btn
                 @click="openComponent('externBills')"
             >
                 Externe Rechnungen
-            </v-btn> -->
+            </v-btn>
         </v-btn-toggle>
     </div>
 </template>
