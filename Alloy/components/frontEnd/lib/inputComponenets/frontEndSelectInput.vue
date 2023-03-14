@@ -14,13 +14,13 @@
                         v-if="files"
                         v-for="(item, index) in files"
                         :value="item.id"
-                    >{{item.label}}</option>
+                    >{{item.label}} - {{ item.id }}</option>
                     <!-- options from the miscellaneous or from getPharmacyByName() function -->
                     <option
                         v-if="filesFromMiscellaneous"
                         v-for="(item, index) in filesFromMiscellaneous"
                         :value="item.id"
-                    >{{item.name}}</option>
+                    >{{item.name}} </option>
                     <!-- options for the select project comes from getFile function -->
                     <option
                         v-if="options"
@@ -43,7 +43,6 @@
                     :rounded="true"
                 ></v-progress-linear>
             </div>
-            {{ inputValue }}
         </div>
     </div>
 </template>
@@ -102,9 +101,10 @@ export default{
         this.isInputok();
         this.setEditable(this.permissions.toEdit)
         //if the component is the company selector then listen to the emit and sends the payloads data to the function
-        if(this.elementId === "0c9cf456-edc3-4779-b00c-14237863fa16"){
+        /* if(this.elementId === "0c9cf456-edc3-4779-b00c-14237863fa16"){
             this.$root.$on('sendSelectedProject', data => {this.setEditableByProject(data)})
-        }
+        } */
+        
     },
     
     computed:{
@@ -112,7 +112,8 @@ export default{
             permissionIds: 'authentication/getPermissionIds',
             directory: 'directory/getDatabaseDirectory',
             autoFillId: 'point/getAutoFillId',
-            projectsFromStore: 'file/getProjectList'
+            projectsFromStore: 'file/getProjectList',
+            dataToSave: 'file/getDataToSave'
         })
     },
 
@@ -135,6 +136,18 @@ export default{
             deep:true,
             handler(){
                 this.setDefaultValue()
+            }
+        },
+        dataToSave:{
+            deep: true,
+            handler(){
+                //elementId of Firma selector
+                if(this.elementId === '0c9cf456-edc3-4779-b00c-14237863fa16') {
+                    this.inputValue = this.dataToSave.find(element => element.elementId === this.elementId).data.text
+                    console.log(this.inputValue)
+                    this.setEditableByProject(this.dataToSave.find(element => element.elementId === '30a1d57d-ac51-4a54-9f83-2c493253b944'))
+                    
+                }
             }
         }
     },
@@ -191,8 +204,14 @@ export default{
             } else {
                 this.editable = false
             }
-            this.inputValue = result.data.queryFileData.data.find(element => element.elementId === "09c5ba61-4e52-4a68-afde-bb7334b45b35").data.text
-            this.setDefaultValue()
+            
+            //this.inputValue = result.data.queryFileData.data.find(element => element.elementId === "09c5ba61-4e52-4a68-afde-bb7334b45b35").data.text
+            //console.log(result.data.queryFileData.data.find(element => element.elementId === "09c5ba61-4e52-4a68-afde-bb7334b45b35"))
+            //this.inputValue = this.data.data.find(item => item.elementId === this.elementId).data.text
+            if(!this.clickedFileId){
+                this.inputValue = result.data.queryFileData.data.find(element => element.elementId === "09c5ba61-4e52-4a68-afde-bb7334b45b35").data.text
+            }
+            
         },
         async getPharmacyById(id){
             if (this.hashMapOfAllPharmacies[id]) {
@@ -285,9 +304,9 @@ export default{
             }
             
             //if the elementId is from the project select then emitting the payloads data
-            if(payload.elementId === "30a1d57d-ac51-4a54-9f83-2c493253b944"){
+            /* if(payload.elementId === "30a1d57d-ac51-4a54-9f83-2c493253b944"){
                 this.$root.$emit('sendSelectedProject', payload);
-            }
+            } */
             this.$emit('update', payload);
         },
         getPharmNameByIdForSingleId (id) {
@@ -304,9 +323,9 @@ export default{
                 
                 `
             }).then((data) => {
-            return data.data.queryFileData.label
+                return data.data.queryFileData.label
             }).catch((error) => {
-            console.log({ error })
+                console.log({ error })
             })
         },
         //get the file by the schema of parameters
