@@ -1,6 +1,6 @@
 <template>
 	<div class="container">
-		<ClientOnly>
+		
 			<div>
 				<!-- the top sectioin contains the new addProject button yearSelect and the SearchFIeld -->
 				<div class="topSection">
@@ -19,11 +19,22 @@
 							mdi-note-plus-outline
 						</v-icon>
 					</v-btn>
+					
 					<!-- the search container contains the events of searchComponent and the yearSelector -->
 					<div class="searchContainer">
 						<selectYear class="selectYearComponent" @sendYear="captureMyYear" v-if="checkPermissionIdsHere('b77ac80c-39ea-4550-b04c-843ad07a3672')"/>
 						<search @sendValue="captureMySearchValue" v-if="checkPermissionIdsHere('b77ac80c-39ea-4550-b04c-843ad07a3672')"/>
 					</div>
+					<v-btn
+						:loading="isFillingData"
+						color="green"
+						class="button"
+						@click="itemsFill()"
+					>
+						<v-icon>	
+							mdi-refresh
+						</v-icon>
+					</v-btn>
 				</div>
 				<!-- the body div contains the data table and the popUp component if its opened -->
 				<div class="body">
@@ -106,7 +117,7 @@
 			>
 				{{ text }}
 			</v-snackbar>
-		</ClientOnly>
+		
 	</div>
 </template>
 
@@ -200,7 +211,9 @@ export default {
 			}
 		`
     },
-
+	created(){
+		this.itemsFill()
+	},
     methods: {
 		async getPharmacyAbb(pharmacyId){
 			if(!this.pharmacyAbb[pharmacyId]){
@@ -487,6 +500,7 @@ export default {
 			deep: true,
 			handler(){
 				this.completeDirectory();
+				this.itemsFill();
 			}
 		},
 		// watcher to react to changes in the projectSchema when it is called from the API

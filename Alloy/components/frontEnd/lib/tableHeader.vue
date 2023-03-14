@@ -12,27 +12,57 @@
 					{{ weeklySummary.weekhours }}
 				</span>
 				<span>
-					({{ userInfo.workhours }})
+					({{ weeklyWorkTimeOfUser }})
 				</span>
 			</p>
 			
 		</div>
 		<v-btn
-			v-if="button === 'release' && showButton"
-			class="button"
 			color="green"
+			class="button"
+			@click="$emit('refreshKW')"
+		>	
+			<v-icon>	
+				mdi-refresh
+			</v-icon>
+		</v-btn>
+		<v-spacer/>
+		<!-- {{ weeklySummary.releaseOrSignObj }}{{ stateOfPoints }} -->
+		<div v-if="weeklySummary.releaseOrSignObj.isLoggedInUser">
+			<div v-if="weeklySummary.releaseOrSignObj.signed">
+				Signiert am: {{  signDate }}
+			</div>
+			<div v-else-if="stateOfPoints === 'needToBeSigned'">
+				Warten auf Signatur 
+			</div>
+		</div>
+		<div v-else>
+			<div v-if="weeklySummary.releaseOrSignObj.signed">
+				Signiert am: {{  signDate }}
+			</div>
+			<div v-else-if="stateOfPoints === 'needToBeReleased'">
+				Warten auf Freigabe
+			</div>
+		</div>
+		<v-btn
+			v-if="button === 'release' && showButton"
+			color="green"
+			class="button"
 			@click="$emit('releaseKW')"
 		>
 			Freigeben
 		</v-btn>
 		<v-btn
-			v-if="button === 'sign' && showButton"
-			class="button"
+			v-if="!weeklySummary.releaseOrSignObj.signed && button === 'sign' && showButton"
 			color="green"
+			class="button"
 			@click="$emit('signTheKW')"
 		>
 			Signieren
 		</v-btn>
+		<!-- <v-btn color="red" @click="$emit('reset')">
+			Reset
+		</v-btn> -->
 	</div>
 </template>
 
@@ -43,8 +73,8 @@ export default {
 			type: String
 		},
 
-		userInfo: {
-			type: Object
+		weeklyWorkTimeOfUser: {
+			type: Number
 		},
 
 		weeklySummary: {
@@ -57,6 +87,22 @@ export default {
 
 		showButton: {
 			type: Boolean
+		},
+
+		stateOfPoints: {
+			type: String
+		}
+	},
+
+	computed: {
+		signDate () {
+			let signDate
+			if (this.weeklySummary.releaseOrSignObj.signed) {
+				signDate = this.weeklySummary.releaseOrSignObj.signed.split('T')[0].split('-')[2] + '.'
+						+ this.weeklySummary.releaseOrSignObj.signed.split('T')[0].split('-')[1] + '.'
+						+ this.weeklySummary.releaseOrSignObj.signed.split('T')[0].split('-')[0]
+			}
+			return signDate
 		}
 	}
 }
@@ -99,7 +145,6 @@ p:first-of-type {
 }
 
 .button {
-	position: absolute;
-	right: 15px;
+	margin: 5px;
 }
 </style>

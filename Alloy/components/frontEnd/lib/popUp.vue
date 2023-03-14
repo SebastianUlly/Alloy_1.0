@@ -31,10 +31,13 @@
                         :class="item.parameters.size"
                         @update="getDataFromComponent"
                         @getCurrentFolderId="setParentId"
+                        :clickedFileId="clickedFile"
                         :elementIdToSearch="clickedFile"
                         :data="sendDataToInputs"
                         :permissions="item.permissions"
                         :selectedUserId="selectedUserId"
+                        @sendNetto="getNetto"
+                        @sendTaxValue="getTaxValue"
 				    />
             </div>
         </div>
@@ -91,7 +94,9 @@ export default {
             payload:"",
             icon: "",
             sendDataToInputs: {},
-            closeButtonImage: closeButtonImage
+            closeButtonImage: closeButtonImage,
+            taxValue: 0,
+            nettoValue: 0
         }
     },
 
@@ -114,6 +119,19 @@ export default {
         this.createNewFile()
     },
     methods:{
+        getTaxValue(taxValue){
+            this.taxValue = parseInt(taxValue)
+        },
+        getNetto(netto){
+            this.nettoValue = netto
+        },
+        setBruttoValue(){
+            if(this.taxValue && this.nettoValue){
+                console.log("asdawe")
+                this.popUpSchema.elements.find(element => element.elementId == "4b156b8d-c58d-4ada-b1b8-65618258112d").parameters.default = (Math.ceil(parseFloat(this.nettoValue * (this.taxValue * 0.01 + 1)) * 10 ) / 10 ).toFixed(2) 
+
+            }
+        },
         isDayTypeHoliday(){
             //if Urlaub || Krankentag || Zeitausgleich clicked change the props for child components
             if(this.getDataToSave.find(item => item.elementId == "f951c3cf-1594-435e-85be-e951be00bb44")?.data?.text == "95aa87dc-9f80-4c33-8ccd-f59f543bec8e" ||
@@ -123,7 +141,7 @@ export default {
                 //set the 000-BOCOM project to the default when holiday clicked
                 (this.popUpSchema.elements?.find(element => element.elementId == "30a1d57d-ac51-4a54-9f83-2c493253b944")).parameters["default"] = "4e5f968b-5314-46e3-85a5-95d22db27047";
                 (this.popUpSchema.elements?.find(element => element.elementId == "30a1d57d-ac51-4a54-9f83-2c493253b944")).permissions.toEdit = false;
-                //set the activity type
+                //set the activity type to Administration
                 (this.popUpSchema.elements?.find(element => element.elementId == "9a8284f2-5615-4cb5-893b-56cc3476b169")).permissions.toEdit = false;
                 (this.popUpSchema.elements?.find(element => element.elementId == "9a8284f2-5615-4cb5-893b-56cc3476b169")).parameters["default"] = "bfe1e26b-0801-4bd1-86c0-563d8118b609";
                 //set the beschreibung not required and disabled
@@ -376,6 +394,16 @@ export default {
                 if(this.popUpSchema.id == "c519459a-5624-4311-bffb-838d43e7f0d0" || this.popUpSchema.id == "50dd57aa-b759-42e7-9bae-3830cd605f02"){
                     this.isDayTypeHoliday();
                 }
+            }
+        },
+        nettoValue:{
+            handler(){
+                this.setBruttoValue()
+            }
+        },
+        taxValue:{
+            handler(){
+                this.setBruttoValue()
             }
         }
 	}

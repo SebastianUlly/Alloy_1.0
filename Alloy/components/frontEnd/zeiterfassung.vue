@@ -55,6 +55,9 @@ export default {
 		},
 		paidHolidays: {
 			type: Array
+		},
+		refreshKWList:{
+			type: Array
 		}
 	},
 	data() {
@@ -346,7 +349,7 @@ export default {
 
 					//sort the tempItems by date
 					tempItems.sort(function (a, b) {
-						console.log(a)
+						// console.log(a)
 						//trick to not manipulate the original object
 						const aTemp = JSON.parse(JSON.stringify(a))
 						const bTemp = JSON.parse(JSON.stringify(b))
@@ -381,6 +384,12 @@ export default {
 				this.itemsFill()
 			}
 		},
+		refreshKWList:{
+			deep: true,
+			handler(){
+				this.itemsFill()
+			}
+		}
 	} 
 };
 </script>
