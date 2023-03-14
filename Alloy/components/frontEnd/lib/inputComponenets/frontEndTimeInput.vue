@@ -15,7 +15,8 @@
                 v-model= "inputValueHour"
                 class="timeInput"
                 min="0"
-                type="number">
+                type="number"
+            >
         </div>
         <!-- ":" in the middle -->
         <div class="middle"> : </div>
@@ -35,7 +36,8 @@
                 min="00"
                 max="55"
                 step="5"
-                type="number">
+                type="number"
+            >
         </div>
     </div>
 </template>
@@ -162,6 +164,9 @@ export default{
         },
         inputValueMinutes:{
             handler(){
+                if(this.inputValueMinutes.toString().length == 1){
+                    this.inputValueMinutes = "0" + this.inputValueMinutes.toString()
+                }
                 this.isInputOk();
             }
         },

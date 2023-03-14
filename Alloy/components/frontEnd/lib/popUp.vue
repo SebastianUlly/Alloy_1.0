@@ -31,6 +31,7 @@
                         :class="item.parameters.size"
                         @update="getDataFromComponent"
                         @getCurrentFolderId="setParentId"
+                        :clickedFileId="clickedFile"
                         :elementIdToSearch="clickedFile"
                         :data="sendDataToInputs"
                         :permissions="item.permissions"
@@ -140,7 +141,7 @@ export default {
                 //set the 000-BOCOM project to the default when holiday clicked
                 (this.popUpSchema.elements?.find(element => element.elementId == "30a1d57d-ac51-4a54-9f83-2c493253b944")).parameters["default"] = "4e5f968b-5314-46e3-85a5-95d22db27047";
                 (this.popUpSchema.elements?.find(element => element.elementId == "30a1d57d-ac51-4a54-9f83-2c493253b944")).permissions.toEdit = false;
-                //set the activity type
+                //set the activity type to Administration
                 (this.popUpSchema.elements?.find(element => element.elementId == "9a8284f2-5615-4cb5-893b-56cc3476b169")).permissions.toEdit = false;
                 (this.popUpSchema.elements?.find(element => element.elementId == "9a8284f2-5615-4cb5-893b-56cc3476b169")).parameters["default"] = "bfe1e26b-0801-4bd1-86c0-563d8118b609";
                 //set the beschreibung not required and disabled

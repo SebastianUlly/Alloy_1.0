@@ -78,7 +78,7 @@ $gap-size: 15px;
 $columns: 12;
 
 .popUp{
-    position: absolute;
+    position: fixed;
     top: 300px;
     left: 15%;
     z-index: 2;

@@ -55,8 +55,8 @@ export default{
         },
         //if the elementIdToSearch exist so we clicked one item it will search for the value
         setDefaultValue(){
-            if(this.elementIdToSearch && this.data != undefined){
-                this.textAreaValue = (this.data.data.find(item => item.elementId === this.elementId).data.text)
+            if(this.elementIdToSearch && this.data){
+                this.textAreaValue = this.data?.data.find(item => item.elementId === this.elementId)?.data?.text
             }   
         },
         //checks if the permissionId is in the permissionIds list and sends the permissionId to the checkPermissionId function

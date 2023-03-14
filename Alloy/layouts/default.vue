@@ -12,6 +12,7 @@
 <script>
 import Navbar from '~/components/navbar'
 import Cookie from 'js-cookie'
+
 export default {
 	components: {
 		Navbar
