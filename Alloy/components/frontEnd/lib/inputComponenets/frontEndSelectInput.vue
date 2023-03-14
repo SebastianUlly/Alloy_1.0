@@ -142,8 +142,8 @@ export default{
             deep: true,
             handler(){
                 //elementId of Firma selector
-                if(this.elementId === '0c9cf456-edc3-4779-b00c-14237863fa16') {
-                    this.inputValue = this.dataToSave.find(element => element.elementId === this.elementId).data.text
+                if(this.elementId === '0c9cf456-edc3-4779-b00c-14237863fa16' && this.dataToSave) {
+                    this.inputValue = this.dataToSave.find(element => element.elementId === this.elementId)?.data.text
                     console.log(this.inputValue)
                     this.setEditableByProject(this.dataToSave.find(element => element.elementId === '30a1d57d-ac51-4a54-9f83-2c493253b944'))
                     
