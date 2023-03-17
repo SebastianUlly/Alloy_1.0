@@ -14,7 +14,7 @@
                         v-if="files"
                         v-for="(item, index) in files"
                         :value="item.id"
-                    >{{item.label}} - {{ item.id }}</option>
+                    >{{item.label}}</option>
                     <!-- options from the miscellaneous or from getPharmacyByName() function -->
                     <option
                         v-if="filesFromMiscellaneous"
