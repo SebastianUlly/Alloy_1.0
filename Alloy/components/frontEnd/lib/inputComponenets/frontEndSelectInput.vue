@@ -122,6 +122,9 @@ export default{
             handler(){
                 this.sendEvent();
                 this.isInputok();
+                if(this.elementId == "17fa2c80-6196-4684-86ad-0a04424858a7"){
+                    this.$emit('sendTaxValue', this.inputValue)
+                }
             }
         },
         permissions:{

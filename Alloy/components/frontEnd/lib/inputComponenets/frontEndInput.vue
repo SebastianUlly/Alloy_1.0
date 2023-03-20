@@ -196,8 +196,9 @@ export default{
                     text : this.inputValue
                 }
             }
-            if(this.parameters.required){
-                
+            //if the component the Netto inputField is, send the netto value to parent component
+            if(this.elementId == "aedf15c2-24ef-4d16-acfe-94511f24b498" && !this.elementIdToSearch){
+                this.$emit('sendNetto', this.inputValue)
             }
             this.$emit('update', payload);
         },
@@ -246,6 +247,17 @@ export default{
             handler(){
                 this.isInputOk();
                 this.sendEvent();
+                if(this.elementId == "aedf15c2-24ef-4d16-acfe-94511f24b498"){
+                    this.$emit('sendNetto', this.inputValue)
+                }
+                
+            }
+        },
+        parameters:{
+            deep: true,
+            handler(){
+                this.inputValue = this.parameters.default
+                this.displayValue = this.parameters.default
             }
         }
     } 

@@ -36,6 +36,8 @@
                         :data="sendDataToInputs"
                         :permissions="item.permissions"
                         :selectedUserId="selectedUserId"
+                        @sendNetto="getNetto"
+                        @sendTaxValue="getTaxValue"
 				    />
             </div>
         </div>
@@ -58,7 +60,7 @@
             <v-btn
                 v-else-if="popUpSchema.metadata"
                 class="addButton"
-                @click="selectFunction(popUpSchema.metadata.saveFunction)"
+                @click="selectFunction(button.function)"
                 :loading="false"
                 :disabled="!readyToSave"
                 color="green"
@@ -107,6 +109,8 @@ export default {
             icon: "",
             sendDataToInputs: {},
             closeButtonImage: closeButtonImage,
+            taxValue: 0,
+            nettoValue: 0
         }
     },
 
@@ -129,6 +133,19 @@ export default {
         this.createNewFile()
     },
     methods:{
+        getTaxValue(taxValue){
+            this.taxValue = parseInt(taxValue)
+        },
+        getNetto(netto){
+            this.nettoValue = netto
+        },
+        setBruttoValue(){
+            if(this.taxValue && this.nettoValue){
+                console.log("asdawe")
+                this.popUpSchema.elements.find(element => element.elementId == "4b156b8d-c58d-4ada-b1b8-65618258112d").parameters.default = (Math.ceil(parseFloat(this.nettoValue * (this.taxValue * 0.01 + 1)) * 10 ) / 10 ).toFixed(2) 
+
+            }
+        },
         isDayTypeHoliday(){
             //if Urlaub || Krankentag || Zeitausgleich clicked change the props for child components
             if(this.getDataToSave.find(item => item.elementId == "f951c3cf-1594-435e-85be-e951be00bb44")?.data?.text == "95aa87dc-9f80-4c33-8ccd-f59f543bec8e" ||
@@ -240,6 +257,9 @@ export default {
                 this.$emit("saveSuccess")
             })
 
+        },
+        splitPopUp(){
+            console.log("split")
         },
         createFile(){
             this.$apollo.mutate({
@@ -395,6 +415,16 @@ export default {
                     this.isDayTypeHoliday();
                 }
             }
+        },
+        nettoValue:{
+            handler(){
+                this.setBruttoValue()
+            }
+        },
+        taxValue:{
+            handler(){
+                this.setBruttoValue()
+            }
         }
 	}
 }
@@ -448,6 +478,9 @@ $columns: 12;
 }
 .addButtonDiv{
     margin-bottom: 20px;
+}
+.addButton{
+    margin: 0 10px;
 }
 .popUpLabellabel{
     font-size: 20px;
