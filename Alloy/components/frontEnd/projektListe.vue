@@ -23,7 +23,9 @@
 					<!-- the search container contains the events of searchComponent and the yearSelector -->
 					<div class="searchContainer">
 						<selectYear class="selectYearComponent" @sendYear="captureMyYear" v-if="checkPermissionIdsHere('b77ac80c-39ea-4550-b04c-843ad07a3672')"/>
+						<searchByPharmacy @sendPharmacy="captureSelectedPharmacy" />
 						<search @sendValue="captureMySearchValue" v-if="checkPermissionIdsHere('b77ac80c-39ea-4550-b04c-843ad07a3672')"/>
+						<searchByStatus @sendStatus="captureStatus"/>
 					</div>
 					<v-btn
 						:loading="isFillingData"
@@ -52,7 +54,6 @@
 						:headers="headers"
 						:items="items"
 						:items-per-page="20"
-						:search="search"
 						class="table"
 						:header-props="{ sortIcon: null }"
 						:sort-by="'Nummer'"
@@ -101,7 +102,6 @@
 											mdi-content-copy
 										</v-icon>
 									</button>
-									
 								</div>
 						</template>
 					</v-data-table>
@@ -117,7 +117,6 @@
 			>
 				{{ text }}
 			</v-snackbar>
-		
 	</div>
 </template>
 
@@ -125,6 +124,8 @@
 import gql from "graphql-tag";
 import { mapGetters } from "vuex";
 import search from "~/components/frontEnd/search";
+import searchByStatus from "~/components/frontEnd/searchByStatus";
+import searchByPharmacy from "~/components/frontEnd/searchByPharmacy";
 import selectYear from "~/components/frontEnd/selectYear";
 import popUp from "~/components/frontEnd/lib/popUp";
 import { MainDirectory } from '~/assets/directoryClasses'
@@ -135,7 +136,9 @@ export default {
 	components: {
 		search,
 		selectYear,
-		popUp
+		popUp,
+		searchByPharmacy,
+		searchByStatus
 },
     data() {
         return {
@@ -160,7 +163,9 @@ export default {
 			isActionAvailable: 0,
 			pharmacyAbb:{},
 			isFillingData: false,
-			popUpLoading: false
+			popUpLoading: false,
+			filterByPharmacy: '',
+			filterByStatus: ''
         };
     },
     apollo: {
@@ -215,6 +220,13 @@ export default {
 		this.itemsFill()
 	},
     methods: {
+		captureStatus(status){
+			this.filterByStatus = status
+		},
+		captureSelectedPharmacy(pharmacy){
+			this.filterByPharmacy = pharmacy
+			
+		},
 		async getPharmacyAbb(pharmacyId){
 			if(!this.pharmacyAbb[pharmacyId]){
 				this.pharmacyAbb[pharmacyId]=(
@@ -360,6 +372,48 @@ export default {
 									}
 								})	
 							}
+							else if (item.label === "Apotheke") {
+								//pushing the row (object) with the following settings to the headers (array)
+								this.headers.push({
+									//the header name is the label of the item
+									text: item.label,
+									//position is center of this row
+									align:'center',
+									//it is not shortable by the Year
+									sortable: false,
+									//the value is the "key" that tells the table where to load the elements
+									//it should not contain spaces, capital letters, special characters
+									value: item.label.replace(/[^a-zA-Z ]/g, ""),
+									//giving the elementId to the headers object too
+									elementId: elementIdToFind,
+									// filtering the projects to get just the list with the desired year (yar comes from the selectYear component)
+									 filter: value => {
+										if (!this.filterByPharmacy) return true
+										return value.includes(this.filterByPharmacy) 
+									}
+								})	
+							}
+							else if (item.label === "Status") {
+								//pushing the row (object) with the following settings to the headers (array)
+								this.headers.push({
+									//the header name is the label of the item
+									text: item.label,
+									//position is center of this row
+									align:'center',
+									//it is not shortable by the Year
+									sortable: false,
+									//the value is the "key" that tells the table where to load the elements
+									//it should not contain spaces, capital letters, special characters
+									value: item.label.replace(/[^a-zA-Z ]/g, ""),
+									//giving the elementId to the headers object too
+									elementId: elementIdToFind,
+									// filtering the projects to get just the list with the desired year (yar comes from the selectYear component)
+									filter: value => {
+										if (!this.filterByStatus) return true
+										return value.includes(this.filterByStatus) 
+									}
+								})	
+							}
 							// the number is a special case where the width and the align must be set
 							else if (item.label === "Nummer") {
 								this.headers.push({
@@ -377,6 +431,10 @@ export default {
 									sortable: false,
 									value: item.label.replace(/[^a-zA-Z ]/g, ""),
 									elementId: elementIdToFind,
+									filter: value => {
+										if (!this.search) return true
+										return value.toLowerCase().includes(this.search.toLowerCase())
+									}
 								})	
 							}
 							//every other case it will push with these default settings
