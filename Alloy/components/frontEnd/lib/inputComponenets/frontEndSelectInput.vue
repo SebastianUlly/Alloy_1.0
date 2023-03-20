@@ -101,10 +101,9 @@ export default{
         this.isInputok();
         this.setEditable(this.permissions.toEdit)
         //if the component is the company selector then listen to the emit and sends the payloads data to the function
-        /* if(this.elementId === "0c9cf456-edc3-4779-b00c-14237863fa16"){
-            this.$root.$on('sendSelectedProject', data => {this.setEditableByProject(data)})
-        } */
-        
+        // if(this.elementId === "0c9cf456-edc3-4779-b00c-14237863fa16"){
+        //     this.$root.$on('sendSelectedProject', data => {this.setEditableByProject(data)})
+        // }
     },
     
     computed:{
@@ -179,6 +178,7 @@ export default{
         },
         //function that call getPharmacyId with the pharmacyId of selected project
         async setEditableByProject(value){
+            console.log(value)
             const result = await this.$apollo.query({
                 variables:{
                     fileId: value.data.text
@@ -195,6 +195,7 @@ export default{
                 
                 `
             })
+            // console.log(result.data.queryFileData.data.find(element => element.elementId === "09c5ba61-4e52-4a68-afde-bb7334b45b35").data.text)
             this.files = []
             this.options = []
             this.optionsFromDatabase = []
@@ -304,9 +305,9 @@ export default{
             }
             
             //if the elementId is from the project select then emitting the payloads data
-            /* if(payload.elementId === "30a1d57d-ac51-4a54-9f83-2c493253b944"){
-                this.$root.$emit('sendSelectedProject', payload);
-            } */
+            // if(payload.elementId === "30a1d57d-ac51-4a54-9f83-2c493253b944"){
+            //     this.$root.$emit('sendSelectedProject', payload);
+            // }
             this.$emit('update', payload);
         },
         getPharmNameByIdForSingleId (id) {
