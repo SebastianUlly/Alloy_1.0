@@ -102,9 +102,9 @@ export default{
         this.isInputok();
         this.setEditable(this.permissions.toEdit)
         //if the component is the company selector then listen to the emit and sends the payloads data to the function
-        if(this.elementId === "0c9cf456-edc3-4779-b00c-14237863fa16"){
-            this.$root.$on('sendSelectedProject', data => {this.setEditableByProject(data)})
-        }
+        // if(this.elementId === "0c9cf456-edc3-4779-b00c-14237863fa16"){
+        //     this.$root.$on('sendSelectedProject', data => {this.setEditableByProject(data)})
+        // }
     },
     
     computed:{
@@ -112,7 +112,8 @@ export default{
             permissionIds: 'authentication/getPermissionIds',
             directory: 'directory/getDatabaseDirectory',
             autoFillId: 'point/getAutoFillId',
-            projectsFromStore: 'file/getProjectList'
+            projectsFromStore: 'file/getProjectList',
+            dataToSave: 'file/getDataToSave'
         })
     },
 
@@ -135,6 +136,14 @@ export default{
             deep:true,
             handler(){
                 this.setDefaultValue()
+            }
+        },
+
+        dataToSave: {
+            deep: true,
+            handler () {
+                console.log('hdaskjhdlk')
+                this.inputValue = this.dataToSave.find(item => item.elementId === '0c9cf456-edc3-4779-b00c-14237863fa16').data.text
             }
         }
     },
@@ -166,6 +175,7 @@ export default{
         },
         //function that call getPharmacyId with the pharmacyId of selected project
         async setEditableByProject(value){
+            console.log(value)
             const result = await this.$apollo.query({
                 variables:{
                     fileId: value.data.text
@@ -182,6 +192,7 @@ export default{
                 
                 `
             })
+            // console.log(result.data.queryFileData.data.find(element => element.elementId === "09c5ba61-4e52-4a68-afde-bb7334b45b35").data.text)
             this.files = []
             this.options = []
             this.optionsFromDatabase = []
@@ -191,8 +202,19 @@ export default{
             } else {
                 this.editable = false
             }
-            this.inputValue = result.data.queryFileData.data.find(element => element.elementId === "09c5ba61-4e52-4a68-afde-bb7334b45b35").data.text
-            this.setDefaultValue()
+            // if(this.clickedFileId && this.data != undefined){
+            //     console.log(this.data.data.find(item => item.elementId === this.elementId).data.text)
+            //     this.inputValue = this.data.data.find(item => item.elementId === this.elementId).data.text
+            // } else {
+                // if (!this.clickedFileId && this.data == undefined) {
+                    this.inputValue = result.data.queryFileData.data.find(element => element.elementId === "09c5ba61-4e52-4a68-afde-bb7334b45b35").data.text
+                // }
+                // }
+            // }
+            // console.log(result.data.queryFileData.data.find(element => element.elementId === "09c5ba61-4e52-4a68-afde-bb7334b45b35").data.text)
+            //if clickedFileId and this element is not the Number, set the default value from the database
+            
+            // this.setDefaultValue()
         },
         async getPharmacyById(id){
             if (this.hashMapOfAllPharmacies[id]) {
@@ -285,9 +307,9 @@ export default{
             }
             
             //if the elementId is from the project select then emitting the payloads data
-            if(payload.elementId === "30a1d57d-ac51-4a54-9f83-2c493253b944"){
-                this.$root.$emit('sendSelectedProject', payload);
-            }
+            // if(payload.elementId === "30a1d57d-ac51-4a54-9f83-2c493253b944"){
+            //     this.$root.$emit('sendSelectedProject', payload);
+            // }
             this.$emit('update', payload);
         },
         getPharmNameByIdForSingleId (id) {
