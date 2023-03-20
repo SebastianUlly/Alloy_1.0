@@ -401,6 +401,15 @@ export default{
             `,
         //filling the files array with the data of fileBySchemaId.data where elementData.elementId (name field of an apotheke) is the same
         })   
+            //elementId of Company select at Bill Popup
+            if(this.elementId === '3d77d406-691c-4b0f-9baf-1380b1390c0d'){
+                for(let company of result.data.fileBySchemaId){
+                    this.files.push({
+                        id: company.id,
+                        label: company.label,
+                    })
+                }
+            }
             //if the current seectInput is the pharmacy selecotr
             if(this.elementId === '09c5ba61-4e52-4a68-afde-bb7334b45b35' && !this.autoFillId){
                 for(const pharmacy of result.data.fileBySchemaId){

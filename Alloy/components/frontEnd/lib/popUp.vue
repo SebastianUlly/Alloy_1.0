@@ -41,15 +41,30 @@
         </div>
         <!-- add button at the bottom of popUp window calls the createFile function that saves the file to the database-->
         <div class="addButtonDiv">
+            <div
+                v-if="popUpSchema.metadata.buttons"
+                v-for="button of popUpSchema.metadata.buttons"
+            >
+                <v-btn
+                    class="addButton"
+                    @click="selectFunction(button.function)"
+                    :loading="false"
+                    :disabled="!readyToSave"
+                    color="green"
+                    large
+                    style="min-width:0"> {{ button.text }}
+                </v-btn>
+            </div>
             <v-btn
-                v-if="popUpSchema.metadata"
+                v-else-if="popUpSchema.metadata"
                 class="addButton"
                 @click="selectFunction(popUpSchema.metadata.saveFunction)"
                 :loading="false"
                 :disabled="!readyToSave"
                 color="green"
                 large
-                style="min-width:0"> Speichern </v-btn>
+                style="min-width:0"> Speichern
+            </v-btn>
         </div>
     </div>
 </template>
@@ -66,7 +81,6 @@ import frontEndSelectInput from "~/components/frontEnd/lib/inputComponenets/fron
 import frontEndTextArea from "~/components/frontEnd/lib/inputComponenets/frontEndTextArea";
 import closeButtonImage from "~/assets/images/close-button.png"
 import frontEndFileUpload from "~/components/frontEnd/lib/inputComponenets/frontEndFileUpload";
-
 export default {
     props:{
         popUpSchema:{
@@ -85,14 +99,14 @@ export default {
         frontEndTimeInput,
         frontEndDateInput,
         frontEndTextArea,
-        frontEndFileUpload
+        frontEndFileUpload,
     },
     data(){
         return{
             payload:"",
             icon: "",
             sendDataToInputs: {},
-            closeButtonImage: closeButtonImage
+            closeButtonImage: closeButtonImage,
         }
     },
 
@@ -167,6 +181,9 @@ export default {
                 (this.popUpSchema.elements?.find(element => element.elementId == "83f4737a-0d63-407d-bdff-4ff576f97a13")).parameters.required = true;
                 (this.popUpSchema.elements?.find(element => element.elementId == "83f4737a-0d63-407d-bdff-4ff576f97a13")).parameters.default = "0";
             }
+        },
+        splitPopUp(){
+            this.popUp = true
         },
         updatePoint(){
             this.$apollo.mutate({
