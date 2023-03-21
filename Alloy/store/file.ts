@@ -15,6 +15,10 @@ export const mutations = {
 		Vue.set(state, 'allFilesHashTable', projects)
 	},
 
+	resetProjectList ( state: object ){
+		Vue.set(state, 'allFilesHashTable', [])
+	},
+
 	setFile (state: object, fileData: { id: string, schemaId: number, label: string, parentIds: string[], data: object[] }) {
 		const values = {
 			id: fileData.id,

@@ -415,7 +415,7 @@ export default{
                 }
             }
             //if the current seectInput is the pharmacy selecotr
-            if(this.elementId === '09c5ba61-4e52-4a68-afde-bb7334b45b35' && !this.autoFillId){
+            else if(this.elementId === '09c5ba61-4e52-4a68-afde-bb7334b45b35' && !this.autoFillId){
                 for(const pharmacy of result.data.fileBySchemaId){
                     this.files.push({
                         id: pharmacy.id,
@@ -424,7 +424,7 @@ export default{
                 }
             }
             //if the current selectInput is not the pharmacy selector
-            if(this.elementId !== "09c5ba61-4e52-4a68-afde-bb7334b45b35" && !this.autoFillId){
+            else if(this.elementId !== "09c5ba61-4e52-4a68-afde-bb7334b45b35" && !this.autoFillId){
                 this.getProjectsFromStore()
 
                 /*  this.loadingFiles = true

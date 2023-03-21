@@ -60,12 +60,12 @@
             <v-btn
                 v-else-if="popUpSchema.metadata"
                 class="addButton"
-                @click="selectFunction(button.function)"
+                @click="selectFunction(popUpSchema.metadata.saveFunction)"
                 :loading="false"
                 :disabled="!readyToSave"
                 color="green"
                 large
-                style="min-width:0"> Speichern
+                style="min-width:0"> Speichern asd
             </v-btn>
         </div>
     </div>
@@ -141,7 +141,6 @@ export default {
         },
         setBruttoValue(){
             if(this.taxValue && this.nettoValue){
-                console.log("asdawe")
                 this.popUpSchema.elements.find(element => element.elementId == "4b156b8d-c58d-4ada-b1b8-65618258112d").parameters.default = (Math.ceil(parseFloat(this.nettoValue * (this.taxValue * 0.01 + 1)) * 10 ) / 10 ).toFixed(2) 
 
             }
@@ -262,6 +261,10 @@ export default {
             console.log("split")
         },
         createFile(){
+            if(!this.getValuesToSave.parentIds && this.popUpSchema.id === '3d77d406-691c-4b0f-9baf-1380b1390c0d' ){
+                this.getValuesToSave['parentIds'] = '034613de-b159-400d-ae09-80297ce43062'
+                this.getValuesToSave['label'] = this.getDataToSave.find(label => label.elementId === '23f134e2-9904-4ed1-b6bf-8a2fb4a6ad3d').data.text
+            }
             this.$apollo.mutate({
                 variables: {
                     metadata: this.getValuesToSave,
