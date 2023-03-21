@@ -14,7 +14,7 @@
                         v-if="files"
                         v-for="(item, index) in files"
                         :value="item.id"
-                    >{{item.label}} - {{ item.id }}</option>
+                    >{{item.label}}</option>
                     <!-- options from the miscellaneous or from getPharmacyByName() function -->
                     <option
                         v-if="filesFromMiscellaneous"
@@ -101,10 +101,9 @@ export default{
         this.isInputok();
         this.setEditable(this.permissions.toEdit)
         //if the component is the company selector then listen to the emit and sends the payloads data to the function
-        /* if(this.elementId === "0c9cf456-edc3-4779-b00c-14237863fa16"){
-            this.$root.$on('sendSelectedProject', data => {this.setEditableByProject(data)})
-        } */
-        
+        // if(this.elementId === "0c9cf456-edc3-4779-b00c-14237863fa16"){
+        //     this.$root.$on('sendSelectedProject', data => {this.setEditableByProject(data)})
+        // }
     },
     
     computed:{
@@ -145,8 +144,8 @@ export default{
             deep: true,
             handler(){
                 //elementId of Firma selector
-                if(this.elementId === '0c9cf456-edc3-4779-b00c-14237863fa16') {
-                    this.inputValue = this.dataToSave.find(element => element.elementId === this.elementId).data.text
+                if(this.elementId === '0c9cf456-edc3-4779-b00c-14237863fa16' && this.dataToSave) {
+                    this.inputValue = this.dataToSave.find(element => element.elementId === this.elementId)?.data.text
                     console.log(this.inputValue)
                     this.setEditableByProject(this.dataToSave.find(element => element.elementId === '30a1d57d-ac51-4a54-9f83-2c493253b944'))
                     
@@ -182,6 +181,7 @@ export default{
         },
         //function that call getPharmacyId with the pharmacyId of selected project
         async setEditableByProject(value){
+            console.log(value)
             const result = await this.$apollo.query({
                 variables:{
                     fileId: value.data.text
@@ -198,6 +198,7 @@ export default{
                 
                 `
             })
+            // console.log(result.data.queryFileData.data.find(element => element.elementId === "09c5ba61-4e52-4a68-afde-bb7334b45b35").data.text)
             this.files = []
             this.options = []
             this.optionsFromDatabase = []
@@ -307,9 +308,9 @@ export default{
             }
             
             //if the elementId is from the project select then emitting the payloads data
-            /* if(payload.elementId === "30a1d57d-ac51-4a54-9f83-2c493253b944"){
-                this.$root.$emit('sendSelectedProject', payload);
-            } */
+            // if(payload.elementId === "30a1d57d-ac51-4a54-9f83-2c493253b944"){
+            //     this.$root.$emit('sendSelectedProject', payload);
+            // }
             this.$emit('update', payload);
         },
         getPharmNameByIdForSingleId (id) {
@@ -404,8 +405,17 @@ export default{
             `,
         //filling the files array with the data of fileBySchemaId.data where elementData.elementId (name field of an apotheke) is the same
         })   
+            //elementId of Company select at Bill Popup
+            if(this.elementId === '3d77d406-691c-4b0f-9baf-1380b1390c0d'){
+                for(let company of result.data.fileBySchemaId){
+                    this.files.push({
+                        id: company.id,
+                        label: company.label,
+                    })
+                }
+            }
             //if the current seectInput is the pharmacy selecotr
-            if(this.elementId === '09c5ba61-4e52-4a68-afde-bb7334b45b35' && !this.autoFillId){
+            else if(this.elementId === '09c5ba61-4e52-4a68-afde-bb7334b45b35' && !this.autoFillId){
                 for(const pharmacy of result.data.fileBySchemaId){
                     this.files.push({
                         id: pharmacy.id,
@@ -414,7 +424,7 @@ export default{
                 }
             }
             //if the current selectInput is not the pharmacy selector
-            if(this.elementId !== "09c5ba61-4e52-4a68-afde-bb7334b45b35" && !this.autoFillId){
+            else if(this.elementId !== "09c5ba61-4e52-4a68-afde-bb7334b45b35" && !this.autoFillId){
                 this.getProjectsFromStore()
 
                 /*  this.loadingFiles = true
